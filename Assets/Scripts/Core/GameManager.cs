@@ -45,4 +45,9 @@ public class GameManager : MonoBehaviour
     public void gamePlaying()
     {
     }
+
+    public void SetGameState(GameState state)
+    {
+        _state = state;
+    }
 }

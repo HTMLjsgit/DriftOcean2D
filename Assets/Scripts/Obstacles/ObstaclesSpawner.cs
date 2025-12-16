@@ -71,10 +71,29 @@ public class ObstaclesSpawner : MonoBehaviour
     {
         if (_spawnedObstacles.Contains(key))
         {
-            
             _spawnedObstacles.Remove(key);
         }
     }
+
+    /// <summary>
+    /// 画面上に出現している全ての障害物を削除する
+    /// </summary>
+    public void ClearAllObstacles()
+    {
+        // リスト内の全てのオブジェクトを破壊
+        foreach (var obstacle in _spawnedObstacles)
+        {
+            // 念のためnullチェック（既に破壊されている場合などを考慮）
+            if (obstacle != null)
+            {
+                Destroy(obstacle);
+            }
+        }
+        
+        // リストの中身を空にする
+        _spawnedObstacles.Clear();
+    }
+    
     /// <summary>
     /// AddDifficultyStage
     /// </summary>
@@ -84,7 +103,6 @@ public class ObstaclesSpawner : MonoBehaviour
         _spawnTime = interval;           
         _globalSpeedMultiplier = speedMultiplier; 
         
-        // ★ここを修正
         // フラグがtrueなら、リストをクリア（リセット）する
         if (clearPrevious)
         {
