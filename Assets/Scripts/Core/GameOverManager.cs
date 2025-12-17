@@ -7,13 +7,14 @@ public class GameOverManager : MonoBehaviour
 {
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField]private Button _continueButton;
+    [SerializeField]private Button _backToTitleButton;
     [SerializeField] private TextMeshProUGUI _scoreText;
     public static GameOverManager instance;
     private SkinManager _skinManager;
     private GameManager _gameManager;
     private ScoreManager _scoreManager;
     private StageManager _stageManager;
-    private float _currentPlayTime;
+
     void Awake()
     {
         if(instance == null)
@@ -32,6 +33,10 @@ public class GameOverManager : MonoBehaviour
         _scoreManager = ScoreManager.instance;
         _stageManager = StageManager.instance;
         _continueButton.onClick.AddListener(ContinueGame);
+        _backToTitleButton.onClick.AddListener(() =>
+        {
+            
+        });
     }
     public void GameOver()
     {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SkinDatabase : Database
 {
-    public static Database instance;
+    public static SkinDatabase instance;
     [Header("Data Storage")]
     // InspectorでSkinDataを登録するためのリスト
     [SerializeField] private List<SkinData> _skinList = new List<SkinData>();
@@ -21,6 +21,7 @@ public class SkinDatabase : Database
         {
             Destroy(this.gameObject);
         }
+        Initialize();
     }
 
     public override void Initialize()
@@ -42,7 +43,9 @@ public class SkinDatabase : Database
         }
         Debug.Log($"SkinDatabase Initialized. Loaded {_skinMap.Count} skins.");
     }
-
+    void Start()
+    {
+    }
     /// <summary>
     /// IDを指定してSkinDataを取得する (最速)
     /// </summary>

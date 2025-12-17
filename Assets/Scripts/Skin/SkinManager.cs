@@ -5,10 +5,7 @@ using System.Linq;
 public class SkinManager : MonoBehaviour
 {
     public static SkinManager instance;
-
-    [Header("Data")]
-    [SerializeField] private List<SkinData> _allSkins;
-    
+    private SkinDatabase _skinDatabase;    
     [Header("Current Status")]
     // 現在装備中のスキンのID
     public int currentSkinID; 
@@ -35,7 +32,10 @@ public class SkinManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    void Start()
+    {
+        _skinDatabase = SkinDatabase.instance;
+    }
     /// <summary>
     /// ゲーム開始時にデータをロード
     /// </summary>
@@ -81,7 +81,7 @@ public class SkinManager : MonoBehaviour
         int unlockedCount = 0; // 解放済みスキンの数（ゴールドクラゲ用）
 
         // 通常の条件チェック
-        foreach (var skin in _allSkins)
+        foreach (var skin in _skinDatabase.GetAllSkins())
         {
             // すでに解放済みならスキップ（ただしカウントはする）
             if (IsUnlocked(skin.id))
@@ -127,11 +127,11 @@ public class SkinManager : MonoBehaviour
 
         // 最後に「コンプリート条件（ゴールドクラゲ）」のチェック 
         // 自身のID以外の全スキン数と比較
-        SkinData goldSkin = _allSkins.FirstOrDefault(s => s.unlockType == SkinData.UnlockType.CompleteAll);
+        SkinData goldSkin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.unlockType == SkinData.UnlockType.CompleteAll);
         if (goldSkin != null && !IsUnlocked(goldSkin.id))
         {
             // 自分以外すべて解放されているか
-            if (unlockedCount >= _allSkins.Count - 1)
+            if (unlockedCount >= _skinDatabase.GetAllSkins().Count - 1)
             {
                 UnlockSkin(goldSkin.id);
                 Debug.Log("ALL COMPLETE! Gold Skin Unlocked!");
@@ -174,7 +174,7 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public Sprite GetCurrentSkinSprite()
     {
-        var skin = _allSkins.FirstOrDefault(s => s.id == currentSkinID);
+        var skin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == currentSkinID);
         return skin != null ? skin.skinSprite : null;
     }
 }
