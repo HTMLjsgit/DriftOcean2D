@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7720569176953743824}
   - component: {fileID: 2587417610619205880}
   - component: {fileID: 8094715474361129552}
+  - component: {fileID: 3737511109626388377}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -181,6 +182,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   _jumpForce: 4
   playerInput: {fileID: 8460236517903966966}
+--- !u!114 &3737511109626388377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299890525847142359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15704931a98ebb643bec3edc845dd74b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinHandler
 --- !u!1 &1806812674749875430
 GameObject:
   m_ObjectHideFlags: 0

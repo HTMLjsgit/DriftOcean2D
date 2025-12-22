@@ -8,19 +8,25 @@ public class TitleController : MonoBehaviour
     [SerializeField] private Button _rankingButton;
     [SerializeField] private FlowUI _flowUI;
     private StartSkinManager _startSkinManager;
+    private SceneController _sceneController;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _startSkinManager = StartSkinManager.instance;
+        _sceneController = SceneController.instance;
         // _startButton.onClick.AddListener();
         _skinButton.onClick.AddListener(() =>
         {
             _flowUI.SwitchView("Skin");
-            // _startSkinManager.OnOpen();
+            _startSkinManager.ApplySkinSprites();
         });
         _rankingButton.onClick.AddListener(() =>
         {
             _flowUI.SwitchView("Ranking");
+        });
+        _startButton.onClick.AddListener(() =>
+        {
+            _sceneController.SceneLoad("Main");
         });
     }
 

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FlowUI : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class FlowUI : MonoBehaviour
     {
         public string key; // 画面名（例: "Title", "InGame", "Result"）
         public List<GameObject> uiObjects; // その画面で表示するオブジェクトのリスト
+        public UnityEvent onOpen;
     }
 
     [Header("UI設定リスト")]
@@ -30,17 +33,16 @@ public class FlowUI : MonoBehaviour
     /// 指定したキーのUIを表示し、それ以外を全て非表示にする
     /// </summary>
     /// <param name="targetKey">表示したい画面のキー</param>
-    public void SwitchView(string targetKey)
+    public void SwitchView(string targetKey, Action action = null)
     {
         bool found = false;
-
         foreach (var state in _viewStates)
         {
             // キーが一致すれば表示(true)、一致しなければ非表示(false)
             bool isActive = state.key == targetKey;
 
             if (isActive) found = true;
-
+            state.onOpen.Invoke();
             // リスト内のオブジェクトをすべて設定
             foreach (var obj in state.uiObjects)
             {
@@ -48,4 +50,5 @@ public class FlowUI : MonoBehaviour
             }
         }
     }
+
 }

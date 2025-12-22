@@ -25,7 +25,6 @@ public class SkinManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject); // シーン遷移しても消えないようにする
-            LoadStatus();
         }
         else
         {
@@ -35,6 +34,7 @@ public class SkinManager : MonoBehaviour
     void Start()
     {
         _skinDatabase = SkinDatabase.instance;
+        LoadStatus();
     }
     /// <summary>
     /// ゲーム開始時にデータをロード
