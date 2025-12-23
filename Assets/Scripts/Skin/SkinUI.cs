@@ -26,6 +26,6 @@ public class SkinUI : MonoBehaviour
         SkinManager.instance.EquipSkin(_skinID);
         Debug.Log($"Equipped Skin ID: {_skinID}");
 
-        StartSkinManager.instance.RefreshAllSlots();
+        SkinInventryManager.instance.RefreshAllSlots();
     }
 }

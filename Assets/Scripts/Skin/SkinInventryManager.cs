@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class StartSkinManager : MonoBehaviour
+public class SkinInventryManager : MonoBehaviour
 {
-    public static StartSkinManager instance;
+    public static SkinInventryManager instance;
 
     [Header("UI References")]
     [SerializeField] private Button _closeButton;

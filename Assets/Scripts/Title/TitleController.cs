@@ -7,12 +7,14 @@ public class TitleController : MonoBehaviour
     [SerializeField] private Button _skinButton;
     [SerializeField] private Button _rankingButton;
     [SerializeField] private FlowUI _flowUI;
-    private StartSkinManager _startSkinManager;
+    private SkinInventryManager _startSkinManager;
+    private RankingInventryManager _rankingInventryManager;
     private SceneController _sceneController;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _startSkinManager = StartSkinManager.instance;
+        _rankingInventryManager = RankingInventryManager.instance;
+        _startSkinManager = SkinInventryManager.instance;
         _sceneController = SceneController.instance;
         // _startButton.onClick.AddListener();
         _skinButton.onClick.AddListener(() =>
@@ -23,6 +25,7 @@ public class TitleController : MonoBehaviour
         _rankingButton.onClick.AddListener(() =>
         {
             _flowUI.SwitchView("Ranking");
+            _rankingInventryManager.OnRankingViewOpen();
         });
         _startButton.onClick.AddListener(() =>
         {
