@@ -35,19 +35,31 @@ public class FlowUI : MonoBehaviour
     /// <param name="targetKey">表示したい画面のキー</param>
     public void SwitchView(string targetKey, Action action = null)
     {
+        Debug.Log($"FlowUI.SwitchView called: targetKey={targetKey}");
         bool found = false;
         foreach (var state in _viewStates)
         {
             // キーが一致すれば表示(true)、一致しなければ非表示(false)
             bool isActive = state.key == targetKey;
 
-            if (isActive) found = true;
-            state.onOpen.Invoke();
+            if (isActive)
+            {
+                found = true;
+                // アクティブになる画面のonOpenイベントだけを呼ぶ
+                Debug.Log($"Invoking onOpen for state: {state.key}");
+                state.onOpen?.Invoke();
+            }
+
             // リスト内のオブジェクトをすべて設定
             foreach (var obj in state.uiObjects)
             {
                 obj.SetActive(isActive);
             }
+        }
+
+        if (!found)
+        {
+            Debug.LogWarning($"ViewState with key '{targetKey}' not found!");
         }
     }
 

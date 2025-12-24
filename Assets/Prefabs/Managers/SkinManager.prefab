@@ -44,8 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b3b54f003c4ae64d8ce0b5a66d96b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkinManager
-  _allSkins:
-  - {fileID: 11400000, guid: 51e8c653630d48b43a7a232075f5bdd3, type: 2}
-  - {fileID: 11400000, guid: 7cf45326b792471498d82f700e1ffc34, type: 2}
-  - {fileID: 11400000, guid: c447185aa1dbb9846aac4ab125fc5a61, type: 2}
-  currentSkinID: 0
+  currentSkinID: 1

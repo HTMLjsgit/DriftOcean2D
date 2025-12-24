@@ -83,7 +83,6 @@ public class ObstaclesSpawner : MonoBehaviour
         // リスト内の全てのオブジェクトを破壊
         foreach (var obstacle in _spawnedObstacles)
         {
-            // 念のためnullチェック（既に破壊されている場合などを考慮）
             if (obstacle != null)
             {
                 Destroy(obstacle);

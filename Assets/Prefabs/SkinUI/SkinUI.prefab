@@ -93,6 +93,7 @@ MonoBehaviour:
   _checkedImageObject: {fileID: 8602054288685212047}
   _skinID: 0
   _skinImageUI: {fileID: 3727418611823267911}
+  _lockedSprite: {fileID: 1005264858726147564, guid: 31c8fe4841cc85849bbb8b62cdc7bcc0, type: 3}
 --- !u!114 &5346472369664897740
 MonoBehaviour:
   m_ObjectHideFlags: 0

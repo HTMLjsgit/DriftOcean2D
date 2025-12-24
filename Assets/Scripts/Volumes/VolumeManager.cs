@@ -33,9 +33,6 @@ public class VolumeManager : MonoBehaviour
     // スクリプトが破棄されるときにリスナーを解除（メモリリーク防止のベストプラクティス）
     void OnDestroy()
     {
-        if (_volumeButton != null)
-        {
-            _volumeButton.onClick.RemoveListener(ToggleVolume);
-        }
+        _volumeButton.onClick.RemoveListener(ToggleVolume);
     }
 }

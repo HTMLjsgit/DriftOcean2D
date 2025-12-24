@@ -43,9 +43,10 @@ public class SkinManager : MonoBehaviour
     {
         // 初期スキン(ID:0)は必ず解放扱いにする
         PlayerPrefs.SetInt(KEY_SKIN_UNLOCKED_PREFIX + "0", 1);
-        
+
         // 装備中のスキンをロード（なければ0番）
         currentSkinID = PlayerPrefs.GetInt(KEY_EQUIPPED_SKIN, 0);
+        Debug.Log($"SkinManager LoadStatus: currentSkinID={currentSkinID}");
     }
 
     /// <summary>
@@ -161,11 +162,18 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public void EquipSkin(int id)
     {
+        Debug.Log($"EquipSkin called: id={id}, IsUnlocked={IsUnlocked(id)}");
+
         if (IsUnlocked(id))
         {
             currentSkinID = id;
             PlayerPrefs.SetInt(KEY_EQUIPPED_SKIN, id);
             PlayerPrefs.Save();
+            Debug.Log($"Skin equipped successfully: currentSkinID={currentSkinID}");
+        }
+        else
+        {
+            Debug.LogWarning($"Skin ID {id} is locked!");
         }
     }
 

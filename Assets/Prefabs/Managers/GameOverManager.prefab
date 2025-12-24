@@ -45,3 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _gameOverPanel: {fileID: 0}
+  _continueButton: {fileID: 0}
+  _backToTitleButton: {fileID: 0}
+  _scoreText: {fileID: 0}
+  _viewRankingButton: {fileID: 0}

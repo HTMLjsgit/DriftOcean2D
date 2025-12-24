@@ -26,15 +26,17 @@ public class SkinInventryManager : MonoBehaviour
 
     public void ApplySkinSprites()
     {
+        Debug.Log("ApplySkinSprites called");
         foreach (var slot in _skinSlots)
         {
             var data = SkinDatabase.instance.GetSkinById(slot.skinId);
-            if (data != null) slot.Initialize(data.skinSprite);
+            slot.Initialize(data.skinSprite);
         }
     }
 
     public void RefreshAllSlots()
     {
+        Debug.Log("RefreshAllSlots called");
         _skinSlots.ForEach(slot => slot.UpdateUIState());
     }
 }

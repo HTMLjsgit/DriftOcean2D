@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _skinList:
+  - {fileID: 11400000, guid: 57a1ff13fcbefb840ba31cc2c2cb6f66, type: 2}
   - {fileID: 11400000, guid: 51e8c653630d48b43a7a232075f5bdd3, type: 2}
   - {fileID: 11400000, guid: 7cf45326b792471498d82f700e1ffc34, type: 2}
   - {fileID: 11400000, guid: c447185aa1dbb9846aac4ab125fc5a61, type: 2}

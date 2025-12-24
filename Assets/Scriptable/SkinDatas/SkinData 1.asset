@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 1
   skinName: 
-  skinSprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  skinSprite: {fileID: 2254785955715560484, guid: aeb379779138dc2459b6b805e742c6a9, type: 3}
   unlockType: 1
   conditionValue: 1960
   lockedDescription: 

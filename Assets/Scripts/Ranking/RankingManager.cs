@@ -45,6 +45,24 @@ public class RankingManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    /// <summary>
+    /// スコアがランキング圏内（10位以内）に入るかチェック
+    /// </summary>
+    /// <param name="score">チェックするスコア</param>
+    /// <returns>ランキング入りするならtrue</returns>
+    public bool IsRankingEligible(float score)
+    {
+        // ランキングが10件未満なら必ず入る
+        if (currentRanking.Count < MAX_RANKING_COUNT)
+        {
+            return true;
+        }
+
+        // 10位のスコアより高ければランキング入り
+        float lowestScore = currentRanking[currentRanking.Count - 1].score;
+        return score > lowestScore;
+    }
+
     // ★修正: 引数に skinID を追加
     public bool TryAddScore(string playerName, float score, int skinID)
     {
@@ -61,12 +79,20 @@ public class RankingManager : MonoBehaviour
             if (currentRanking[currentRanking.Count - 1] == newEntry)
             {
                 currentRanking.RemoveAt(currentRanking.Count - 1);
-                return false; 
+                return false;
             }
             currentRanking.RemoveAt(currentRanking.Count - 1);
         }
 
         SaveRanking();
         return true;
+    }
+
+    /// <summary>
+    /// 現在のランキングを取得
+    /// </summary>
+    public List<RankingEntry> GetCurrentRanking()
+    {
+        return currentRanking;
     }
 }
