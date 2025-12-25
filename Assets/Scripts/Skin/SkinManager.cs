@@ -163,7 +163,7 @@ public class SkinManager : MonoBehaviour
     public void EquipSkin(int id)
     {
         Debug.Log($"EquipSkin called: id={id}, IsUnlocked={IsUnlocked(id)}");
-
+        
         if (IsUnlocked(id))
         {
             currentSkinID = id;

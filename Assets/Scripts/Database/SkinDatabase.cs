@@ -51,6 +51,8 @@ public class SkinDatabase : Database
     /// </summary>
     public SkinData GetSkinById(int id)
     {
+        Debug.Log("_skinMap: " + _skinMap.Count);
+        Debug.Log("id: " + id);
         if (_skinMap.TryGetValue(id, out SkinData skin))
         {
             return skin;

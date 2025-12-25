@@ -3,11 +3,10 @@ using UnityEngine.UI;
 
 public class SkinUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _checkedImageObject;
     [SerializeField] private int _skinID;
     [SerializeField] private Image _skinImageUI;
     [SerializeField] private Sprite _lockedSprite; // ロック状態のスプライト
-
+    [SerializeField] private Image _outlineImage;
     private Sprite _originalSprite; // 元のスキンスプライト
     public int skinId => _skinID;
 
@@ -33,9 +32,10 @@ public class SkinUI : MonoBehaviour
             _skinImageUI.sprite = _lockedSprite;
         }
 
-        // チェックマークは装備中かつ解放済みの場合のみ表示
-        _checkedImageObject.SetActive(isEquipped && isUnlocked);
+        // Outlineは装備中の場合のみ表示
+        _outlineImage.gameObject.SetActive(isEquipped);
 
+        // チェックマークは装備中かつ解放済みの場合のみ表示
         Debug.Log($"SkinUI {_skinID}: UpdateUIState - currentSkinID={SkinManager.instance.currentSkinID}, isUnlocked={isUnlocked}, isEquipped={isEquipped}");
     }
 
