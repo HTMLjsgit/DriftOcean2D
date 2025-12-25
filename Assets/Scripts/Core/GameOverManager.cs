@@ -21,6 +21,13 @@ public class GameOverManager : MonoBehaviour
     private RankingManager _rankingManager;
     private NicknameInputUI _nicknameInputUI;
     private PlayerNameManager _playerNameManager;
+    private AdsManager _adsManager;
+    private UGSCloudSaveManager _cloudSaveManager;
+    private UGSLeaderboardManager _leaderboardManager;
+
+    // コンティニュー制限
+    private const string KEY_CONTINUE_USED = "ContinueUsed";
+    private bool hasUsedContinue = false;
 
     void Awake()
     {
@@ -42,10 +49,13 @@ public class GameOverManager : MonoBehaviour
         _rankingManager = RankingManager.instance;
         _nicknameInputUI = NicknameInputUI.instance;
         _playerNameManager = PlayerNameManager.instance;
+        _adsManager = AdsManager.instance;
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        _leaderboardManager = UGSLeaderboardManager.instance;
 
         Debug.Log("OnStart _rankingManager: " + _rankingManager);
 
-        _continueButton.onClick.AddListener(ContinueGame);
+        _continueButton.onClick.AddListener(OnContinueButtonClicked);
         _backToTitleButton.onClick.AddListener(() =>
         {
             Time.timeScale = 1;
@@ -55,7 +65,7 @@ public class GameOverManager : MonoBehaviour
         // ランキング確認ボタン
         _viewRankingButton.onClick.AddListener(OnViewRankingClicked);
     }
-    public void GameOver()
+    public async void GameOver()
     {
         _gameManager.SetGameState(GameManager.GameState.GameOver);
         _gameOverPanel.SetActive(true);
@@ -66,12 +76,34 @@ public class GameOverManager : MonoBehaviour
         _scoreText.SetText($"Score: {finalScore.ToString("F2")}");
         Time.timeScale = 0;
 
-        // スキン解放チェック
-        _skinManager.ReportGameResult(finalScore, finalTime);
+        // UGSに統計データを保存（スキン解放チェックの前に実行）
+        if (_cloudSaveManager != null)
+        {
+            await _cloudSaveManager.UpdateStats(finalScore, finalTime);
+            Debug.Log("Stats updated to UGS Cloud Save");
+        }
+
+        // スキン解放チェック（更新された統計データを使用）
+        await _skinManager.ReportGameResult(finalScore, finalTime);
         _stageManager.SetCurrentPlay(false);
 
-        // ランキング圏内チェック
-        CheckAndShowRankingInput(finalScore);
+        // UGSリーダーボードにスコアを送信
+        if (_leaderboardManager != null)
+        {
+            bool success = await _leaderboardManager.SubmitScore(finalScore);
+            if (success)
+            {
+                Debug.Log($"Score submitted to UGS Leaderboard: {finalScore}");
+            }
+        }
+        else
+        {
+            // UGS未使用時はローカルランキングに保存
+            CheckAndShowRankingInput(finalScore);
+        }
+
+        // コンティニューボタンの表示/非表示を更新
+        UpdateContinueButton();
     }
 
     /// <summary>
@@ -108,9 +140,42 @@ public class GameOverManager : MonoBehaviour
     }
 
     /// <summary>
-    /// コンティニュー処理
+    /// コンティニューボタンクリック時の処理
     /// </summary>
-    private void ContinueGame()
+    private void OnContinueButtonClicked()
+    {
+        // 広告を視聴してコンティニュー
+        if (_adsManager != null)
+        {
+            _adsManager.ShowRewardedAd(
+                onSuccess: () =>
+                {
+                    // 広告視聴成功 - コンティニュー実行
+                    Debug.Log("Rewarded ad success - Continue game");
+                    hasUsedContinue = true;
+                    ExecuteContinue();
+                },
+                onFailed: () =>
+                {
+                    // 広告視聴失敗 - エラーメッセージ表示
+                    Debug.LogWarning("Rewarded ad failed - Cannot continue");
+                    // TODO: ユーザーに広告が利用できないことを通知
+                }
+            );
+        }
+        else
+        {
+            Debug.LogWarning("AdsManager not found. Continuing without ad.");
+            // テスト用：広告マネージャーがない場合はそのままコンティニュー
+            hasUsedContinue = true;
+            ExecuteContinue();
+        }
+    }
+
+    /// <summary>
+    /// コンティニュー処理を実行
+    /// </summary>
+    private void ExecuteContinue()
     {
         // 1. 時間を再開させる
         Time.timeScale = 1;
@@ -123,5 +188,28 @@ public class GameOverManager : MonoBehaviour
 
         // 4. ステージ進行を再開（スコアは維持）
         _stageManager.StageResume();
+    }
+
+    /// <summary>
+    /// コンティニューボタンの表示/非表示を更新
+    /// </summary>
+    private void UpdateContinueButton()
+    {
+        // 1回のプレイで1回のみコンティニュー可能
+        if (hasUsedContinue)
+        {
+            _continueButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            // 広告が利用可能かチェック
+            bool adReady = _adsManager != null && _adsManager.IsRewardedAdReady();
+            _continueButton.gameObject.SetActive(adReady || _adsManager == null); // テスト用：AdsManagerがない場合は表示
+
+            if (!adReady && _adsManager != null)
+            {
+                Debug.LogWarning("Rewarded ad is not ready. Continue button hidden.");
+            }
+        }
     }
 }

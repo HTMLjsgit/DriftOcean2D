@@ -1,7 +1,7 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 
 /// <summary>
 /// ニックネーム入力UIの管理
@@ -15,6 +15,7 @@ public class NicknameInputUI : MonoBehaviour
     [SerializeField] private Button _cancelButton;
     [SerializeField] private TextMeshProUGUI _messageText;
     private PlayerNameManager _playerNameManager;
+    private UGSCloudSaveManager _cloudSaveManager;
     [Header("Settings")]
     [SerializeField] private int _maxNameLength = 10;
     [SerializeField] private string _defaultName = "プレイヤー";
@@ -41,6 +42,7 @@ public class NicknameInputUI : MonoBehaviour
         // InputFieldの最大文字数を設定
         _nameInputField.characterLimit = _maxNameLength;
         _playerNameManager = PlayerNameManager.instance;
+        _cloudSaveManager = UGSCloudSaveManager.instance;
         // ボタンのイベント登録
         _submitButton.onClick.AddListener(OnSubmitClicked);
         _cancelButton.onClick.AddListener(OnCancelClicked);
@@ -63,8 +65,18 @@ public class NicknameInputUI : MonoBehaviour
         // メッセージ設定
         _messageText.text = message;
 
-        // InputFieldをクリア＆デフォルト名を設定
-        _nameInputField.text = _playerNameManager.currentPlayerName;
+        // InputFieldをクリア＆現在の名前を設定
+        string currentName = "";
+        if (_cloudSaveManager != null)
+        {
+            currentName = _cloudSaveManager.GetPlayerName();
+        }
+        else if (_playerNameManager != null)
+        {
+            currentName = _playerNameManager.currentPlayerName;
+        }
+
+        _nameInputField.text = currentName;
         _nameInputField.Select();
         _nameInputField.ActivateInputField();
 

@@ -677,7 +677,7 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Android: DOTWEEN;UNITASK_DOTWEEN_SUPPORT
+    Android: DOTWEEN;UNITASK_DOTWEEN_SUPPORT;LEVELPLAY_DEPENDENCIES_INSTALLED;UNITY_LEVELPLAY;UNITY_ADMOB;UNITY_UGS
     EmbeddedLinux: DOTWEEN
     GameCoreScarlett: DOTWEEN
     GameCoreXboxOne: DOTWEEN
@@ -793,10 +793,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: cb26bd21-b321-4665-b7be-1483558d4e22
+  cloudProjectId: 59ddb7f9-6735-4339-953b-94b12386f6a0
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: DriftOcean2D 2025-12-10_17-58-37
+  projectName: DriftOcean2D
   organizationId: mitihumisan
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

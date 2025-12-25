@@ -24,17 +24,9 @@ public class SceneController : MonoBehaviour
 
     void Start()
     {
-        // ★追加: ゲーム起動時も「黒画面→フェードイン」を実行する
-        // まず強制的に真っ暗にする
-        // _sceneLoadCanvasGroup.alpha = 1f;
-        // _sceneLoadCanvasGroup.blocksRaycasts = true;
-
-        // フェードイン開始
-        // StartFadeIn().Forget();
-        SceneManager.sceneLoaded += SceneLoaded;
-    }
-    private void SceneLoaded(Scene scene, LoadSceneMode mode)
-    {
+        // 初回起動時のフェードイン
+        _sceneLoadCanvasGroup.alpha = 1f;
+        _sceneLoadCanvasGroup.blocksRaycasts = true;
         StartFadeIn().Forget();
     }
     /// <summary>
@@ -48,9 +40,10 @@ public class SceneController : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
 
         await _sceneLoadCanvasGroup.DOFade(0f, 1f)
+            .SetUpdate(true) // Time.timeScaleに影響されないようにする
             .SetLink(this.gameObject)
             .ToUniTask(cancellationToken: token);
-            
+
         _sceneLoadCanvasGroup.blocksRaycasts = false;
     }
 
@@ -63,10 +56,14 @@ public class SceneController : MonoBehaviour
     {
         var token = this.GetCancellationTokenOnDestroy();
 
+        // Time.timeScaleを必ず1に戻す（ゲームオーバー時は0になっている可能性があるため）
+        Time.timeScale = 1f;
+
         // --- 1. 暗転 (フェードアウト) ---
         _sceneLoadCanvasGroup.blocksRaycasts = true;
-        
+
         await _sceneLoadCanvasGroup.DOFade(1f, 1f)
+            .SetUpdate(true) // Time.timeScaleに影響されないようにする
             .SetLink(this.gameObject)
             .ToUniTask(cancellationToken: token);
 
@@ -78,11 +75,10 @@ public class SceneController : MonoBehaviour
         // これを入れると「ロード終わった！」という切り替わりが綺麗に見えます
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
 
-        Debug.Log("シーン読み込み完了。明転します。");
-
         // --- 3. 明転 (フェードイン) ---
         // ここで「新たなシーンで黒→明るく」が実行されます
         await _sceneLoadCanvasGroup.DOFade(0f, 1f)
+            .SetUpdate(true) // Time.timeScaleに影響されないようにする
             .SetLink(this.gameObject)
             .ToUniTask(cancellationToken: token);
 

@@ -6,6 +6,7 @@
   <Project Path="Unity.Services.Core.Internal.csproj" />
   <Project Path="Unity.Services.Leaderboards.csproj" />
   <Project Path="Unity.Services.Authentication.PlayerAccounts.csproj" />
+  <Project Path="Unity.Services.CloudSave.csproj" />
   <Project Path="Unity.ShaderGraph.Editor.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.csproj" />
   <Project Path="Unity.Mathematics.csproj" />
@@ -80,6 +81,7 @@
   <Project Path="SingularityGroup.HotReload.Runtime.Public.csproj" />
   <Project Path="Unity.Mathematics.Editor.csproj" />
   <Project Path="Unity.VisualScripting.SettingsProvider.Editor.csproj" />
+  <Project Path="GoogleMobileAds.Editor.csproj" />
   <Project Path="UniTask.TextMeshPro.csproj" />
   <Project Path="Unity.Services.Core.Threading.csproj" />
   <Project Path="Unity.InputSystem.TestFramework.csproj" />
@@ -88,6 +90,7 @@
   <Project Path="Unity.VisualScripting.Shared.Editor.csproj" />
   <Project Path="Unity.Services.Core.Device.csproj" />
   <Project Path="Unity.Services.Core.Analytics.csproj" />
+  <Project Path="Unity.Services.CloudSave.Editor.csproj" />
   <Project Path="Unity.RenderPipeline.Universal.ShaderLibrary.csproj" />
   <Project Path="Unity.Services.Authentication.Editor.Shared.csproj" />
   <Project Path="Unity.2D.Common.Runtime.csproj" />

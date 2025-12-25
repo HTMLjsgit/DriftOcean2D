@@ -30,6 +30,8 @@ public class RankingUIManager : MonoBehaviour
     private SkinManager _skinManager;
     private SkinDatabase _skinDatabase;
     private NicknameInputUI _nicknameInputUI;
+    private UGSLeaderboardManager _ugsLeaderboardManager;
+    private UGSCloudSaveManager _cloudSaveManager;
 
     void Awake()
     {
@@ -50,6 +52,8 @@ public class RankingUIManager : MonoBehaviour
         _skinManager = SkinManager.instance;
         _skinDatabase = SkinDatabase.instance;
         _nicknameInputUI = NicknameInputUI.instance;
+        _ugsLeaderboardManager = UGSLeaderboardManager.instance;
+        _cloudSaveManager = UGSCloudSaveManager.instance;
 
         // 閉じるボタンのリスナー登録
         _closeButton.onClick.AddListener(OnCloseClicked);
@@ -67,7 +71,7 @@ public class RankingUIManager : MonoBehaviour
     /// <summary>
     /// ランキングビューを開く（FlowUIまたはパネルで表示）
     /// </summary>
-    public void ShowRanking()
+    public async void ShowRanking()
     {
         if (_flowUI != null)
         {
@@ -78,6 +82,12 @@ public class RankingUIManager : MonoBehaviour
         {
             // Mainシーン: パネルを直接表示
             _rankingPanel.SetActive(true);
+        }
+
+        // UGS使用時はリーダーボードを更新
+        if (_ugsLeaderboardManager != null)
+        {
+            await _ugsLeaderboardManager.RefreshLeaderboard();
         }
 
         RefreshRankingList();
@@ -122,20 +132,41 @@ public class RankingUIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // ランキングデータを取得して表示
-        var ranking = _rankingManager.GetCurrentRanking();
-        Debug.Log($"Ranking count: {ranking.Count}");
-
-        for (int i = 0; i < ranking.Count; i++)
+        // UGS使用時はUGSランキングを表示
+        if (_ugsLeaderboardManager != null)
         {
-            var entry = ranking[i];
+            var ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
+            Debug.Log($"UGS Ranking count: {ugsRankings.Count}");
 
-            // プレハブ生成
-            GameObject row = Instantiate(_rankingRowPrefab, _contentTransform);
+            for (int i = 0; i < ugsRankings.Count; i++)
+            {
+                var entry = ugsRankings[i];
 
-            // テキスト設定
-            RankingUI rowScript = row.GetComponent<RankingUI>();
-            rowScript.SetData(i + 1, entry.playerName, entry.score, entry.skinID);
+                // プレハブ生成
+                GameObject row = Instantiate(_rankingRowPrefab, _contentTransform);
+
+                // テキスト設定
+                RankingUI rowScript = row.GetComponent<RankingUI>();
+                rowScript.SetData(entry.rank, entry.playerName, entry.score, entry.skinID);
+            }
+        }
+        else
+        {
+            // UGS未使用時はローカルランキングを表示
+            var ranking = _rankingManager.GetCurrentRanking();
+            Debug.Log($"Local Ranking count: {ranking.Count}");
+
+            for (int i = 0; i < ranking.Count; i++)
+            {
+                var entry = ranking[i];
+
+                // プレハブ生成
+                GameObject row = Instantiate(_rankingRowPrefab, _contentTransform);
+
+                // テキスト設定
+                RankingUI rowScript = row.GetComponent<RankingUI>();
+                rowScript.SetData(i + 1, entry.playerName, entry.score, entry.skinID);
+            }
         }
     }
 
@@ -144,11 +175,22 @@ public class RankingUIManager : MonoBehaviour
     /// </summary>
     private void UpdateYourHighScore()
     {
-        // ベストスコアを取得
-        float bestScore = PlayerPrefs.GetFloat("Stats_BestScore", 0f);
+        // ベストスコアを取得（UGS優先、フォールバックはPlayerPrefs）
+        float bestScore = 0f;
+        string playerName = "";
 
-        // プレイヤー名を取得
-        string playerName = _playerNameManager.GetPlayerName();
+        if (_cloudSaveManager != null)
+        {
+            // UGS使用時はCloudSaveから取得
+            bestScore = _cloudSaveManager.GetStats().bestScore;
+            playerName = _cloudSaveManager.GetPlayerName();
+        }
+        else
+        {
+            // UGS未使用時はPlayerPrefsから取得
+            bestScore = PlayerPrefs.GetFloat("Stats_BestScore", 0f);
+            playerName = _playerNameManager.GetPlayerName();
+        }
 
         // 現在装備中のスキンを取得
         int currentSkinID = _skinManager.currentSkinID;
@@ -171,45 +213,94 @@ public class RankingUIManager : MonoBehaviour
     /// </summary>
     private void UpdateUntilRankingText(float yourScore)
     {
-        var ranking = _rankingManager.GetCurrentRanking();
-
-        if (ranking.Count == 0)
+        // UGS使用時はUGSランキングから計算
+        if (_ugsLeaderboardManager != null)
         {
-            _untilRankingText.text = "まだランキングがありません";
-            return;
-        }
+            var ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
 
-        // すでにランキング入りしているかチェック
-        bool isInRanking = false;
-        int yourRank = -1;
-
-        for (int i = 0; i < ranking.Count; i++)
-        {
-            if (ranking[i].score <= yourScore)
+            if (ugsRankings.Count == 0)
             {
-                isInRanking = true;
-                yourRank = i + 1;
-                break;
+                _untilRankingText.text = "まだランキングがありません";
+                return;
             }
-        }
 
-        if (isInRanking)
-        {
-            _untilRankingText.text = $"現在 {yourRank}位！";
-        }
-        else
-        {
-            // ランキング圏外の場合、10位との差を表示
-            if (ranking.Count >= 10)
+            // すでにランキング入りしているかチェック
+            bool isInRanking = false;
+            int yourRank = -1;
+
+            for (int i = 0; i < ugsRankings.Count; i++)
             {
-                float tenthScore = ranking[9].score;
-                float difference = tenthScore - yourScore;
-                _untilRankingText.text = $"ランキング入りまで あと {difference:F2}";
+                if (ugsRankings[i].score <= yourScore)
+                {
+                    isInRanking = true;
+                    yourRank = i + 1;
+                    break;
+                }
+            }
+
+            if (isInRanking)
+            {
+                _untilRankingText.text = $"現在 {yourRank}位！";
             }
             else
             {
-                // ランキングが10件未満の場合は必ずランキング入りできる
-                _untilRankingText.text = "次回プレイでランキング入り確定！";
+                // ランキング圏外の場合、10位との差を表示
+                if (ugsRankings.Count >= 10)
+                {
+                    float tenthScore = ugsRankings[9].score;
+                    float difference = tenthScore - yourScore;
+                    _untilRankingText.text = $"ランキング入りまで あと {difference:F2}";
+                }
+                else
+                {
+                    // ランキングが10件未満の場合は必ずランキング入りできる
+                    _untilRankingText.text = "次回プレイでランキング入り確定！";
+                }
+            }
+        }
+        else
+        {
+            // UGS未使用時はローカルランキングから計算
+            var ranking = _rankingManager.GetCurrentRanking();
+
+            if (ranking.Count == 0)
+            {
+                _untilRankingText.text = "まだランキングがありません";
+                return;
+            }
+
+            // すでにランキング入りしているかチェック
+            bool isInRanking = false;
+            int yourRank = -1;
+
+            for (int i = 0; i < ranking.Count; i++)
+            {
+                if (ranking[i].score <= yourScore)
+                {
+                    isInRanking = true;
+                    yourRank = i + 1;
+                    break;
+                }
+            }
+
+            if (isInRanking)
+            {
+                _untilRankingText.text = $"現在 {yourRank}位！";
+            }
+            else
+            {
+                // ランキング圏外の場合、10位との差を表示
+                if (ranking.Count >= 10)
+                {
+                    float tenthScore = ranking[9].score;
+                    float difference = tenthScore - yourScore;
+                    _untilRankingText.text = $"ランキング入りまで あと {difference:F2}";
+                }
+                else
+                {
+                    // ランキングが10件未満の場合は必ずランキング入りできる
+                    _untilRankingText.text = "次回プレイでランキング入り確定！";
+                }
             }
         }
     }
@@ -230,11 +321,30 @@ public class RankingUIManager : MonoBehaviour
     /// <summary>
     /// 名前が変更されたときの処理
     /// </summary>
-    private void OnNameChanged(string newName)
+    private async void OnNameChanged(string newName)
     {
-        _playerNameManager.SavePlayerName(newName);
+        // UGS使用時はCloudSaveに保存
+        if (_cloudSaveManager != null)
+        {
+            bool success = await _cloudSaveManager.SetPlayerName(newName);
+            if (success)
+            {
+                Debug.Log($"プレイヤー名をUGSに保存しました: {newName}");
+            }
+            else
+            {
+                Debug.LogWarning("Failed to save player name to UGS. Falling back to local save.");
+                _playerNameManager?.SavePlayerName(newName);
+            }
+        }
+        else
+        {
+            // UGS未使用時はPlayerPrefsに保存
+            _playerNameManager.SavePlayerName(newName);
+            Debug.Log($"プレイヤー名をローカルに保存しました: {newName}");
+        }
+
         // 名前を更新したらYour High Scoreの表示も更新
         UpdateYourHighScore();
-        Debug.Log($"プレイヤー名を変更しました: {newName}");
     }
 }

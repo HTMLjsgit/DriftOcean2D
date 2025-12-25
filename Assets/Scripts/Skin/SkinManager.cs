@@ -1,17 +1,20 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq; 
+using System.Linq;
 
 public class SkinManager : MonoBehaviour
 {
     public static SkinManager instance;
-    private SkinDatabase _skinDatabase;    
+    private SkinDatabase _skinDatabase;
+    private AdsManager _adsManager;
+    private UGSCloudSaveManager _cloudSaveManager;
+
     [Header("Current Status")]
     // 現在装備中のスキンのID
-    public int currentSkinID; 
+    public int currentSkinID;
     bool anyNewUnlock = false;
 
-    // --- 永続化データのキー ---
+    // --- 永続化データのキー（PlayerPrefsフォールバック用） ---
     private const string KEY_TOTAL_PLAY_COUNT = "Stats_PlayCount";
     private const string KEY_TOTAL_PLAY_TIME = "Stats_TotalTime";
     private const string KEY_DEATH_COUNT = "Stats_DeathCount";
@@ -24,20 +27,43 @@ public class SkinManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // シーン遷移しても消えないようにする
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
     }
+
     void Start()
     {
         _skinDatabase = SkinDatabase.instance;
-        LoadStatus();
+        _adsManager = AdsManager.instance;
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        // UGS使用時はCloud Saveデータロード完了後に読み込み
+        if (_cloudSaveManager != null)
+        {
+            _cloudSaveManager.OnDataLoaded += LoadFromUGS;
+        }
+        else
+        {
+            // UGS未使用時はPlayerPrefsから読み込み
+            LoadStatus();
+        }
     }
+
     /// <summary>
-    /// ゲーム開始時にデータをロード
+    /// UGS Cloud Saveからデータをロード
+    /// </summary>
+    private void LoadFromUGS()
+    {
+        currentSkinID = _cloudSaveManager.GetCurrentSkinID();
+        Debug.Log($"SkinManager loaded from UGS: currentSkinID={currentSkinID}");
+    }
+
+    /// <summary>
+    /// ゲーム開始時にデータをロード（PlayerPrefsフォールバック用）
     /// </summary>
     private void LoadStatus()
     {
@@ -46,7 +72,7 @@ public class SkinManager : MonoBehaviour
 
         // 装備中のスキンをロード（なければ0番）
         currentSkinID = PlayerPrefs.GetInt(KEY_EQUIPPED_SKIN, 0);
-        Debug.Log($"SkinManager LoadStatus: currentSkinID={currentSkinID}");
+        Debug.Log($"SkinManager LoadStatus (PlayerPrefs): currentSkinID={currentSkinID}");
     }
 
     /// <summary>
@@ -54,37 +80,31 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     /// <param name="runScore">今回のスコア</param>
     /// <param name="runTime">今回の生存時間(秒)</param>
-    public void ReportGameResult(float runScore, float runTime)
+    public async System.Threading.Tasks.Task ReportGameResult(float runScore, float runTime)
     {
-        // 1. 統計データを更新・保存
-        int playCount = PlayerPrefs.GetInt(KEY_TOTAL_PLAY_COUNT, 0) + 1;
-        float totalTime = PlayerPrefs.GetFloat(KEY_TOTAL_PLAY_TIME, 0f) + runTime;
-        int deathCount = PlayerPrefs.GetInt(KEY_DEATH_COUNT, 0) + 1;
-        float bestScore = PlayerPrefs.GetFloat(KEY_BEST_SCORE, 0f);
+        _skinDatabase = SkinDatabase.instance;
+        _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        if (runScore > bestScore) bestScore = runScore;
+        PlayerStats stats = _cloudSaveManager.GetStats();
 
-        PlayerPrefs.SetInt(KEY_TOTAL_PLAY_COUNT, playCount);
-        PlayerPrefs.SetFloat(KEY_TOTAL_PLAY_TIME, totalTime);
-        PlayerPrefs.SetInt(KEY_DEATH_COUNT, deathCount);
-        PlayerPrefs.SetFloat(KEY_BEST_SCORE, bestScore);
-        PlayerPrefs.Save();
-
-        // 2. 解放条件のチェック
-        CheckUnlockConditions(runScore, runTime, playCount, totalTime, deathCount, bestScore);
+        // 解放条件のチェック
+        await CheckUnlockConditions(runScore, runTime, stats.totalPlayCount, stats.totalPlayTime, stats.deathCount, stats.bestScore);
     }
 
     /// <summary>
     /// 全スキンをチェックして解放処理を行う
     /// </summary>
-    private void CheckUnlockConditions(float runScore, float runTime, int playCount, float totalTime, int deathCount, float bestScore)
+    private async System.Threading.Tasks.Task CheckUnlockConditions(float runScore, float runTime, int playCount, float totalTime, int deathCount, float bestScore)
     {
-        int unlockedCount = 0; // 解放済みスキンの数（ゴールドクラゲ用）
+        if (_skinDatabase == null)
+        {
+            return;
+        }
 
-        // 通常の条件チェック
+        int unlockedCount = 0;
+
         foreach (var skin in _skinDatabase.GetAllSkins())
         {
-            // すでに解放済みならスキップ（ただしカウントはする）
             if (IsUnlocked(skin.id))
             {
                 unlockedCount++;
@@ -105,7 +125,6 @@ public class SkinManager : MonoBehaviour
                     if (playCount >= (int)skin.conditionValue) unlock = true;
                     break;
                 case SkinData.UnlockType.SurvivalTime:
-                    // 今回の生存時間が条件を超えたか
                     if (runTime >= skin.conditionValue) unlock = true;
                     break;
                 case SkinData.UnlockType.TotalPlayTime:
@@ -114,27 +133,24 @@ public class SkinManager : MonoBehaviour
                 case SkinData.UnlockType.DeathCount:
                     if (deathCount >= (int)skin.conditionValue) unlock = true;
                     break;
-                // AdWatchやCompleteAllは特殊なのでここでの単純比較はしない
             }
 
             if (unlock)
             {
-                UnlockSkin(skin.id);
+                await UnlockSkin(skin.id);
                 unlockedCount++;
                 anyNewUnlock = true;
                 Debug.Log($"Skin Unlocked! : {skin.skinName}");
             }
         }
 
-        // 最後に「コンプリート条件（ゴールドクラゲ）」のチェック 
-        // 自身のID以外の全スキン数と比較
+        // コンプリート条件（ゴールドクラゲ）のチェック
         SkinData goldSkin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.unlockType == SkinData.UnlockType.CompleteAll);
         if (goldSkin != null && !IsUnlocked(goldSkin.id))
         {
-            // 自分以外すべて解放されているか
             if (unlockedCount >= _skinDatabase.GetAllSkins().Count - 1)
             {
-                UnlockSkin(goldSkin.id);
+                await UnlockSkin(goldSkin.id);
                 Debug.Log("ALL COMPLETE! Gold Skin Unlocked!");
             }
         }
@@ -143,10 +159,21 @@ public class SkinManager : MonoBehaviour
     /// <summary>
     /// スキンを解放状態にする
     /// </summary>
-    public void UnlockSkin(int id)
+    public async System.Threading.Tasks.Task UnlockSkin(int id)
     {
-        PlayerPrefs.SetInt(KEY_SKIN_UNLOCKED_PREFIX + id, 1);
-        PlayerPrefs.Save();
+        // UGS使用時はCloud Saveに保存
+        if (_cloudSaveManager != null)
+        {
+            await _cloudSaveManager.UnlockSkin(id);
+            Debug.Log($"Skin {id} unlocked and saved to UGS Cloud Save");
+        }
+        else
+        {
+            // UGS未使用時はPlayerPrefsに保存
+            PlayerPrefs.SetInt(KEY_SKIN_UNLOCKED_PREFIX + id, 1);
+            PlayerPrefs.Save();
+            Debug.Log($"Skin {id} unlocked and saved to PlayerPrefs");
+        }
     }
 
     /// <summary>
@@ -154,22 +181,46 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public bool IsUnlocked(int id)
     {
-        return PlayerPrefs.GetInt(KEY_SKIN_UNLOCKED_PREFIX + id, 0) == 1;
+        // UGS使用時はCloud Saveから確認
+        if (_cloudSaveManager != null)
+        {
+            bool unlocked = _cloudSaveManager.IsSkinUnlocked(id);
+            Debug.Log($"[DEBUG] SkinManager.IsUnlocked({id}): {unlocked} (from UGS)");
+            return unlocked;
+        }
+        else
+        {
+            // UGS未使用時はPlayerPrefsから確認
+            bool unlocked = PlayerPrefs.GetInt(KEY_SKIN_UNLOCKED_PREFIX + id, 0) == 1;
+            Debug.Log($"[DEBUG] SkinManager.IsUnlocked({id}): {unlocked} (from PlayerPrefs)");
+            return unlocked;
+        }
     }
 
     /// <summary>
     /// スキンを装備する
     /// </summary>
-    public void EquipSkin(int id)
+    public async System.Threading.Tasks.Task EquipSkin(int id)
     {
         Debug.Log($"EquipSkin called: id={id}, IsUnlocked={IsUnlocked(id)}");
-        
+
         if (IsUnlocked(id))
         {
             currentSkinID = id;
-            PlayerPrefs.SetInt(KEY_EQUIPPED_SKIN, id);
-            PlayerPrefs.Save();
-            Debug.Log($"Skin equipped successfully: currentSkinID={currentSkinID}");
+
+            // UGS使用時はCloud Saveに保存
+            if (_cloudSaveManager != null)
+            {
+                await _cloudSaveManager.EquipSkin(id);
+                Debug.Log($"Skin {id} equipped and saved to UGS Cloud Save");
+            }
+            else
+            {
+                // UGS未使用時はPlayerPrefsに保存
+                PlayerPrefs.SetInt(KEY_EQUIPPED_SKIN, id);
+                PlayerPrefs.Save();
+                Debug.Log($"Skin {id} equipped and saved to PlayerPrefs");
+            }
         }
         else
         {
@@ -184,5 +235,57 @@ public class SkinManager : MonoBehaviour
     {
         var skin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == currentSkinID);
         return skin != null ? skin.skinSprite : null;
+    }
+
+    /// <summary>
+    /// 広告視聴でスキンを解放する（AdWatchタイプのスキン用）
+    /// </summary>
+    /// <param name="skinID">解放するスキンのID</param>
+    /// <param name="onSuccess">解放成功時のコールバック</param>
+    /// <param name="onFailed">解放失敗時のコールバック</param>
+    public async void UnlockSkinByAd(int skinID, System.Action onSuccess = null, System.Action onFailed = null)
+    {
+        // スキンが存在するかチェック
+        var skin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == skinID);
+        if (skin == null)
+        {
+            Debug.LogError($"Skin ID {skinID} not found!");
+            onFailed?.Invoke();
+            return;
+        }
+
+        // すでに解放済みかチェック
+        if (IsUnlocked(skinID))
+        {
+            Debug.LogWarning($"Skin ID {skinID} is already unlocked!");
+            onSuccess?.Invoke();
+            return;
+        }
+
+        // 広告がない場合の処理
+        if (_adsManager == null)
+        {
+            Debug.LogWarning("AdsManager not found. Unlocking skin without ad (test mode).");
+            await UnlockSkin(skinID);
+            onSuccess?.Invoke();
+            return;
+        }
+
+        // 広告を表示
+        _adsManager.ShowRewardedAd(
+            onSuccess: async () =>
+            {
+                // 広告視聴成功 - スキンを解放
+                await UnlockSkin(skinID);
+                Debug.Log($"Skin unlocked by ad: {skin.skinName}");
+                onSuccess?.Invoke();
+            },
+            onFailed: () =>
+            {
+                // 広告視聴失敗
+                Debug.LogWarning($"Failed to unlock skin {skinID} by ad.");
+                onFailed?.Invoke();
+            }
+        );
     }
 }

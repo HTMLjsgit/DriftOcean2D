@@ -1,0 +1,404 @@
+using UnityEngine;
+using System;
+using System.Collections;
+
+#if UNITY_ADMOB
+using GoogleMobileAds.Api;
+#endif
+
+/// <summary>
+/// Google AdMob広告管理クラス
+/// リワード広告（スキン解放・コンティニュー用）とインタースティシャル広告（5回ごと）を管理
+/// </summary>
+public class AdsManager : MonoBehaviour
+{
+    public static AdsManager instance;
+
+    [Header("AdMob Settings")]
+    [SerializeField] private bool useTestAds = true; // テスト広告を使用するか
+
+    [Header("Ad Unit IDs (本番用)")]
+    [SerializeField] private string androidRewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917"; // テストID
+    [SerializeField] private string androidInterstitialAdUnitId = "ca-app-pub-3940256099942544/1033173712"; // テストID
+
+    [Header("Play Count Ad Settings")]
+    [SerializeField] private int adIntervalPlayCount = 5; // 5回ごとに広告表示
+
+    // プレイ回数カウント用のキー
+    private const string KEY_SESSION_PLAY_COUNT = "SessionPlayCount";
+
+#if UNITY_ADMOB
+    private RewardedAd rewardedAd;
+    private InterstitialAd interstitialAd;
+#endif
+
+    // コールバック
+    private Action onRewardedAdSuccess;
+    private Action onRewardedAdFailed;
+
+    private bool isInitialized = false;
+
+    // テスト用広告ユニットID
+    private const string TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
+    private const string TEST_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void Start()
+    {
+        InitializeAds();
+    }
+
+    /// <summary>
+    /// 広告SDKの初期化
+    /// </summary>
+    private void InitializeAds()
+    {
+#if UNITY_ADMOB
+        try
+        {
+            Debug.Log("AdMob SDK initialization started...");
+
+            // AdMob SDK初期化
+            MobileAds.Initialize(initStatus =>
+            {
+                Debug.Log("AdMob SDK initialized successfully!");
+                isInitialized = true;
+
+                // 初期化完了後に広告をロード
+                LoadRewardedAd();
+                LoadInterstitialAd();
+            });
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"AdMob initialization error: {e.Message}");
+        }
+#else
+        Debug.LogWarning("AdMob SDK is not installed. Please install Google Mobile Ads Unity Plugin.");
+        isInitialized = false;
+#endif
+    }
+
+#if UNITY_ADMOB
+    #region Rewarded Ad
+
+    /// <summary>
+    /// リワード広告をロード
+    /// </summary>
+    private void LoadRewardedAd()
+    {
+        // 既存の広告があれば破棄
+        if (rewardedAd != null)
+        {
+            rewardedAd.Destroy();
+            rewardedAd = null;
+        }
+
+        string adUnitId = useTestAds ? TEST_REWARDED_AD_UNIT_ID : androidRewardedAdUnitId;
+        Debug.Log($"Loading rewarded ad with ID: {adUnitId}");
+
+        // 広告リクエストを作成
+        var request = new AdRequest();
+
+        // リワード広告をロード
+        RewardedAd.Load(adUnitId, request, (RewardedAd ad, LoadAdError error) =>
+        {
+            if (error != null || ad == null)
+            {
+                Debug.LogError($"Rewarded ad failed to load: {error}");
+                return;
+            }
+
+            Debug.Log("Rewarded ad loaded successfully!");
+            rewardedAd = ad;
+
+            // イベントリスナーを登録
+            RegisterRewardedAdEvents(rewardedAd);
+        });
+    }
+
+    /// <summary>
+    /// リワード広告のイベントリスナーを登録
+    /// </summary>
+    private void RegisterRewardedAdEvents(RewardedAd ad)
+    {
+        // 広告が報酬を付与したとき
+        ad.OnAdPaid += (AdValue adValue) =>
+        {
+            Debug.Log($"Rewarded ad paid {adValue.Value} {adValue.CurrencyCode}");
+        };
+
+        // 広告が開かれたとき
+        ad.OnAdFullScreenContentOpened += () =>
+        {
+            Debug.Log("Rewarded ad full screen content opened");
+        };
+
+        // 広告が閉じられたとき
+        ad.OnAdFullScreenContentClosed += () =>
+        {
+            Debug.Log("Rewarded ad full screen content closed");
+
+            // 報酬が付与されなかった場合の処理
+            if (onRewardedAdFailed != null)
+            {
+                onRewardedAdFailed.Invoke();
+            }
+
+            // コールバックをクリア
+            onRewardedAdSuccess = null;
+            onRewardedAdFailed = null;
+
+            // 次の広告をロード
+            LoadRewardedAd();
+        };
+
+        // 広告の表示に失敗したとき
+        ad.OnAdFullScreenContentFailed += (AdError error) =>
+        {
+            Debug.LogError($"Rewarded ad failed to show: {error}");
+
+            onRewardedAdFailed?.Invoke();
+            onRewardedAdSuccess = null;
+            onRewardedAdFailed = null;
+
+            // 次の広告をロード
+            LoadRewardedAd();
+        };
+    }
+
+    #endregion
+
+    #region Interstitial Ad
+
+    /// <summary>
+    /// インタースティシャル広告をロード
+    /// </summary>
+    private void LoadInterstitialAd()
+    {
+        // 既存の広告があれば破棄
+        if (interstitialAd != null)
+        {
+            interstitialAd.Destroy();
+            interstitialAd = null;
+        }
+
+        string adUnitId = useTestAds ? TEST_INTERSTITIAL_AD_UNIT_ID : androidInterstitialAdUnitId;
+        Debug.Log($"Loading interstitial ad with ID: {adUnitId}");
+
+        // 広告リクエストを作成
+        var request = new AdRequest();
+
+        // インタースティシャル広告をロード
+        InterstitialAd.Load(adUnitId, request, (InterstitialAd ad, LoadAdError error) =>
+        {
+            if (error != null || ad == null)
+            {
+                Debug.LogError($"Interstitial ad failed to load: {error}");
+                return;
+            }
+
+            Debug.Log("Interstitial ad loaded successfully!");
+            interstitialAd = ad;
+
+            // イベントリスナーを登録
+            RegisterInterstitialAdEvents(interstitialAd);
+        });
+    }
+
+    /// <summary>
+    /// インタースティシャル広告のイベントリスナーを登録
+    /// </summary>
+    private void RegisterInterstitialAdEvents(InterstitialAd ad)
+    {
+        // 広告が支払われたとき
+        ad.OnAdPaid += (AdValue adValue) =>
+        {
+            Debug.Log($"Interstitial ad paid {adValue.Value} {adValue.CurrencyCode}");
+        };
+
+        // 広告が開かれたとき
+        ad.OnAdFullScreenContentOpened += () =>
+        {
+            Debug.Log("Interstitial ad full screen content opened");
+        };
+
+        // 広告が閉じられたとき
+        ad.OnAdFullScreenContentClosed += () =>
+        {
+            Debug.Log("Interstitial ad full screen content closed");
+
+            // 次の広告をロード
+            LoadInterstitialAd();
+        };
+
+        // 広告の表示に失敗したとき
+        ad.OnAdFullScreenContentFailed += (AdError error) =>
+        {
+            Debug.LogError($"Interstitial ad failed to show: {error}");
+
+            // 次の広告をロード
+            LoadInterstitialAd();
+        };
+    }
+
+    #endregion
+#endif
+
+    #region Public Methods
+
+    /// <summary>
+    /// リワード広告を表示（コンティニュー・スキン解放用）
+    /// </summary>
+    /// <param name="onSuccess">広告視聴成功時のコールバック</param>
+    /// <param name="onFailed">広告視聴失敗時のコールバック</param>
+    public void ShowRewardedAd(Action onSuccess, Action onFailed = null)
+    {
+#if UNITY_ADMOB
+        if (!isInitialized)
+        {
+            Debug.LogWarning("AdMob SDK is not initialized yet.");
+            onFailed?.Invoke();
+            return;
+        }
+
+        if (rewardedAd != null && rewardedAd.CanShowAd())
+        {
+            onRewardedAdSuccess = onSuccess;
+            onRewardedAdFailed = onFailed;
+
+            // 報酬付与時のコールバックを設定
+            rewardedAd.Show((Reward reward) =>
+            {
+                Debug.Log($"Rewarded ad granted reward: {reward.Amount} {reward.Type}");
+
+                // 報酬付与
+                onRewardedAdSuccess?.Invoke();
+                onRewardedAdSuccess = null;
+                onRewardedAdFailed = null;
+            });
+        }
+        else
+        {
+            Debug.LogWarning("Rewarded ad is not ready yet.");
+            onFailed?.Invoke();
+
+            // 広告をロード
+            LoadRewardedAd();
+        }
+#else
+        Debug.LogWarning("AdMob SDK is not installed. Simulating ad with delay for testing.");
+        // テスト用：SDK未インストール時は2秒待ってから成功扱い（広告を見たような体験）
+        StartCoroutine(SimulateAdDelay(onSuccess, onFailed));
+#endif
+    }
+
+    /// <summary>
+    /// インタースティシャル広告を表示（5回ごと）
+    /// </summary>
+    public void ShowInterstitialAd()
+    {
+#if UNITY_ADMOB
+        if (!isInitialized)
+        {
+            Debug.LogWarning("AdMob SDK is not initialized yet.");
+            return;
+        }
+
+        if (interstitialAd != null && interstitialAd.CanShowAd())
+        {
+            Debug.Log("Showing interstitial ad");
+            interstitialAd.Show();
+        }
+        else
+        {
+            Debug.LogWarning("Interstitial ad is not ready yet.");
+
+            // 広告をロード
+            LoadInterstitialAd();
+        }
+#else
+        Debug.LogWarning("AdMob SDK is not installed. Skipping interstitial ad.");
+#endif
+    }
+
+    /// <summary>
+    /// ゲームプレイ開始時に呼び出す（プレイ回数カウント）
+    /// </summary>
+    public void OnGamePlayStart()
+    {
+        // セッション内のプレイ回数をカウント
+        int sessionPlayCount = PlayerPrefs.GetInt(KEY_SESSION_PLAY_COUNT, 0) + 1;
+        PlayerPrefs.SetInt(KEY_SESSION_PLAY_COUNT, sessionPlayCount);
+        PlayerPrefs.Save();
+
+        Debug.Log($"Session Play Count: {sessionPlayCount}");
+
+        // 5回ごとにインタースティシャル広告を表示
+        if (sessionPlayCount % adIntervalPlayCount == 0)
+        {
+            Debug.Log("Showing interstitial ad (every 5 plays)");
+            ShowInterstitialAd();
+        }
+    }
+
+    /// <summary>
+    /// リワード広告が利用可能かチェック
+    /// </summary>
+    public bool IsRewardedAdReady()
+    {
+#if UNITY_ADMOB
+        return isInitialized && rewardedAd != null && rewardedAd.CanShowAd();
+#else
+        return true; // テスト用
+#endif
+    }
+
+    #endregion
+
+    #region Test Simulation
+
+    /// <summary>
+    /// SDK未インストール時の広告表示をシミュレート（テスト用）
+    /// </summary>
+    private IEnumerator SimulateAdDelay(Action onSuccess, Action onFailed)
+    {
+        Debug.Log("Simulating ad display... (2 seconds)");
+
+        // Time.timeScale=0でも動くようにWaitForSecondsRealtimeを使用
+        yield return new WaitForSecondsRealtime(2f);
+
+        Debug.Log("Simulated ad completed. Granting reward.");
+        onSuccess?.Invoke();
+    }
+
+    #endregion
+
+    void OnDestroy()
+    {
+#if UNITY_ADMOB
+        // 広告を破棄
+        if (rewardedAd != null)
+        {
+            rewardedAd.Destroy();
+        }
+
+        if (interstitialAd != null)
+        {
+            interstitialAd.Destroy();
+        }
+#endif
+    }
+}

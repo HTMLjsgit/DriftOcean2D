@@ -16,12 +16,13 @@ public class SkinDatabase : Database
         if(instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(this.gameObject);
+            Initialize();
         }
         else
         {
             Destroy(this.gameObject);
         }
-        Initialize();
     }
 
     public override void Initialize()

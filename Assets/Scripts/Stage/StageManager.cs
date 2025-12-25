@@ -8,6 +8,7 @@ public class StageManager : MonoBehaviour
     public static StageManager instance;
     private ScoreManager _scoreManager;
     private ObstaclesSpawner _obstaclesSpawner;
+    private AdsManager _adsManager;
     void Awake()
     {
         if(instance == null)
@@ -24,6 +25,7 @@ public class StageManager : MonoBehaviour
     {
         _scoreManager = ScoreManager.instance;
         _obstaclesSpawner = ObstaclesSpawner.instance;
+        _adsManager = AdsManager.instance;
         StageStart();
 
     }
@@ -40,6 +42,9 @@ public class StageManager : MonoBehaviour
         _scoreManager.ScoreMeasureStart();
         _obstaclesSpawner.spawn = true;
         SetCurrentPlay(true);
+
+        // プレイ回数カウント（5回ごとに広告表示）
+        _adsManager.OnGamePlayStart();
     }
     public void StageResume()
     {
