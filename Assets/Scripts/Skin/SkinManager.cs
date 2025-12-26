@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Threading.Tasks;
 public class SkinManager : MonoBehaviour
 {
     public static SkinManager instance;
@@ -14,20 +14,12 @@ public class SkinManager : MonoBehaviour
     public int currentSkinID;
     bool anyNewUnlock = false;
 
-    // --- 永続化データのキー（PlayerPrefsフォールバック用） ---
-    private const string KEY_TOTAL_PLAY_COUNT = "Stats_PlayCount";
-    private const string KEY_TOTAL_PLAY_TIME = "Stats_TotalTime";
-    private const string KEY_DEATH_COUNT = "Stats_DeathCount";
-    private const string KEY_BEST_SCORE = "Stats_BestScore";
-    private const string KEY_SKIN_UNLOCKED_PREFIX = "Skin_Unlocked_";
-    private const string KEY_EQUIPPED_SKIN = "Skin_Equipped";
-
     void Awake()
     {
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -41,15 +33,20 @@ public class SkinManager : MonoBehaviour
         _adsManager = AdsManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        // UGS使用時はCloud Saveデータロード完了後に読み込み
         if (_cloudSaveManager != null)
         {
             _cloudSaveManager.OnDataLoaded += LoadFromUGS;
+
+            // データが既に読み込まれている場合は即座にロード
+            if (_cloudSaveManager.IsDataLoaded)
+            {
+                LoadFromUGS();
+                Debug.Log("[DEBUG] SkinManager: Data already loaded, LoadFromUGS called immediately");
+            }
         }
         else
         {
-            // UGS未使用時はPlayerPrefsから読み込み
-            LoadStatus();
+            Debug.LogError("UGSCloudSaveManager not found. SkinManager requires UGSCloudSaveManager.");
         }
     }
 
@@ -63,24 +60,11 @@ public class SkinManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ゲーム開始時にデータをロード（PlayerPrefsフォールバック用）
-    /// </summary>
-    private void LoadStatus()
-    {
-        // 初期スキン(ID:0)は必ず解放扱いにする
-        PlayerPrefs.SetInt(KEY_SKIN_UNLOCKED_PREFIX + "0", 1);
-
-        // 装備中のスキンをロード（なければ0番）
-        currentSkinID = PlayerPrefs.GetInt(KEY_EQUIPPED_SKIN, 0);
-        Debug.Log($"SkinManager LoadStatus (PlayerPrefs): currentSkinID={currentSkinID}");
-    }
-
-    /// <summary>
     /// ゲームオーバー時に呼ばれる：統計を更新し、スキンの解放チェックを行う
     /// </summary>
     /// <param name="runScore">今回のスコア</param>
     /// <param name="runTime">今回の生存時間(秒)</param>
-    public async System.Threading.Tasks.Task ReportGameResult(float runScore, float runTime)
+    public async Task ReportGameResult(float runScore, float runTime)
     {
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
@@ -94,7 +78,7 @@ public class SkinManager : MonoBehaviour
     /// <summary>
     /// 全スキンをチェックして解放処理を行う
     /// </summary>
-    private async System.Threading.Tasks.Task CheckUnlockConditions(float runScore, float runTime, int playCount, float totalTime, int deathCount, float bestScore)
+    private async Task CheckUnlockConditions(float runScore, float runTime, int playCount, float totalTime, int deathCount, float bestScore)
     {
         if (_skinDatabase == null)
         {
@@ -159,21 +143,10 @@ public class SkinManager : MonoBehaviour
     /// <summary>
     /// スキンを解放状態にする
     /// </summary>
-    public async System.Threading.Tasks.Task UnlockSkin(int id)
+    public async Task UnlockSkin(int id)
     {
-        // UGS使用時はCloud Saveに保存
-        if (_cloudSaveManager != null)
-        {
-            await _cloudSaveManager.UnlockSkin(id);
-            Debug.Log($"Skin {id} unlocked and saved to UGS Cloud Save");
-        }
-        else
-        {
-            // UGS未使用時はPlayerPrefsに保存
-            PlayerPrefs.SetInt(KEY_SKIN_UNLOCKED_PREFIX + id, 1);
-            PlayerPrefs.Save();
-            Debug.Log($"Skin {id} unlocked and saved to PlayerPrefs");
-        }
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        await _cloudSaveManager.UnlockSkin(id);
     }
 
     /// <summary>
@@ -181,7 +154,6 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public bool IsUnlocked(int id)
     {
-        // UGS使用時はCloud Saveから確認
         if (_cloudSaveManager != null)
         {
             bool unlocked = _cloudSaveManager.IsSkinUnlocked(id);
@@ -190,37 +162,29 @@ public class SkinManager : MonoBehaviour
         }
         else
         {
-            // UGS未使用時はPlayerPrefsから確認
-            bool unlocked = PlayerPrefs.GetInt(KEY_SKIN_UNLOCKED_PREFIX + id, 0) == 1;
-            Debug.Log($"[DEBUG] SkinManager.IsUnlocked({id}): {unlocked} (from PlayerPrefs)");
-            return unlocked;
+            Debug.LogError("Cannot check unlock status: UGSCloudSaveManager is not available");
+            return false;
         }
     }
 
     /// <summary>
     /// スキンを装備する
     /// </summary>
-    public async System.Threading.Tasks.Task EquipSkin(int id)
+    public async Task EquipSkin(int id)
     {
         Debug.Log($"EquipSkin called: id={id}, IsUnlocked={IsUnlocked(id)}");
+
+        if (_cloudSaveManager == null)
+        {
+            Debug.LogError("Cannot equip skin: UGSCloudSaveManager is not available");
+            return;
+        }
 
         if (IsUnlocked(id))
         {
             currentSkinID = id;
-
-            // UGS使用時はCloud Saveに保存
-            if (_cloudSaveManager != null)
-            {
-                await _cloudSaveManager.EquipSkin(id);
-                Debug.Log($"Skin {id} equipped and saved to UGS Cloud Save");
-            }
-            else
-            {
-                // UGS未使用時はPlayerPrefsに保存
-                PlayerPrefs.SetInt(KEY_EQUIPPED_SKIN, id);
-                PlayerPrefs.Save();
-                Debug.Log($"Skin {id} equipped and saved to PlayerPrefs");
-            }
+            await _cloudSaveManager.EquipSkin(id);
+            Debug.Log($"Skin {id} equipped and saved to UGS Cloud Save");
         }
         else
         {

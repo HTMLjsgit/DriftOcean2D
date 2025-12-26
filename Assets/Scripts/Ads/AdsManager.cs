@@ -2,9 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-#if UNITY_ADMOB
 using GoogleMobileAds.Api;
-#endif
 
 /// <summary>
 /// Google AdMob広告管理クラス
@@ -27,10 +25,10 @@ public class AdsManager : MonoBehaviour
     // プレイ回数カウント用のキー
     private const string KEY_SESSION_PLAY_COUNT = "SessionPlayCount";
 
-#if UNITY_ADMOB
+
     private RewardedAd rewardedAd;
     private InterstitialAd interstitialAd;
-#endif
+
 
     // コールバック
     private Action onRewardedAdSuccess;
@@ -65,7 +63,6 @@ public class AdsManager : MonoBehaviour
     /// </summary>
     private void InitializeAds()
     {
-#if UNITY_ADMOB
         try
         {
             Debug.Log("AdMob SDK initialization started...");
@@ -85,13 +82,9 @@ public class AdsManager : MonoBehaviour
         {
             Debug.LogError($"AdMob initialization error: {e.Message}");
         }
-#else
-        Debug.LogWarning("AdMob SDK is not installed. Please install Google Mobile Ads Unity Plugin.");
-        isInitialized = false;
-#endif
     }
 
-#if UNITY_ADMOB
+
     #region Rewarded Ad
 
     /// <summary>
@@ -255,7 +248,7 @@ public class AdsManager : MonoBehaviour
     }
 
     #endregion
-#endif
+
 
     #region Public Methods
 
@@ -266,7 +259,7 @@ public class AdsManager : MonoBehaviour
     /// <param name="onFailed">広告視聴失敗時のコールバック</param>
     public void ShowRewardedAd(Action onSuccess, Action onFailed = null)
     {
-#if UNITY_ADMOB
+
         if (!isInitialized)
         {
             Debug.LogWarning("AdMob SDK is not initialized yet.");
@@ -298,11 +291,6 @@ public class AdsManager : MonoBehaviour
             // 広告をロード
             LoadRewardedAd();
         }
-#else
-        Debug.LogWarning("AdMob SDK is not installed. Simulating ad with delay for testing.");
-        // テスト用：SDK未インストール時は2秒待ってから成功扱い（広告を見たような体験）
-        StartCoroutine(SimulateAdDelay(onSuccess, onFailed));
-#endif
     }
 
     /// <summary>
@@ -310,7 +298,7 @@ public class AdsManager : MonoBehaviour
     /// </summary>
     public void ShowInterstitialAd()
     {
-#if UNITY_ADMOB
+
         if (!isInitialized)
         {
             Debug.LogWarning("AdMob SDK is not initialized yet.");
@@ -329,9 +317,7 @@ public class AdsManager : MonoBehaviour
             // 広告をロード
             LoadInterstitialAd();
         }
-#else
-        Debug.LogWarning("AdMob SDK is not installed. Skipping interstitial ad.");
-#endif
+
     }
 
     /// <summary>
@@ -359,11 +345,8 @@ public class AdsManager : MonoBehaviour
     /// </summary>
     public bool IsRewardedAdReady()
     {
-#if UNITY_ADMOB
+
         return isInitialized && rewardedAd != null && rewardedAd.CanShowAd();
-#else
-        return true; // テスト用
-#endif
     }
 
     #endregion
@@ -388,7 +371,7 @@ public class AdsManager : MonoBehaviour
 
     void OnDestroy()
     {
-#if UNITY_ADMOB
+
         // 広告を破棄
         if (rewardedAd != null)
         {
@@ -399,6 +382,6 @@ public class AdsManager : MonoBehaviour
         {
             interstitialAd.Destroy();
         }
-#endif
+
     }
 }

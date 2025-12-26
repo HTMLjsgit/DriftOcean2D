@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-#if UNITY_UGS
 using Unity.Services.Leaderboards;
 using Unity.Services.Leaderboards.Models;
-#endif
 
 /// <summary>
 /// UGS Leaderboards専用マネージャー
@@ -100,7 +98,6 @@ public class UGSLeaderboardManager : MonoBehaviour
     /// </summary>
     public async Task<bool> RefreshLeaderboard(int limit = 10)
     {
-#if UNITY_UGS
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
             Debug.LogWarning("UGS not signed in. Cannot refresh leaderboard.");
@@ -178,10 +175,6 @@ public class UGSLeaderboardManager : MonoBehaviour
 
         Debug.Log($"Leaderboard refreshed: {_cachedRankings.Count} entries");
         return true;
-#else
-        Debug.LogWarning("UGS SDK not installed.");
-        return false;
-#endif
     }
 
     /// <summary>
@@ -197,7 +190,6 @@ public class UGSLeaderboardManager : MonoBehaviour
     /// </summary>
     public async Task<UGSRankingEntry> GetPlayerRank()
     {
-#if UNITY_UGS
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
             Debug.LogWarning("UGS not signed in. Cannot get player rank.");
@@ -248,10 +240,6 @@ public class UGSLeaderboardManager : MonoBehaviour
             skinID = skinID,
             playerId = playerEntry.PlayerId
         };
-#else
-        Debug.LogWarning("UGS SDK not installed.");
-        return null;
-#endif
     }
 }
 

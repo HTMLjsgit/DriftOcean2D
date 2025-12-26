@@ -20,6 +20,9 @@ public class UGSCloudSaveManager : MonoBehaviour
     // データロード完了イベント
     public event Action OnDataLoaded;
 
+    // データが読み込まれているかのフラグ
+    public bool IsDataLoaded { get; private set; } = false;
+
     void Awake()
     {
         if (instance == null)
@@ -44,8 +47,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("UGSManager not found. Using local data only.");
-            InitializeLocalData();
+            Debug.LogError("UGSManager not found. UGSCloudSaveManager requires UGSManager.");
         }
     }
 
@@ -59,15 +61,6 @@ public class UGSCloudSaveManager : MonoBehaviour
 
         // データをロード
         LoadPlayerData();
-    }
-
-    /// <summary>
-    /// ローカルデータで初期化（UGS未使用時）
-    /// </summary>
-    private void InitializeLocalData()
-    {
-        _playerData = new PlayerCloudData();
-        OnDataLoaded?.Invoke();
     }
 
     /// <summary>
@@ -102,6 +95,7 @@ public class UGSCloudSaveManager : MonoBehaviour
             }
         }
 
+        IsDataLoaded = true;
         OnDataLoaded?.Invoke();
         Debug.Log("[DEBUG] OnDataLoaded event invoked");
     }
@@ -131,10 +125,8 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("UGS not available. Saving locally (PlayerPrefs).");
-            // フォールバック: PlayerPrefsに保存
-            SaveToPlayerPrefs();
-            return true;
+            Debug.LogError("UGS not available. Cannot save player data.");
+            return false;
         }
     }
 
@@ -279,40 +271,6 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         return await SavePlayerData();
-    }
-
-    #endregion
-
-    #region PlayerPrefs Fallback
-
-    /// <summary>
-    /// PlayerPrefsに保存（フォールバック）
-    /// </summary>
-    private void SaveToPlayerPrefs()
-    {
-        if (_playerData == null) return;
-
-        string json = JsonUtility.ToJson(_playerData);
-        PlayerPrefs.SetString("CloudPlayerData", json);
-        PlayerPrefs.Save();
-        Debug.Log("Player data saved to PlayerPrefs (fallback).");
-    }
-
-    /// <summary>
-    /// PlayerPrefsからロード（フォールバック）
-    /// </summary>
-    private void LoadFromPlayerPrefs()
-    {
-        if (PlayerPrefs.HasKey("CloudPlayerData"))
-        {
-            string json = PlayerPrefs.GetString("CloudPlayerData");
-            _playerData = JsonUtility.FromJson<PlayerCloudData>(json);
-            Debug.Log("Player data loaded from PlayerPrefs (fallback).");
-        }
-        else
-        {
-            _playerData = new PlayerCloudData();
-        }
     }
 
     #endregion

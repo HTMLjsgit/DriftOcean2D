@@ -4,14 +4,12 @@ using System.Threading.Tasks;
 
 
 
-#if UNITY_UGS
 using Unity.Services.Core;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Leaderboards;
 using Unity.Services.Leaderboards.Models;
 using System.Collections.Generic;
-#endif
 
 /// <summary>
 /// Unity Gaming Services (UGS) 統合管理クラス
@@ -55,7 +53,6 @@ public class UGSManager : MonoBehaviour
     /// </summary>
     private async Task InitializeUGS()
     {
-#if UNITY_UGS
         if (!useUGS)
         {
             Debug.LogWarning("UGS is disabled in settings.");
@@ -81,13 +78,8 @@ public class UGSManager : MonoBehaviour
             isInitialized = false;
             OnSignInFailed?.Invoke();
         }
-#else
-        Debug.LogWarning("UGS SDK is not installed. Please install Unity Gaming Services packages.");
-        isInitialized = false;
-#endif
     }
 
-#if UNITY_UGS
     /// <summary>
     /// 匿名サインイン
     /// </summary>
@@ -305,8 +297,6 @@ public class UGSManager : MonoBehaviour
     }
 
     #endregion
-#endif
-
     #region Public Status Methods
 
     /// <summary>
@@ -330,12 +320,10 @@ public class UGSManager : MonoBehaviour
     /// </summary>
     public string GetPlayerId()
     {
-#if UNITY_UGS
         if (isSignedIn)
         {
             return AuthenticationService.Instance.PlayerId;
         }
-#endif
         return "LocalPlayer";
     }
 
