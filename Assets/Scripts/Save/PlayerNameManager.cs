@@ -81,4 +81,18 @@ public class PlayerNameManager : MonoBehaviour
         }
         return _currentPlayerName;
     }
+
+    /// <summary>
+    /// UGSCloudSaveManagerから名前を同期（UGS使用時に呼ぶ）
+    /// </summary>
+    public void SyncFromUGS(string nameFromUGS)
+    {
+        if (!string.IsNullOrEmpty(nameFromUGS))
+        {
+            _currentPlayerName = nameFromUGS;
+            PlayerPrefs.SetString(KEY_PLAYER_NAME, nameFromUGS);
+            PlayerPrefs.Save();
+            Debug.Log($"プレイヤー名をUGSから同期: {nameFromUGS}");
+        }
+    }
 }

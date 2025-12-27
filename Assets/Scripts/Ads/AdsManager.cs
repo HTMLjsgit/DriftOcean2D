@@ -22,9 +22,7 @@ public class AdsManager : MonoBehaviour
     [Header("Play Count Ad Settings")]
     [SerializeField] private int adIntervalPlayCount = 5; // 5回ごとに広告表示
 
-    // プレイ回数カウント用のキー
-    private const string KEY_SESSION_PLAY_COUNT = "SessionPlayCount";
-
+    private UGSCloudSaveManager _cloudSaveManager;
 
     private RewardedAd rewardedAd;
     private InterstitialAd interstitialAd;
@@ -35,6 +33,7 @@ public class AdsManager : MonoBehaviour
     private Action onRewardedAdFailed;
 
     private bool isInitialized = false;
+    private bool rewardGranted = false; // 報酬が付与されたかどうかのフラグ
 
     // テスト用広告ユニットID
     private const string TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
@@ -55,6 +54,7 @@ public class AdsManager : MonoBehaviour
 
     void Start()
     {
+        _cloudSaveManager = UGSCloudSaveManager.instance;
         InitializeAds();
     }
 
@@ -144,13 +144,21 @@ public class AdsManager : MonoBehaviour
         {
             Debug.Log("Rewarded ad full screen content closed");
 
-            // 報酬が付与されなかった場合の処理
-            if (onRewardedAdFailed != null)
+            // 報酬が付与されていた場合、ここで成功コールバックを呼ぶ
+            if (rewardGranted)
             {
-                onRewardedAdFailed.Invoke();
+                Debug.Log("Reward was granted. Calling success callback.");
+                onRewardedAdSuccess?.Invoke();
+            }
+            else
+            {
+                // 報酬が付与されなかった場合の処理
+                Debug.Log("Reward was not granted. Calling failed callback.");
+                onRewardedAdFailed?.Invoke();
             }
 
-            // コールバックをクリア
+            // フラグとコールバックをクリア
+            rewardGranted = false;
             onRewardedAdSuccess = null;
             onRewardedAdFailed = null;
 
@@ -164,6 +172,7 @@ public class AdsManager : MonoBehaviour
             Debug.LogError($"Rewarded ad failed to show: {error}");
 
             onRewardedAdFailed?.Invoke();
+            rewardGranted = false;
             onRewardedAdSuccess = null;
             onRewardedAdFailed = null;
 
@@ -271,16 +280,15 @@ public class AdsManager : MonoBehaviour
         {
             onRewardedAdSuccess = onSuccess;
             onRewardedAdFailed = onFailed;
+            rewardGranted = false; // フラグをリセット
 
             // 報酬付与時のコールバックを設定
             rewardedAd.Show((Reward reward) =>
             {
                 Debug.Log($"Rewarded ad granted reward: {reward.Amount} {reward.Type}");
 
-                // 報酬付与
-                onRewardedAdSuccess?.Invoke();
-                onRewardedAdSuccess = null;
-                onRewardedAdFailed = null;
+                // 報酬が付与されたことをフラグで記録（広告を閉じた時に成功コールバックを呼ぶ）
+                rewardGranted = true;
             });
         }
         else
@@ -325,18 +333,29 @@ public class AdsManager : MonoBehaviour
     /// </summary>
     public void OnGamePlayStart()
     {
-        // セッション内のプレイ回数をカウント
-        int sessionPlayCount = PlayerPrefs.GetInt(KEY_SESSION_PLAY_COUNT, 0) + 1;
-        PlayerPrefs.SetInt(KEY_SESSION_PLAY_COUNT, sessionPlayCount);
-        PlayerPrefs.Save();
+        // UGSCloudSaveManagerからtotalPlayCountを取得
+        _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        Debug.Log($"Session Play Count: {sessionPlayCount}");
-
-        // 5回ごとにインタースティシャル広告を表示
-        if (sessionPlayCount % adIntervalPlayCount == 0)
+        if (_cloudSaveManager == null)
         {
-            Debug.Log("Showing interstitial ad (every 5 plays)");
+            Debug.LogWarning("[AdsManager] UGSCloudSaveManager not found. Cannot check play count for ads.");
+            return;
+        }
+
+        // UGSのtotalPlayCountを取得（これから始まるプレイ分を含めて+1）
+        int totalPlayCount = _cloudSaveManager.GetStats().totalPlayCount + 1;
+
+        Debug.Log($"[AdsManager] Total Play Count (including this play): {totalPlayCount}, Ad interval: {adIntervalPlayCount}");
+
+        // adIntervalPlayCountの倍数でインタースティシャル広告を表示
+        if (totalPlayCount % adIntervalPlayCount == 0)
+        {
+            Debug.Log($"[AdsManager] Showing interstitial ad (total plays: {totalPlayCount})");
             ShowInterstitialAd();
+        }
+        else
+        {
+            Debug.Log($"[AdsManager] No ad this time. Next ad at play count: {(totalPlayCount / adIntervalPlayCount + 1) * adIntervalPlayCount}");
         }
     }
 

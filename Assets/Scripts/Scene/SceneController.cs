@@ -9,6 +9,8 @@ public class SceneController : MonoBehaviour
     [SerializeField] private CanvasGroup _sceneLoadCanvasGroup;
     public static SceneController instance;
 
+    private bool isLoading = false; // ロード中フラグ
+
     void Awake()
     {
         if (instance == null)
@@ -49,39 +51,90 @@ public class SceneController : MonoBehaviour
 
     public void SceneLoad(string sceneName)
     {
+        // 既にロード中の場合は無視
+        if (isLoading)
+        {
+            Debug.LogWarning($"Scene load already in progress. Ignoring request to load '{sceneName}'");
+            return;
+        }
+
         LoadSceneTask(sceneName).Forget();
     }
 
     private async UniTaskVoid LoadSceneTask(string sceneName)
     {
-        var token = this.GetCancellationTokenOnDestroy();
+        isLoading = true;
 
-        // Time.timeScaleを必ず1に戻す（ゲームオーバー時は0になっている可能性があるため）
-        Time.timeScale = 1f;
+        try
+        {
+            var token = this.GetCancellationTokenOnDestroy();
 
-        // --- 1. 暗転 (フェードアウト) ---
-        _sceneLoadCanvasGroup.blocksRaycasts = true;
+            // 既存のフェードアニメーションを強制停止（競合を防ぐ）
+            _sceneLoadCanvasGroup.DOKill();
+            Debug.Log("[SceneController] Killed existing DOTween animations on CanvasGroup");
 
-        await _sceneLoadCanvasGroup.DOFade(1f, 1f)
-            .SetUpdate(true) // Time.timeScaleに影響されないようにする
-            .SetLink(this.gameObject)
-            .ToUniTask(cancellationToken: token);
+            // --- 1. 暗転 (フェードアウト) ---
+            _sceneLoadCanvasGroup.blocksRaycasts = true;
 
-        // --- 2. シーンロード ---
-        // 黒画面のままロード待ち
-        await SceneManager.LoadSceneAsync(sceneName).ToUniTask(cancellationToken: token);
+            await _sceneLoadCanvasGroup.DOFade(1f, 1f)
+                .SetUpdate(true) // Time.timeScaleに影響されないようにする
+                .SetLink(this.gameObject)
+                .ToUniTask(cancellationToken: token);
 
-        // ★ポイント: ロード直後に少しだけ待つ（演出的なタメ）
-        // これを入れると「ロード終わった！」という切り替わりが綺麗に見えます
-        await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+            // フェードアウト完了後にTime.timeScaleを1に戻す（プレイヤーが見えない状態で戻す）
+            Time.timeScale = 1f;
+            Debug.Log("[SceneController] Time.timeScale reset to 1 after fade out");
 
-        // --- 3. 明転 (フェードイン) ---
-        // ここで「新たなシーンで黒→明るく」が実行されます
-        await _sceneLoadCanvasGroup.DOFade(0f, 1f)
-            .SetUpdate(true) // Time.timeScaleに影響されないようにする
-            .SetLink(this.gameObject)
-            .ToUniTask(cancellationToken: token);
+            // --- 2. シーンロード ---
+            // 黒画面のままロード待ち
+            await SceneManager.LoadSceneAsync(sceneName).ToUniTask(cancellationToken: token);
 
+            // ★ポイント: ロード直後に少しだけ待つ（演出的なタメ）
+            // これを入れると「ロード終わった！」という切り替わりが綺麗に見えます
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+
+            // --- 3. 明転 (フェードイン) ---
+            // ここで「新たなシーンで黒→明るく」が実行されます
+            Debug.Log($"[SceneController] Starting fade in... alpha={_sceneLoadCanvasGroup.alpha}");
+
+            await _sceneLoadCanvasGroup.DOFade(0f, 1f)
+                .SetUpdate(true) // Time.timeScaleに影響されないようにする
+                .SetLink(this.gameObject)
+                .ToUniTask(cancellationToken: token);
+
+            _sceneLoadCanvasGroup.blocksRaycasts = false;
+            Debug.Log($"[SceneController] Fade in complete. alpha={_sceneLoadCanvasGroup.alpha}");
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.LogWarning("[SceneController] Scene load was cancelled.");
+            // キャンセルされた場合でもフェードインを完了させる
+            ForceCompleteFadeIn();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SceneController] Error during scene load: {e.Message}\n{e.StackTrace}");
+            // エラーが発生した場合でもフェードインを完了させる
+            ForceCompleteFadeIn();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// エラー時に強制的にフェードインを完了させる
+    /// </summary>
+    private void ForceCompleteFadeIn()
+    {
+        Debug.Log("[SceneController] Force completing fade in...");
+
+        // 実行中のDOTweenアニメーションを停止
+        _sceneLoadCanvasGroup.DOKill();
+
+        // 強制的にalphaを0にする
+        _sceneLoadCanvasGroup.alpha = 0f;
         _sceneLoadCanvasGroup.blocksRaycasts = false;
     }
 }

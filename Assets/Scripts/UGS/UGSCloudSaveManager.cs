@@ -36,7 +36,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
     }
 
-    void Start()
+    async void Start()
     {
         _ugsManager = UGSManager.instance;
 
@@ -44,6 +44,14 @@ public class UGSCloudSaveManager : MonoBehaviour
         {
             // サインイン成功後にデータをロード
             _ugsManager.OnSignInSuccess += OnUGSSignInSuccess;
+
+            // 既にサインイン済みの場合（2回目以降のシーン読み込み）は即座にリロード
+            if (_ugsManager.IsSignedIn())
+            {
+                Debug.Log("[UGSCloudSaveManager] Already signed in, reloading player data...");
+                await System.Threading.Tasks.Task.Delay(100); // 少し待ってから実行
+                await LoadPlayerData();
+            }
         }
         else
         {
@@ -60,15 +68,21 @@ public class UGSCloudSaveManager : MonoBehaviour
         await Task.Delay(500);
 
         // データをロード
-        LoadPlayerData();
+        await LoadPlayerData();
     }
 
     /// <summary>
     /// Cloud Saveからプレイヤーデータをロード
     /// </summary>
-    private async void LoadPlayerData()
+    private async Task LoadPlayerData()
     {
         Debug.Log("[DEBUG] LoadPlayerData started...");
+
+        if (_ugsManager == null || !_ugsManager.IsSignedIn())
+        {
+            Debug.LogWarning("[DEBUG] UGSManager not ready. Cannot load player data.");
+            return;
+        }
 
         _playerData = await _ugsManager.LoadData<PlayerCloudData>(CLOUD_SAVE_KEY_PLAYER_DATA);
 
@@ -96,8 +110,22 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         IsDataLoaded = true;
+
+        // PlayerNameManagerに名前を同期（常に使用）
+        PlayerNameManager.instance.SyncFromUGS(_playerData.playerName);
+
         OnDataLoaded?.Invoke();
         Debug.Log("[DEBUG] OnDataLoaded event invoked");
+    }
+
+    /// <summary>
+    /// Cloud Saveからプレイヤーデータを強制的に再ロード（公開メソッド）
+    /// </summary>
+    public async Task ReloadPlayerData()
+    {
+        Debug.Log("[DEBUG] ReloadPlayerData called - forcing reload from cloud...");
+        await LoadPlayerData();
+        Debug.Log("[DEBUG] ReloadPlayerData completed");
     }
 
     /// <summary>
@@ -162,7 +190,9 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     public bool IsSkinUnlocked(int skinID)
     {
-        return _playerData?.unlockedSkinIDs.Contains(skinID) ?? false;
+        bool result = _playerData?.unlockedSkinIDs.Contains(skinID) ?? false;
+        Debug.Log($"[DEBUG] UGSCloudSaveManager.IsSkinUnlocked({skinID}): {result}, _playerData is null: {_playerData == null}, unlockedSkinIDs: [{string.Join(", ", _playerData?.unlockedSkinIDs ?? new List<int>())}]");
+        return result;
     }
 
     /// <summary>

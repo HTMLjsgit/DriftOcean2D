@@ -19,7 +19,7 @@ public class SkinManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            // DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -55,6 +55,15 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     private void LoadFromUGS()
     {
+        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (_cloudSaveManager == null)
+        {
+            Debug.LogError("Cannot load from UGS: UGSCloudSaveManager is not available");
+            return;
+        }
+
         currentSkinID = _cloudSaveManager.GetCurrentSkinID();
         Debug.Log($"SkinManager loaded from UGS: currentSkinID={currentSkinID}");
     }
@@ -145,7 +154,15 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public async Task UnlockSkin(int id)
     {
+        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
         _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (_cloudSaveManager == null)
+        {
+            Debug.LogError("Cannot unlock skin: UGSCloudSaveManager is not available");
+            return;
+        }
+
         await _cloudSaveManager.UnlockSkin(id);
     }
 
@@ -154,17 +171,18 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public bool IsUnlocked(int id)
     {
-        if (_cloudSaveManager != null)
-        {
-            bool unlocked = _cloudSaveManager.IsSkinUnlocked(id);
-            Debug.Log($"[DEBUG] SkinManager.IsUnlocked({id}): {unlocked} (from UGS)");
-            return unlocked;
-        }
-        else
+        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (_cloudSaveManager == null)
         {
             Debug.LogError("Cannot check unlock status: UGSCloudSaveManager is not available");
             return false;
         }
+
+        bool unlocked = _cloudSaveManager.IsSkinUnlocked(id);
+        Debug.Log($"[DEBUG] SkinManager.IsUnlocked({id}): {unlocked} (from UGS)");
+        return unlocked;
     }
 
     /// <summary>
@@ -172,6 +190,9 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     public async Task EquipSkin(int id)
     {
+        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+
         Debug.Log($"EquipSkin called: id={id}, IsUnlocked={IsUnlocked(id)}");
 
         if (_cloudSaveManager == null)

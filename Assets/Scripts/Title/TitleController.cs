@@ -36,8 +36,15 @@ public class TitleController : MonoBehaviour
         }
 
         // _startButton.onClick.AddListener();
-        _skinButton.onClick.AddListener(() =>
+        _skinButton.onClick.AddListener(async () =>
         {
+            // Skinビューを開く前に最新データを再ロード
+            if (_cloudSaveManager != null && _cloudSaveManager.IsDataLoaded)
+            {
+                Debug.Log("[TitleController] Reloading data before showing skins...");
+                await _cloudSaveManager.ReloadPlayerData();
+            }
+
             _flowUI.SwitchView("Skin");
             _startSkinManager.ApplySkinSprites();
         });
@@ -69,8 +76,7 @@ public class TitleController : MonoBehaviour
             currentName = _playerNameManager.GetPlayerName();
         }
 
-        // デフォルト名の場合は名前入力を促す
-        if (string.IsNullOrEmpty(currentName) || currentName == "プレイヤー")
+        if (string.IsNullOrEmpty(currentName))
         {
             Debug.Log("Player name not set, showing input panel");
             // 名前が未設定なら入力画面を表示
@@ -94,24 +100,15 @@ public class TitleController : MonoBehaviour
         Debug.Log($"プレイヤー名を設定します: {playerName}");
 
         // UGS使用時はCloudSaveに保存
-        if (_cloudSaveManager != null)
+        bool success = await _cloudSaveManager.SetPlayerName(playerName);
+        if (success)
         {
-            bool success = await _cloudSaveManager.SetPlayerName(playerName);
-            if (success)
-            {
-                Debug.Log($"プレイヤー名をUGSに保存しました: {playerName}");
-            }
-            else
-            {
-                Debug.LogWarning("Failed to save player name to UGS. Falling back to local save.");
-                _playerNameManager?.SavePlayerName(playerName);
-            }
+            Debug.Log($"プレイヤー名をUGSに保存しました: {playerName}");
         }
         else
         {
-            // UGS未使用時はPlayerPrefsに保存
+            Debug.LogWarning("Failed to save player name to UGS. Falling back to local save.");
             _playerNameManager?.SavePlayerName(playerName);
-            Debug.Log($"プレイヤー名をローカルに保存しました: {playerName}");
         }
     }
 

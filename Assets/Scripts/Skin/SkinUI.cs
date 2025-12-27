@@ -29,21 +29,22 @@ public class SkinUI : MonoBehaviour
         bool isUnlocked = SkinManager.instance.IsUnlocked(_skinID);
         bool isEquipped = SkinManager.instance.currentSkinID == _skinID;
 
+        Debug.Log($"[SkinUI {_skinID}] UpdateUIState - isUnlocked={isUnlocked}, isEquipped={isEquipped}, currentSkinID={SkinManager.instance.currentSkinID}");
+
         // 解放されていればオリジナルスプライト、ロック中ならロックスプライトを表示
         if (isUnlocked)
         {
             _skinImageUI.sprite = _originalSprite;
+            Debug.Log($"[SkinUI {_skinID}] Setting ORIGINAL sprite");
         }
         else
         {
             _skinImageUI.sprite = _lockedSprite;
+            Debug.Log($"[SkinUI {_skinID}] Setting LOCKED sprite");
         }
 
         // Outlineは装備中の場合のみ表示
         _outlineImage.gameObject.SetActive(isEquipped);
-
-        // チェックマークは装備中かつ解放済みの場合のみ表示
-        Debug.Log($"SkinUI {_skinID}: UpdateUIState - currentSkinID={SkinManager.instance.currentSkinID}, isUnlocked={isUnlocked}, isEquipped={isEquipped}");
     }
 
     public async void OnClickedSkinUI()

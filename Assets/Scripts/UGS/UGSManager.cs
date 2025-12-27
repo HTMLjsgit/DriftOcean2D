@@ -34,18 +34,26 @@ public class UGSManager : MonoBehaviour
     {
         if (instance == null)
         {
+            Debug.Log($"[DEBUG] UGSManager Awake: Creating new singleton instance");
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
         {
+            Debug.Log($"[DEBUG] UGSManager Awake: Destroying duplicate instance");
             Destroy(gameObject);
         }
     }
 
     async void Start()
     {
+        Debug.Log($"[DEBUG] UGSManager Start called");
         await InitializeUGS();
+    }
+
+    void OnDestroy()
+    {
+        Debug.Log($"[DEBUG] UGSManager OnDestroy called");
     }
 
     /// <summary>

@@ -13,7 +13,6 @@ public class FlowUI : MonoBehaviour
         public List<GameObject> uiObjects; // その画面で表示するオブジェクトのリスト
         public UnityEvent onOpen;
     }
-
     [Header("UI設定リスト")]
     [SerializeField] private List<ViewState> _viewStates = new List<ViewState>();
 

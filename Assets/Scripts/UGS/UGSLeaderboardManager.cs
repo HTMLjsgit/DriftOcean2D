@@ -49,6 +49,12 @@ public class UGSLeaderboardManager : MonoBehaviour
     /// </summary>
     public async Task<bool> SubmitScore(float score)
     {
+        Debug.Log($"[DEBUG] SubmitScore called. _ugsManager is null: {_ugsManager == null}");
+        if (_ugsManager != null)
+        {
+            Debug.Log($"[DEBUG] SubmitScore: _ugsManager.IsSignedIn(): {_ugsManager.IsSignedIn()}");
+        }
+
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
             Debug.LogWarning("UGS not signed in. Cannot submit score.");
@@ -82,8 +88,17 @@ public class UGSLeaderboardManager : MonoBehaviour
         if (success)
         {
             Debug.Log("Score submitted successfully!");
-            // スコア送信後にランキングを更新
-            await RefreshLeaderboard();
+
+            // スコア送信後にランキングを更新（エラーが発生しても続行）
+            try
+            {
+                await RefreshLeaderboard();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to refresh leaderboard after score submission: {e.Message}");
+                // スコアは既に送信されているので、リフレッシュ失敗は無視
+            }
         }
         else
         {
@@ -98,6 +113,13 @@ public class UGSLeaderboardManager : MonoBehaviour
     /// </summary>
     public async Task<bool> RefreshLeaderboard(int limit = 10)
     {
+        // デバッグ用：詳細なログを出力
+        Debug.Log($"[DEBUG] RefreshLeaderboard called. _ugsManager is null: {_ugsManager == null}");
+        if (_ugsManager != null)
+        {
+            Debug.Log($"[DEBUG] _ugsManager.IsSignedIn(): {_ugsManager.IsSignedIn()}");
+        }
+
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
             Debug.LogWarning("UGS not signed in. Cannot refresh leaderboard.");

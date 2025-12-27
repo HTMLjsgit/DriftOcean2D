@@ -65,17 +65,8 @@ public class NicknameInputUI : MonoBehaviour
         // メッセージ設定
         _messageText.text = message;
 
-        // InputFieldをクリア＆現在の名前を設定
-        string currentName = "";
-        if (_cloudSaveManager != null)
-        {
-            currentName = _cloudSaveManager.GetPlayerName();
-        }
-        else if (_playerNameManager != null)
-        {
-            currentName = _playerNameManager.currentPlayerName;
-        }
-
+        // InputFieldに現在の名前を設定（UGSから取得、常に使用）
+        string currentName = _cloudSaveManager.GetPlayerName();
         _nameInputField.text = currentName;
         _nameInputField.Select();
         _nameInputField.ActivateInputField();

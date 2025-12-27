@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Stage3
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyProfile
   thresholdYear: 1970
-  spawnInterval: 1
+  restDuration: 0
+  spawnInterval: 0.8
   speedMultiplier: 1.2
   newObstaclesToAdd:
+  - {fileID: 11400000, guid: b7450fceb447b8c468ab977640624b1c, type: 2}
+  - {fileID: 11400000, guid: 2c26956cc89595446b08b7cbaa0031c9, type: 2}
   - {fileID: 11400000, guid: b8b552ebc0727084f8051672a5f15e8d, type: 2}
