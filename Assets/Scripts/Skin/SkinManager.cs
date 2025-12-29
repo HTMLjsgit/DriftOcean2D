@@ -73,21 +73,50 @@ public class SkinManager : MonoBehaviour
     /// </summary>
     /// <param name="runScore">今回のスコア</param>
     /// <param name="runTime">今回の生存時間(秒)</param>
-    public async Task ReportGameResult(float runScore, float runTime)
+    /// <param name="noInputAchieved">無操作条件達成フラグ</param>
+    /// <param name="usedContinue">コンティニュー使用フラグ</param>
+    public async Task ReportGameResult(float runScore, float runTime, bool noInputAchieved = false, bool usedContinue = false)
     {
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
         PlayerStats stats = _cloudSaveManager.GetStats();
 
+        // 連続生存条件の更新（イルカ用：1分以上生存したか）
+        float survivalThreshold = 60f; // 1分
+        bool survivedLongEnough = runTime >= survivalThreshold;
+        await _cloudSaveManager.UpdateConsecutiveSurvival(survivedLongEnough);
+        int consecutiveSurvivalCount = _cloudSaveManager.GetConsecutiveSurvivalCount();
+
+        // 無操作解放フラグの更新（海綿体用）
+        if (noInputAchieved && !_cloudSaveManager.HasNoInputUnlocked())
+        {
+            await _cloudSaveManager.SetNoInputUnlocked();
+        }
+
+        // ノーコンティニューでハードモード到達の判定（カニ用）
+        // ハードモード = 6分（360秒）以上生存
+        float hardModeThreshold = 360f;
+        if (!usedContinue && runTime >= hardModeThreshold && !_cloudSaveManager.HasNoContinueHardModeUnlocked())
+        {
+            await _cloudSaveManager.SetNoContinueHardModeUnlocked();
+        }
+
         // 解放条件のチェック
-        await CheckUnlockConditions(runScore, runTime, stats.totalPlayCount, stats.totalPlayTime, stats.deathCount, stats.bestScore);
+        await CheckUnlockConditions(
+            runScore, runTime,
+            stats.totalPlayCount, stats.totalPlayTime, stats.deathCount, stats.bestScore,
+            consecutiveSurvivalCount, noInputAchieved, usedContinue
+        );
     }
 
     /// <summary>
     /// 全スキンをチェックして解放処理を行う
     /// </summary>
-    private async Task CheckUnlockConditions(float runScore, float runTime, int playCount, float totalTime, int deathCount, float bestScore)
+    private async Task CheckUnlockConditions(
+        float runScore, float runTime,
+        int playCount, float totalTime, int deathCount, float bestScore,
+        int consecutiveSurvivalCount, bool noInputAchieved, bool usedContinue)
     {
         if (_skinDatabase == null)
         {
@@ -126,6 +155,24 @@ public class SkinManager : MonoBehaviour
                 case SkinData.UnlockType.DeathCount:
                     if (deathCount >= (int)skin.conditionValue) unlock = true;
                     break;
+
+                // 新しい解放条件
+                case SkinData.UnlockType.NoInput:
+                    // 無操作条件（海綿体用）: 30秒操作なしで解放
+                    if (_cloudSaveManager.HasNoInputUnlocked()) unlock = true;
+                    break;
+                case SkinData.UnlockType.SNSShare:
+                    // SNSシェア条件（アカウミガメ用）: SNSでシェアすると解放
+                    if (_cloudSaveManager.HasSNSShared()) unlock = true;
+                    break;
+                case SkinData.UnlockType.ConsecutiveSurvival:
+                    // 連続生存条件（イルカ用）: conditionValue回連続で1分以上生存
+                    if (consecutiveSurvivalCount >= (int)skin.conditionValue) unlock = true;
+                    break;
+                case SkinData.UnlockType.NoContinueHardMode:
+                    // ノーコンティニューでハードモード到達（カニ用）
+                    if (_cloudSaveManager.HasNoContinueHardModeUnlocked()) unlock = true;
+                    break;
             }
 
             if (unlock)
@@ -146,6 +193,33 @@ public class SkinManager : MonoBehaviour
                 await UnlockSkin(goldSkin.id);
                 Debug.Log("ALL COMPLETE! Gold Skin Unlocked!");
             }
+        }
+    }
+
+    /// <summary>
+    /// SNSシェアによるスキン解放（アカウミガメ用）
+    /// 外部から呼び出される
+    /// </summary>
+    public async Task UnlockBySNSShare()
+    {
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (_cloudSaveManager == null)
+        {
+            Debug.LogError("Cannot unlock by SNS share: UGSCloudSaveManager is not available");
+            return;
+        }
+
+        // SNSシェアフラグを設定
+        await _cloudSaveManager.SetSNSShared();
+
+        // SNSShare条件のスキンを探して解放
+        _skinDatabase = SkinDatabase.instance;
+        var snsSkin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.unlockType == SkinData.UnlockType.SNSShare);
+        if (snsSkin != null && !IsUnlocked(snsSkin.id))
+        {
+            await UnlockSkin(snsSkin.id);
+            Debug.Log($"Skin unlocked by SNS share: {snsSkin.skinName}");
         }
     }
 

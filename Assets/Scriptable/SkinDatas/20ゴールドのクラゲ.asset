@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b144c30e19827d74f971f7c6ca1638e5, type: 3}
+  m_Name: "20\u30B4\u30FC\u30EB\u30C9\u306E\u30AF\u30E9\u30B2"
+  m_EditorClassIdentifier: Assembly-CSharp::SkinData
+  id: 20
+  skinName: "\u30B4\u30FC\u30EB\u30C9\u306E\u30AF\u30E9\u30B2"
+  skinSprite: {fileID: 5400512859475762972, guid: 4962e64ff37459c45be39246d1b96f90, type: 3}
+  unlockType: 7
+  conditionValue: 0
+  lockedDescription: "\u3059\u3079\u3066\u306E\u30B9\u30AD\u30F3\u3092\u89E3\u653E\u3059\u308B"

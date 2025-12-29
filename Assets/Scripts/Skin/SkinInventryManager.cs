@@ -25,7 +25,6 @@ public class SkinInventryManager : MonoBehaviour
     void Start()
     {
         _closeButton.onClick.AddListener(() => _flowUI.SwitchView("Start"));
-
         // UGSCloudSaveManagerのデータロード完了を待つ
         _cloudSaveManager = UGSCloudSaveManager.instance;
         if (_cloudSaveManager != null)

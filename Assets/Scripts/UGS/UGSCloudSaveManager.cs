@@ -227,7 +227,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     public int GetCurrentSkinID()
     {
-        int skinID = _playerData?.currentSkinID ?? 0;
+        int skinID = _playerData?.currentSkinID ?? 1; // デフォルトは初期スキンID 1
         Debug.Log($"[DEBUG] UGSCloudSaveManager.GetCurrentSkinID() returning: {skinID}, _playerData.currentSkinID: {_playerData?.currentSkinID}");
         return skinID;
     }
@@ -269,7 +269,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     public List<int> GetUnlockedSkinIDs()
     {
-        return _playerData?.unlockedSkinIDs ?? new List<int> { 0 };
+        return _playerData?.unlockedSkinIDs ?? new List<int> { 1 }; // デフォルトは初期スキンID 1
     }
 
     #endregion
@@ -301,6 +301,96 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// 連続生存カウンターを更新（イルカ用：連続で1分以上生存）
+    /// </summary>
+    /// <param name="survived">今回1分以上生存したか</param>
+    public async Task<bool> UpdateConsecutiveSurvival(bool survived)
+    {
+        if (_playerData == null) return false;
+
+        if (survived)
+        {
+            _playerData.stats.consecutiveSurvivalCount++;
+            Debug.Log($"Consecutive survival count: {_playerData.stats.consecutiveSurvivalCount}");
+        }
+        else
+        {
+            _playerData.stats.consecutiveSurvivalCount = 0;
+            Debug.Log("Consecutive survival count reset to 0");
+        }
+
+        return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// 連続生存カウントを取得
+    /// </summary>
+    public int GetConsecutiveSurvivalCount()
+    {
+        return _playerData?.stats.consecutiveSurvivalCount ?? 0;
+    }
+
+    /// <summary>
+    /// SNSシェアフラグを設定（アカウミガメ用）
+    /// </summary>
+    public async Task<bool> SetSNSShared()
+    {
+        if (_playerData == null) return false;
+
+        _playerData.stats.hasSNSShared = true;
+        Debug.Log("SNS share flag set to true");
+        return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// SNSシェア済みか確認
+    /// </summary>
+    public bool HasSNSShared()
+    {
+        return _playerData?.stats.hasSNSShared ?? false;
+    }
+
+    /// <summary>
+    /// 無操作解放フラグを設定（海綿体用）
+    /// </summary>
+    public async Task<bool> SetNoInputUnlocked()
+    {
+        if (_playerData == null) return false;
+
+        _playerData.stats.hasNoInputUnlocked = true;
+        Debug.Log("No input unlock flag set to true");
+        return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// 無操作解放済みか確認
+    /// </summary>
+    public bool HasNoInputUnlocked()
+    {
+        return _playerData?.stats.hasNoInputUnlocked ?? false;
+    }
+
+    /// <summary>
+    /// ノーコンティニューハードモード到達フラグを設定（カニ用）
+    /// </summary>
+    public async Task<bool> SetNoContinueHardModeUnlocked()
+    {
+        if (_playerData == null) return false;
+
+        _playerData.stats.hasNoContinueHardModeUnlocked = true;
+        Debug.Log("No continue hard mode unlock flag set to true");
+        return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// ノーコンティニューハードモード到達済みか確認
+    /// </summary>
+    public bool HasNoContinueHardModeUnlocked()
+    {
+        return _playerData?.stats.hasNoContinueHardModeUnlocked ?? false;
     }
 
     #endregion

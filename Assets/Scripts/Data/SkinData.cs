@@ -5,14 +5,18 @@ public class SkinData : ScriptableObject
 {
     public enum UnlockType
     {
-        None,           // 初期解放 
+        None,           // 初期解放
         ScoreReach,     // 特定のスコア到達（ベストスコア）
-        PlayCount,      // 累計プレイ回数 
-        SurvivalTime,   // 1回のプレイでの生存時間 
-        TotalPlayTime,  // 累計プレイ時間 
-        DeathCount,     // 累計死亡回数 
+        PlayCount,      // 累計プレイ回数
+        SurvivalTime,   // 1回のプレイでの生存時間
+        TotalPlayTime,  // 累計プレイ時間
+        DeathCount,     // 累計死亡回数
         AdWatch,        // 広告視聴（仕様書に記載あり）
-        CompleteAll     // 他のスキンを全て解放 
+        CompleteAll,    // 他のスキンを全て解放
+        NoInput,        // 一定時間操作なし（海綿体用）
+        SNSShare,       // SNSシェア（アカウミガメ用）
+        ConsecutiveSurvival, // 連続で一定時間生存（イルカ用）
+        NoContinueHardMode   // コンティニューなしでハードモード到達（カニ用）
     }
 
     public int id;

@@ -8,8 +8,8 @@ using System.Collections.Generic;
 public class PlayerCloudData
 {
     public string playerName = "プレイヤー";
-    public int currentSkinID = 0;
-    public List<int> unlockedSkinIDs = new List<int> { 0 }; // 初期スキンは解放済み
+    public int currentSkinID = 1; // 初期スキンID（ミズクラゲ）
+    public List<int> unlockedSkinIDs = new List<int> { 1 }; // 初期スキンは解放済み
     public PlayerStats stats = new PlayerStats();
 }
 
@@ -23,4 +23,16 @@ public class PlayerStats
     public float totalPlayTime = 0f;
     public int deathCount = 0;
     public float bestScore = 0f;
+
+    // 連続生存条件用（イルカ：3回連続で1分以上生存）
+    public int consecutiveSurvivalCount = 0;  // 連続で条件を満たした回数
+
+    // SNSシェア済みフラグ（アカウミガメ用）
+    public bool hasSNSShared = false;
+
+    // 無操作解放済みフラグ（海綿体用）
+    public bool hasNoInputUnlocked = false;
+
+    // ノーコンティニューでハードモード到達済みフラグ（カニ用）
+    public bool hasNoContinueHardModeUnlocked = false;
 }

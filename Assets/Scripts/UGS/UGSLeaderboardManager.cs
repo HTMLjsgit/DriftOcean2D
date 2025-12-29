@@ -143,7 +143,7 @@ public class UGSLeaderboardManager : MonoBehaviour
         foreach (var entry in scoresPage.Results)
         {
             string playerName = "Unknown";
-            int skinID = 0;
+            int skinID = 1; // デフォルトは初期スキンID 1
 
             // メタデータからプレイヤー名とスキンIDを取得
             try
@@ -227,7 +227,7 @@ public class UGSLeaderboardManager : MonoBehaviour
         }
 
         string playerName = "Unknown";
-        int skinID = 0;
+        int skinID = 1; // デフォルトは初期スキンID 1
 
         try
         {

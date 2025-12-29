@@ -13,6 +13,9 @@ public class GameOverManager : MonoBehaviour
     [Header("Ranking System")]
     [SerializeField] private Button _viewRankingButton; // ランキング確認ボタン
 
+    [Header("SNS Share")]
+    [SerializeField] private Button _shareButton; // SNSシェアボタン
+
     public static GameOverManager instance;
     private SkinManager _skinManager;
     private GameManager _gameManager;
@@ -24,10 +27,14 @@ public class GameOverManager : MonoBehaviour
     private AdsManager _adsManager;
     private UGSCloudSaveManager _cloudSaveManager;
     private UGSLeaderboardManager _leaderboardManager;
+    private PlayerController _playerController;
 
     // コンティニュー制限
     private const string KEY_CONTINUE_USED = "ContinueUsed";
-    private bool hasUsedContinue = false;
+    private bool _hasUsedContinue = false;
+
+    // 外部からアクセス用
+    public bool HasUsedContinue => _hasUsedContinue;
 
     void Awake()
     {
@@ -52,6 +59,7 @@ public class GameOverManager : MonoBehaviour
         _adsManager = AdsManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _leaderboardManager = UGSLeaderboardManager.instance;
+        _playerController = PlayerController.instance;
 
         Debug.Log("OnStart _rankingManager: " + _rankingManager);
 
@@ -66,6 +74,12 @@ public class GameOverManager : MonoBehaviour
 
         // ランキング確認ボタン
         _viewRankingButton.onClick.AddListener(OnViewRankingClicked);
+
+        // SNSシェアボタン
+        if (_shareButton != null)
+        {
+            _shareButton.onClick.AddListener(OnShareButtonClicked);
+        }
     }
 
     public async void GameOver()
@@ -81,7 +95,7 @@ public class GameOverManager : MonoBehaviour
         _gameOverPanel.SetActive(true);
 
         // コンティニュー済みの場合は即座にボタンを非表示
-        if (hasUsedContinue && _continueButton != null && _continueButton.gameObject != null)
+        if (_hasUsedContinue && _continueButton != null && _continueButton.gameObject != null)
         {
             _continueButton.gameObject.SetActive(false);
         }
@@ -98,8 +112,11 @@ public class GameOverManager : MonoBehaviour
             await _cloudSaveManager.UpdateStats(finalScore, finalTime);
             Debug.Log("Stats updated to UGS Cloud Save");
 
+            // 無操作条件の達成チェック
+            bool noInputAchieved = _playerController != null && _playerController.NoInputUnlockAchieved;
+
             // スキン解放チェック（更新された統計データを使用）
-            await _skinManager.ReportGameResult(finalScore, finalTime);
+            await _skinManager.ReportGameResult(finalScore, finalTime, noInputAchieved, _hasUsedContinue);
             _stageManager.SetCurrentPlay(false);
 
             // UGSリーダーボードにスコアを送信
@@ -154,6 +171,23 @@ public class GameOverManager : MonoBehaviour
     }
 
     /// <summary>
+    /// SNSシェアボタンがクリックされたときの処理
+    /// </summary>
+    private void OnShareButtonClicked()
+    {
+        float currentScore = _scoreManager.getCurrentScore();
+
+        if (SNSShareManager.instance != null)
+        {
+            SNSShareManager.instance.ShareScore(currentScore);
+        }
+        else
+        {
+            Debug.LogWarning("SNSShareManager not found. Cannot share.");
+        }
+    }
+
+    /// <summary>
     /// コンティニューボタンクリック時の処理
     /// </summary>
     private void OnContinueButtonClicked()
@@ -164,7 +198,7 @@ public class GameOverManager : MonoBehaviour
             {
                 // 広告視聴成功 - コンティニュー実行
                 Debug.Log("Rewarded ad success - Continue game");
-                hasUsedContinue = true;
+                _hasUsedContinue = true;
 
                 // コンティニューボタンを即座に非表示
                 if (_continueButton != null && _continueButton.gameObject != null)
@@ -213,7 +247,7 @@ public class GameOverManager : MonoBehaviour
         }
 
         // 1回のプレイで1回のみコンティニュー可能
-        if (hasUsedContinue)
+        if (_hasUsedContinue)
         {
             _continueButton.gameObject.SetActive(false);
         }

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyProfile
   thresholdYear: 1970
   restDuration: 0
-  spawnInterval: 0.8
-  speedMultiplier: 1.2
+  spawnInterval: 1.4
+  speedMultiplier: 1
   newObstaclesToAdd:
   - {fileID: 11400000, guid: b7450fceb447b8c468ab977640624b1c, type: 2}
   - {fileID: 11400000, guid: 2c26956cc89595446b08b7cbaa0031c9, type: 2}
