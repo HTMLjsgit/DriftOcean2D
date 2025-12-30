@@ -131,7 +131,7 @@ public class GameSceneRankingUI : MonoBehaviour
     {
         string currentName = _playerNameManager.GetPlayerName();
         _nicknameInputUI.ShowPanel(
-            $"現在の名前: {currentName}\n新しい名前を入力してください",
+            "What's your name",
             OnNameChanged,
             null
         );

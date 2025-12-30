@@ -31,6 +31,7 @@ public class AdsManager : MonoBehaviour
     // コールバック
     private Action onRewardedAdSuccess;
     private Action onRewardedAdFailed;
+    private Action onInterstitialAdClosed;
 
     private bool isInitialized = false;
     private bool rewardGranted = false; // 報酬が付与されたかどうかのフラグ
@@ -242,6 +243,10 @@ public class AdsManager : MonoBehaviour
         {
             Debug.Log("Interstitial ad full screen content closed");
 
+            // コールバックを呼ぶ
+            onInterstitialAdClosed?.Invoke();
+            onInterstitialAdClosed = null;
+
             // 次の広告をロード
             LoadInterstitialAd();
         };
@@ -250,6 +255,10 @@ public class AdsManager : MonoBehaviour
         ad.OnAdFullScreenContentFailed += (AdError error) =>
         {
             Debug.LogError($"Interstitial ad failed to show: {error}");
+
+            // 失敗してもコールバックを呼ぶ（ゲームを続行できるように）
+            onInterstitialAdClosed?.Invoke();
+            onInterstitialAdClosed = null;
 
             // 次の広告をロード
             LoadInterstitialAd();
@@ -331,7 +340,8 @@ public class AdsManager : MonoBehaviour
     /// <summary>
     /// ゲームプレイ開始時に呼び出す（プレイ回数カウント）
     /// </summary>
-    public void OnGamePlayStart()
+    /// <param name="onComplete">広告表示完了後（または広告なしの場合は即座に）呼ばれるコールバック</param>
+    public void OnGamePlayStart(Action onComplete = null)
     {
         // UGSCloudSaveManagerからtotalPlayCountを取得
         _cloudSaveManager = UGSCloudSaveManager.instance;
@@ -339,6 +349,7 @@ public class AdsManager : MonoBehaviour
         if (_cloudSaveManager == null)
         {
             Debug.LogWarning("[AdsManager] UGSCloudSaveManager not found. Cannot check play count for ads.");
+            onComplete?.Invoke();
             return;
         }
 
@@ -351,11 +362,41 @@ public class AdsManager : MonoBehaviour
         if (totalPlayCount % adIntervalPlayCount == 0)
         {
             Debug.Log($"[AdsManager] Showing interstitial ad (total plays: {totalPlayCount})");
-            ShowInterstitialAd();
+            ShowInterstitialAdWithCallback(onComplete);
         }
         else
         {
             Debug.Log($"[AdsManager] No ad this time. Next ad at play count: {(totalPlayCount / adIntervalPlayCount + 1) * adIntervalPlayCount}");
+            onComplete?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// インタースティシャル広告を表示（コールバック付き）
+    /// </summary>
+    /// <param name="onClosed">広告が閉じられた後に呼ばれるコールバック</param>
+    public void ShowInterstitialAdWithCallback(Action onClosed)
+    {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("AdMob SDK is not initialized yet.");
+            onClosed?.Invoke();
+            return;
+        }
+
+        if (interstitialAd != null && interstitialAd.CanShowAd())
+        {
+            Debug.Log("Showing interstitial ad with callback");
+            onInterstitialAdClosed = onClosed;
+            interstitialAd.Show();
+        }
+        else
+        {
+            Debug.LogWarning("Interstitial ad is not ready yet.");
+            onClosed?.Invoke();
+
+            // 広告をロード
+            LoadInterstitialAd();
         }
     }
 

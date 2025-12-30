@@ -81,7 +81,7 @@ public class TitleController : MonoBehaviour
             Debug.Log("Player name not set, showing input panel");
             // 名前が未設定なら入力画面を表示
             _nicknameInputUI.ShowPanel(
-                "ようこそ！\nあなたの名前を入力してください",
+                "What's your name",
                 OnFirstTimeNameSubmitted,
                 null // キャンセルなし
             );

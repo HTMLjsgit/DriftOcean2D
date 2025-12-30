@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.Linq;
 
 public class SkinUI : MonoBehaviour
@@ -8,13 +9,16 @@ public class SkinUI : MonoBehaviour
     [SerializeField] private Image _skinImageUI;
     [SerializeField] private Sprite _lockedSprite; // ロック状態のスプライト
     [SerializeField] private Image _outlineImage;
+    [SerializeField] private TextMeshProUGUI _newLabelText; // Newラベル
     private Sprite _originalSprite; // 元のスキンスプライト
     private SkinDatabase _skinDatabase;
+    private UGSCloudSaveManager _cloudSaveManager;
     public int skinId => _skinID;
 
     void Start()
     {
         _skinDatabase = SkinDatabase.instance;
+        _cloudSaveManager = UGSCloudSaveManager.instance;
     }
 
     public void Initialize(Sprite sprite)
@@ -25,11 +29,15 @@ public class SkinUI : MonoBehaviour
 
     public void UpdateUIState()
     {
+        // 常に最新のインスタンスを取得
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+
         // スキンが解放されているかチェック
         bool isUnlocked = SkinManager.instance.IsUnlocked(_skinID);
         bool isEquipped = SkinManager.instance.currentSkinID == _skinID;
+        bool isNew = _cloudSaveManager != null && _cloudSaveManager.IsSkinNew(_skinID);
 
-        Debug.Log($"[SkinUI {_skinID}] UpdateUIState - isUnlocked={isUnlocked}, isEquipped={isEquipped}, currentSkinID={SkinManager.instance.currentSkinID}");
+        Debug.Log($"[SkinUI {_skinID}] UpdateUIState - isUnlocked={isUnlocked}, isEquipped={isEquipped}, isNew={isNew}");
 
         // 解放されていればオリジナルスプライト、ロック中ならロックスプライトを表示
         if (isUnlocked)
@@ -45,6 +53,12 @@ public class SkinUI : MonoBehaviour
 
         // Outlineは装備中の場合のみ表示
         _outlineImage.gameObject.SetActive(isEquipped);
+
+        // Newラベルは解放済みかつ未装備（見ていない）場合のみ表示
+        if (_newLabelText != null)
+        {
+            _newLabelText.gameObject.SetActive(isUnlocked && isNew);
+        }
     }
 
     public async void OnClickedSkinUI()
@@ -88,6 +102,12 @@ public class SkinUI : MonoBehaviour
         // 解放済みの場合は装備
         await SkinManager.instance.EquipSkin(_skinID);
         Debug.Log($"Equipped Skin ID: {_skinID}");
+
+        // スキンを見た（装備した）としてマーク（Newラベルを消す）
+        if (_cloudSaveManager != null)
+        {
+            await _cloudSaveManager.MarkSkinAsSeen(_skinID);
+        }
 
         SkinInventryManager.instance.RefreshAllSlots();
     }

@@ -394,4 +394,69 @@ public class UGSCloudSaveManager : MonoBehaviour
     }
 
     #endregion
+
+    #region Skin Notification (New Label & Unlock Notice)
+
+    /// <summary>
+    /// 未通知（タイトル画面でお知らせ表示していない）の解放済みスキンIDリストを取得
+    /// </summary>
+    public List<int> GetUnnotifiedSkinIDs()
+    {
+        if (_playerData == null) return new List<int>();
+
+        // 解放済みだがお知らせ済みリストにないスキンを返す
+        return _playerData.unlockedSkinIDs
+            .Where(id => !_playerData.notifiedSkinIDs.Contains(id))
+            .ToList();
+    }
+
+    /// <summary>
+    /// スキンをお知らせ済みとしてマーク
+    /// </summary>
+    public async Task<bool> MarkSkinsAsNotified(List<int> skinIDs)
+    {
+        if (_playerData == null || skinIDs == null || skinIDs.Count == 0) return false;
+
+        foreach (var id in skinIDs)
+        {
+            if (!_playerData.notifiedSkinIDs.Contains(id))
+            {
+                _playerData.notifiedSkinIDs.Add(id);
+            }
+        }
+
+        Debug.Log($"Marked skins as notified: [{string.Join(", ", skinIDs)}]");
+        return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// スキンが新規（未装備/未閲覧）かチェック（Newラベル用）
+    /// </summary>
+    public bool IsSkinNew(int skinID)
+    {
+        if (_playerData == null) return false;
+
+        // 解放済みかつ見ていない（装備していない）スキンは新規
+        return _playerData.unlockedSkinIDs.Contains(skinID) &&
+               !_playerData.seenSkinIDs.Contains(skinID);
+    }
+
+    /// <summary>
+    /// スキンを見た（装備した）としてマーク（Newラベルを消す）
+    /// </summary>
+    public async Task<bool> MarkSkinAsSeen(int skinID)
+    {
+        if (_playerData == null) return false;
+
+        if (!_playerData.seenSkinIDs.Contains(skinID))
+        {
+            _playerData.seenSkinIDs.Add(skinID);
+            Debug.Log($"Skin {skinID} marked as seen (New label removed)");
+            return await SavePlayerData();
+        }
+
+        return true;
+    }
+
+    #endregion
 }

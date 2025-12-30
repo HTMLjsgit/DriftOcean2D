@@ -11,11 +11,10 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _scoreText;
 
     [Header("Ranking System")]
-    [SerializeField] private Button _viewRankingButton; // ランキング確認ボタン
 
     [Header("SNS Share")]
     [SerializeField] private Button _shareButton; // SNSシェアボタン
-
+    [SerializeField] private Button _retryButton;
     public static GameOverManager instance;
     private SkinManager _skinManager;
     private GameManager _gameManager;
@@ -71,10 +70,7 @@ public class GameOverManager : MonoBehaviour
             Debug.Log("[GameOverManager] Calling SceneController.SceneLoad(Title)");
             SceneController.instance.SceneLoad("Title");
         });
-
-        // ランキング確認ボタン
-        _viewRankingButton.onClick.AddListener(OnViewRankingClicked);
-
+        _retryButton.onClick.AddListener(OnRetryButtonClicked);
         // SNSシェアボタン
         if (_shareButton != null)
         {
@@ -103,7 +99,7 @@ public class GameOverManager : MonoBehaviour
         float finalScore = _scoreManager.getCurrentScore();
         float finalTime = _stageManager.currentPlayTime;
 
-        _scoreText.SetText($"Score: {finalScore.ToString("F2")}");
+        _scoreText.SetText($"{finalScore.ToString("F2")}");
         Time.timeScale = 0;
 
         try
@@ -262,5 +258,32 @@ public class GameOverManager : MonoBehaviour
                 Debug.LogWarning("Rewarded ad is not ready. Continue button hidden.");
             }
         }
+    }
+
+    /// <summary>
+    /// リトライボタンクリック時の処理
+    /// 完全に最初からやり直し（プレイ回数としてカウント）
+    /// </summary>
+    private void OnRetryButtonClicked()
+    {
+        Debug.Log("[GameOverManager] Retry button clicked");
+
+        // 1. コンティニューフラグをリセット（新しいプレイなので）
+        _hasUsedContinue = false;
+
+        // 2. ゲームオーバー画面を閉じる
+        _gameOverPanel.SetActive(false);
+
+        // 3. ゲーム状態をプレイ中に戻す
+        _gameManager.SetGameState(GameManager.GameState.Playing);
+
+        // 4. PlayerControllerの状態をリセット
+        if (_playerController != null)
+        {
+            _playerController.ResetForRetry();
+        }
+
+        // 5. リトライ処理を実行（StageManager側で広告チェック→timeScale=1→ゲーム開始）
+        _stageManager.StageRetry();
     }
 }

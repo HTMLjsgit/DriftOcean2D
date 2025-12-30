@@ -15,6 +15,10 @@ public class PlayerController : MonoBehaviour
     private GameManager _gameManager;
     private GameOverManager _gameOverManager;
     public static PlayerController instance;
+
+    // 初期位置（リトライ時にリセットするため）
+    private Vector3 _initialPosition;
+
     // 無操作トラッキング用
     [Header("No Input Tracking")]
     [SerializeField] private float _noInputThreshold = 30f; // 無操作判定時間（秒）
@@ -33,6 +37,9 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        // 初期位置を保存
+        _initialPosition = transform.position;
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -87,6 +94,28 @@ public class PlayerController : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D collider)
     {
-        
+
+    }
+
+    /// <summary>
+    /// リトライ時にプレイヤーの状態をリセット
+    /// </summary>
+    public void ResetForRetry()
+    {
+        // 位置を初期位置に戻す
+        transform.position = _initialPosition;
+
+        // 速度をリセット
+        if (_rigidbody2D != null)
+        {
+            _rigidbody2D.linearVelocity = Vector2.zero;
+        }
+
+        // 無操作トラッキングをリセット
+        _lastInputTime = Time.time;
+        _noInputUnlockTriggered = false;
+        NoInputUnlockAchieved = false;
+
+        Debug.Log("[PlayerController] Reset for retry");
     }
 }

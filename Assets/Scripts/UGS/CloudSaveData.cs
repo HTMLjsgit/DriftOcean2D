@@ -10,6 +10,8 @@ public class PlayerCloudData
     public string playerName = "プレイヤー";
     public int currentSkinID = 1; // 初期スキンID（ミズクラゲ）
     public List<int> unlockedSkinIDs = new List<int> { 1 }; // 初期スキンは解放済み
+    public List<int> notifiedSkinIDs = new List<int> { 1 }; // お知らせ済みスキンリスト（タイトル画面で通知済み）
+    public List<int> seenSkinIDs = new List<int> { 1 }; // 見た（装備した）スキンリスト（Newラベル用）
     public PlayerStats stats = new PlayerStats();
 }
 

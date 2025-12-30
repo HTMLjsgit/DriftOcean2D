@@ -46,6 +46,29 @@ public class StageManager : MonoBehaviour
         // プレイ回数カウント（5回ごとに広告表示）
         _adsManager.OnGamePlayStart();
     }
+    /// <summary>
+    /// リトライ処理（完全に最初からやり直し）
+    /// プレイ回数としてカウントし、5回ごとに広告を表示
+    /// </summary>
+    public void StageRetry()
+    {
+        // 1. まずリセット処理を行う（Time.timeScale = 0 のままでOK）
+        currentPlayTime = 0;
+        _scoreManager.ScoreMeasureInit();
+        _obstaclesSpawner.ClearAllObstacles();
+        _obstaclesSpawner.spawn = false;
+
+        // 2. プレイ回数カウント＆広告チェック（5回ごとに広告表示）
+        //    広告表示後（または広告なしの場合は即座に）ゲームを開始
+        _adsManager.OnGamePlayStart(onComplete: () =>
+        {
+            // 3. 広告が終わってからtimeScale = 1にしてゲーム開始
+            Time.timeScale = 1;
+            _scoreManager.ScoreMeasureStart();
+            _obstaclesSpawner.spawn = true;
+            SetCurrentPlay(true);
+        });
+    }
     public void StageResume()
     {
         // Init（初期化）は呼ばずに、計測だけ再開する
