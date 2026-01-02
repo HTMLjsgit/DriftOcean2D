@@ -16,11 +16,64 @@ public class DifficultyManager : MonoBehaviour
     private List<DifficultyProfile> _pendingStages;
     private bool _isChangingDifficulty = false;
 
+    public static DifficultyManager instance;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         _scoreManager = ScoreManager.instance;
         _obstacleSpawner = ObstaclesSpawner.instance;
+        InitializePendingStages();
+    }
+
+    /// <summary>
+    /// ペンディングステージリストを初期化
+    /// </summary>
+    private void InitializePendingStages()
+    {
         _pendingStages = difficultyStages.OrderBy(x => x.thresholdYear).ToList();
+        Debug.Log($"[DifficultyManager] Initialized {_pendingStages.Count} difficulty stages");
+    }
+
+    /// <summary>
+    /// リトライ時に難易度を最初の状態に戻す
+    /// </summary>
+    public void ResetDifficulty()
+    {
+        Debug.Log("[DifficultyManager] Resetting difficulty to initial state");
+
+        // ペンディングステージを再初期化
+        InitializePendingStages();
+
+        // 処理中フラグをリセット
+        _isChangingDifficulty = false;
+
+        // 最初の難易度プロファイルを適用（1960年の状態）
+        if (difficultyStages.Count > 0)
+        {
+            var firstStage = difficultyStages.OrderBy(x => x.thresholdYear).FirstOrDefault();
+            if (firstStage != null)
+            {
+                _obstacleSpawner.AddDifficultyStage(
+                    firstStage.spawnInterval,
+                    firstStage.speedMultiplier,
+                    firstStage.newObstaclesToAdd,
+                    true
+                );
+                Debug.Log($"[DifficultyManager] Applied initial difficulty: {firstStage.thresholdYear}");
+            }
+        }
     }
 
     void Update()

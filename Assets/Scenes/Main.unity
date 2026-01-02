@@ -242,6 +242,17 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &164330306 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7417996099344055284, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
+  m_PrefabInstance: {fileID: 1886609962}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &177952266
 GameObject:
   m_ObjectHideFlags: 0
@@ -1998,6 +2009,10 @@ PrefabInstance:
       propertyPath: _contentTransform
       value: 
       objectReference: {fileID: 1886609964}
+    - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
+      propertyPath: _rankingTypeLabel
+      value: 
+      objectReference: {fileID: 164330306}
     - target: {fileID: 4531354003107337264, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 540
@@ -4179,7 +4194,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 619394802}
-  - {fileID: 4746759036314525329}
   - {fileID: 1438948746}
   - {fileID: 5804040064486799570}
   - {fileID: 7100322735596152280}
@@ -4202,3 +4216,4 @@ SceneRoots:
   - {fileID: 3965151831332368416}
   - {fileID: 320814079}
   - {fileID: 363741681}
+  - {fileID: 4746759036314525329}

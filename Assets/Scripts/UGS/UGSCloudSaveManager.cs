@@ -139,6 +139,12 @@ public class UGSCloudSaveManager : MonoBehaviour
             return false;
         }
 
+        // 保存前に重複を削除（データクリーンアップ）
+        _playerData.unlockedSkinIDs = _playerData.unlockedSkinIDs.Distinct().ToList();
+        _playerData.notifiedSkinIDs = _playerData.notifiedSkinIDs.Distinct().ToList();
+        _playerData.seenSkinIDs = _playerData.seenSkinIDs.Distinct().ToList();
+        _playerData.viewedSkinInventoryUnlockedSkins = _playerData.viewedSkinInventoryUnlockedSkins.Distinct().ToList();
+
         if (_ugsManager != null && _ugsManager.IsSignedIn())
         {
             Debug.Log("Saving player data to Cloud Save...");
@@ -456,6 +462,90 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// スキン一覧を見たとしてマーク（SkinボタンのNewラベル用）
+    /// 現在の解放済みスキンをすべて記録
+    /// </summary>
+    public async Task<bool> MarkSkinInventoryAsViewed()
+    {
+        if (_playerData == null) return false;
+
+        // 現在解放済みのスキンをすべて記録
+        foreach (var skinID in _playerData.unlockedSkinIDs)
+        {
+            if (!_playerData.viewedSkinInventoryUnlockedSkins.Contains(skinID))
+            {
+                _playerData.viewedSkinInventoryUnlockedSkins.Add(skinID);
+            }
+        }
+
+        Debug.Log($"Skin inventory viewed. Marked skins: [{string.Join(", ", _playerData.viewedSkinInventoryUnlockedSkins)}]");
+        return await SavePlayerData();
+    }
+
+    /// <summary>
+    /// SkinボタンにNewを表示すべきか（スキン一覧で未確認の新しいスキンがあるか）
+    /// </summary>
+    public bool HasNewSkinsInInventory()
+    {
+        if (_playerData == null) return false;
+
+        // 解放済みだがスキン一覧で確認していないスキンがあるか
+        foreach (var skinID in _playerData.unlockedSkinIDs)
+        {
+            if (!_playerData.viewedSkinInventoryUnlockedSkins.Contains(skinID))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region Tap Unlock (ぷにぷにタップ回数でアンロック)
+
+    /// <summary>
+    /// グローバルタップ回数を取得
+    /// </summary>
+    public int GetGlobalTapCount()
+    {
+        if (_playerData == null) return 0;
+        return _playerData.globalTapCount;
+    }
+
+    /// <summary>
+    /// グローバルタップ回数を増やす
+    /// </summary>
+    public async Task<int> IncrementGlobalTapCount()
+    {
+        if (_playerData == null) return 0;
+
+        int currentCount = _playerData.globalTapCount;
+        _playerData.globalTapCount++;
+
+        Debug.Log($"[UGSCloudSaveManager] Global tap count: {currentCount} -> {_playerData.globalTapCount}");
+
+        await SavePlayerData();
+
+        return _playerData.globalTapCount;
+    }
+
+    /// <summary>
+    /// グローバルタップ回数をリセット
+    /// </summary>
+    public async Task<bool> ResetGlobalTapCount()
+    {
+        if (_playerData == null) return false;
+
+        _playerData.globalTapCount = 0;
+
+        Debug.Log($"[UGSCloudSaveManager] Global tap count reset");
+
+        return await SavePlayerData();
     }
 
     #endregion

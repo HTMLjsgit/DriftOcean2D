@@ -46,6 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   _scoreTextUI: {fileID: 0}
   _scorePerSecond: 1
-  _timeMultiplier: 1
+  _timeMultiplier: 0.456
   currentScore: 1950
   _initialScore: 0

@@ -16,16 +16,17 @@ public class SkinData : ScriptableObject
         NoInput,        // 一定時間操作なし（海綿体用）
         SNSShare,       // SNSシェア（アカウミガメ用）
         ConsecutiveSurvival, // 連続で一定時間生存（イルカ用）
-        NoContinueHardMode   // コンティニューなしでハードモード到達（カニ用）
+        NoContinueHardMode,  // コンティニューなしでハードモード到達（カニ用）
+        TapUnlock       // ぷにぷにタップ回数で解放（conditionValueでタップ回数指定）
     }
 
     public int id;
     public string skinName;
     public Sprite skinSprite;
     public UnlockType unlockType;
-    
+
     [Header("条件値 (秒数・回数・スコア)")]
-    public float conditionValue; 
+    public float conditionValue;
 
     [Header("説明文 (ロック時に表示)")]
     public string lockedDescription; // 例：「3分間生き残る」

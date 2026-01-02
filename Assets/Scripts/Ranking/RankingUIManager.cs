@@ -16,6 +16,14 @@ public class RankingUIManager : MonoBehaviour
     [SerializeField] private Button _closeButton; // 閉じるボタン
     [SerializeField] private Button _changeNameButton; // 名前変更ボタン
 
+    [Header("Ranking Type Switch")]
+    [SerializeField] private Button _allTimeButton; // 総合ランキングボタン
+    [SerializeField] private Button _dailyButton; // デイリーランキングボタン
+    [SerializeField] private TextMeshProUGUI _rankingTypeLabel; // ランキング種別ラベル（例: "総合ランキング"）
+
+    [Header("Default Ranking Type")]
+    [SerializeField] private DefaultRankingType _defaultRankingType = DefaultRankingType.AllTime; // デフォルトで表示するランキング種別
+
     [Header("Your High Score UI")]
     [SerializeField] private Image _yourSkinImage; // プレイヤーのスキン画像
     [SerializeField] private TextMeshProUGUI _yourNameText; // プレイヤー名
@@ -37,12 +45,20 @@ public class RankingUIManager : MonoBehaviour
     // 非同期処理のキャンセル用
     private CancellationTokenSource _cancellationTokenSource;
 
+    // ランキング種別の定義
+    private enum RankingType { AllTime, Daily }
+    public enum DefaultRankingType { AllTime, Daily } // Inspector用のpublic enum
+    private RankingType _currentRankingType;
+
     void Awake()
     {
         if (instance == null)
         {
             instance = this;
             _cancellationTokenSource = new CancellationTokenSource();
+
+            // デフォルトのランキングタイプを設定
+            _currentRankingType = _defaultRankingType == DefaultRankingType.Daily ? RankingType.Daily : RankingType.AllTime;
         }
         else
         {
@@ -72,6 +88,16 @@ public class RankingUIManager : MonoBehaviour
 
         // 名前変更ボタンのリスナー登録
         _changeNameButton.onClick.AddListener(OnChangeNameClicked);
+
+        // ランキング切り替えボタンのリスナー登録
+        if (_allTimeButton != null)
+        {
+            _allTimeButton.onClick.AddListener(() => SwitchRankingType(RankingType.AllTime));
+        }
+        if (_dailyButton != null)
+        {
+            _dailyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Daily));
+        }
 
         // Mainシーンの場合は初期状態で非表示
         if (_flowUI == null)
@@ -108,8 +134,9 @@ public class RankingUIManager : MonoBehaviour
             // キャンセルチェック
             token.ThrowIfCancellationRequested();
 
-            // リーダーボードを更新（常に使用）
+            // 総合とデイリーの両方のリーダーボードを更新
             await _ugsLeaderboardManager.RefreshLeaderboard();
+            await _ugsLeaderboardManager.RefreshDailyLeaderboard();
 
             // キャンセルチェック
             token.ThrowIfCancellationRequested();
@@ -165,9 +192,20 @@ public class RankingUIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // UGSランキングを表示（常に使用）
-        var ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
-        Debug.Log($"UGS Ranking count: {ugsRankings.Count}");
+        // 現在のランキング種別に応じて表示
+        List<UGSRankingEntry> ugsRankings;
+        if (_currentRankingType == RankingType.Daily)
+        {
+            ugsRankings = _ugsLeaderboardManager.GetCachedDailyRankings();
+            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "デイリーランキング";
+            Debug.Log($"Daily Ranking count: {ugsRankings.Count}");
+        }
+        else
+        {
+            ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
+            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "総合ランキング";
+            Debug.Log($"All-Time Ranking count: {ugsRankings.Count}");
+        }
 
         for (int i = 0; i < ugsRankings.Count; i++)
         {
@@ -310,5 +348,26 @@ public class RankingUIManager : MonoBehaviour
         {
             Debug.LogError($"[RankingUIManager] Error in OnNameChanged: {e.Message}\n{e.StackTrace}");
         }
+    }
+
+    /// <summary>
+    /// ランキング種別を切り替える
+    /// </summary>
+    private void SwitchRankingType(RankingType type)
+    {
+        if (_currentRankingType == type)
+        {
+            // 既に同じ種別が選択されている場合は何もしない
+            return;
+        }
+
+        _currentRankingType = type;
+        Debug.Log($"Ranking type switched to: {type}");
+
+        // ランキングリストを再描画
+        RefreshRankingList();
+
+        // Your High Scoreも更新（デイリーの場合は今日のスコアを表示）
+        UpdateYourHighScore();
     }
 }

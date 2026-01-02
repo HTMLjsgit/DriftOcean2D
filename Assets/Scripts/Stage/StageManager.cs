@@ -9,6 +9,7 @@ public class StageManager : MonoBehaviour
     private ScoreManager _scoreManager;
     private ObstaclesSpawner _obstaclesSpawner;
     private AdsManager _adsManager;
+    private DifficultyManager _difficultyManager;
     void Awake()
     {
         if(instance == null)
@@ -26,6 +27,7 @@ public class StageManager : MonoBehaviour
         _scoreManager = ScoreManager.instance;
         _obstaclesSpawner = ObstaclesSpawner.instance;
         _adsManager = AdsManager.instance;
+        _difficultyManager = DifficultyManager.instance;
         StageStart();
 
     }
@@ -57,6 +59,12 @@ public class StageManager : MonoBehaviour
         _scoreManager.ScoreMeasureInit();
         _obstaclesSpawner.ClearAllObstacles();
         _obstaclesSpawner.spawn = false;
+
+        // 難易度を最初の状態にリセット
+        if (_difficultyManager != null)
+        {
+            _difficultyManager.ResetDifficulty();
+        }
 
         // 2. プレイ回数カウント＆広告チェック（5回ごとに広告表示）
         //    広告表示後（または広告なしの場合は即座に）ゲームを開始
