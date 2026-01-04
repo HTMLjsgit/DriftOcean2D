@@ -15,6 +15,6 @@ MonoBehaviour:
   id: 18
   skinName: "\u30AA\u30AA\u30B0\u30BD\u30AF\u30E0\u30B7"
   skinSprite: {fileID: 7952973365406442264, guid: a05b18c2044461a46b939b2e32b6148d, type: 3}
-  unlockType: 1
-  conditionValue: 1970
-  lockedDescription: 
+  unlockType: 13
+  conditionValue: 180
+  lockedDescription: "\u30CF\u30FC\u30C9\u30E2\u30FC\u30C9\u30673\u5206\u751F\u5B58"

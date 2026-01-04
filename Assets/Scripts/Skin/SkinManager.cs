@@ -102,11 +102,23 @@ public class SkinManager : MonoBehaviour
             await _cloudSaveManager.SetNoContinueHardModeUnlocked();
         }
 
+        // 最高難易度での生存時間を計算（新しいスキン条件用：イカ、オオグソクムシ）
+        float maxDifficultySurvivalTime = 0f;
+        bool reachedMaxDifficulty = false;
+        if (DifficultyManager.instance != null && DifficultyManager.instance.maxDifficultyMode)
+        {
+            reachedMaxDifficulty = true;
+            // 最高難易度到達後の経過時間を使用
+            // TODO: より正確な計測が必要な場合、DifficultyManagerに最高難易度到達時刻を記録する
+            maxDifficultySurvivalTime = runTime;
+        }
+
         // 解放条件のチェック
         await CheckUnlockConditions(
             runScore, runTime,
             stats.totalPlayCount, stats.totalPlayTime, stats.deathCount, stats.bestScore,
-            consecutiveSurvivalCount, noInputAchieved, usedContinue
+            consecutiveSurvivalCount, noInputAchieved, usedContinue,
+            reachedMaxDifficulty, maxDifficultySurvivalTime
         );
     }
 
@@ -116,7 +128,8 @@ public class SkinManager : MonoBehaviour
     private async Task CheckUnlockConditions(
         float runScore, float runTime,
         int playCount, float totalTime, int deathCount, float bestScore,
-        int consecutiveSurvivalCount, bool noInputAchieved, bool usedContinue)
+        int consecutiveSurvivalCount, bool noInputAchieved, bool usedContinue,
+        bool reachedMaxDifficulty, float maxDifficultySurvivalTime)
     {
         if (_skinDatabase == null)
         {
@@ -172,6 +185,17 @@ public class SkinManager : MonoBehaviour
                 case SkinData.UnlockType.NoContinueHardMode:
                     // ノーコンティニューでハードモード到達（カニ用）
                     if (_cloudSaveManager.HasNoContinueHardModeUnlocked()) unlock = true;
+                    break;
+                case SkinData.UnlockType.MaxDifficultySurvival:
+                    // 最高難易度生存条件（イカ、オオグソクムシ用）
+                    // conditionValue=0の場合はハードモード到達のみ、>0の場合は生存時間も確認
+                    if (reachedMaxDifficulty)
+                    {
+                        if (skin.conditionValue == 0 || maxDifficultySurvivalTime >= skin.conditionValue)
+                        {
+                            unlock = true;
+                        }
+                    }
                     break;
             }
 

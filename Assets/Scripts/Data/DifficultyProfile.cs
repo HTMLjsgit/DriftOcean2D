@@ -18,4 +18,7 @@ public class DifficultyProfile : ScriptableObject
 
     [Header("New Trash")]
     public List<ObstacleData> newObstaclesToAdd; 
+
+    [Header("最高難易度かどうか")]
+    public bool maxDifficulty;
 }

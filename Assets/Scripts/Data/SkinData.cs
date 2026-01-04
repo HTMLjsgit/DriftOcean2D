@@ -17,7 +17,8 @@ public class SkinData : ScriptableObject
         SNSShare,       // SNSシェア（アカウミガメ用）
         ConsecutiveSurvival, // 連続で一定時間生存（イルカ用）
         NoContinueHardMode,  // コンティニューなしでハードモード到達（カニ用）
-        TapUnlock       // ぷにぷにタップ回数で解放（conditionValueでタップ回数指定）
+        TapUnlock,      // ぷにぷにタップ回数で解放（conditionValueでタップ回数指定）
+        MaxDifficultySurvival // 最高難易度で生存（conditionValue=0でハードモード到達、>0で生存時間指定）
     }
 
     public int id;

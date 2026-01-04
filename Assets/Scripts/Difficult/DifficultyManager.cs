@@ -9,13 +9,13 @@ public class DifficultyManager : MonoBehaviour
     [Header("References")]
     private ScoreManager _scoreManager;
     private ObstaclesSpawner _obstacleSpawner;
+    private BGMManager _bgmManager;
 
     [Header("Stages")]
     [SerializeField] private List<DifficultyProfile> difficultyStages;
-
+    public bool maxDifficultyMode;
     private List<DifficultyProfile> _pendingStages;
     private bool _isChangingDifficulty = false;
-
     public static DifficultyManager instance;
 
     void Awake()
@@ -34,6 +34,7 @@ public class DifficultyManager : MonoBehaviour
     {
         _scoreManager = ScoreManager.instance;
         _obstacleSpawner = ObstaclesSpawner.instance;
+        _bgmManager = BGMManager.instance;
         InitializePendingStages();
     }
 
@@ -59,6 +60,15 @@ public class DifficultyManager : MonoBehaviour
         // 処理中フラグをリセット
         _isChangingDifficulty = false;
 
+        // 最高難易度モードをリセット
+        maxDifficultyMode = false;
+
+        // BGMを通常に戻す
+        if (_bgmManager != null)
+        {
+            _bgmManager.ResetBGM();
+        }
+
         // 最初の難易度プロファイルを適用（1960年の状態）
         if (difficultyStages.Count > 0)
         {
@@ -78,7 +88,7 @@ public class DifficultyManager : MonoBehaviour
 
     void Update()
     {
-        // ★修正1: 処理中(_isChangingDifficulty)なら何もしないで帰る
+        //  処理中(_isChangingDifficulty)なら何もしないで帰る
         if (_pendingStages.Count == 0 || _isChangingDifficulty) return;
 
         DifficultyProfile nextStage = _pendingStages[0];
@@ -87,7 +97,7 @@ public class DifficultyManager : MonoBehaviour
         {
             ApplyDifficulty(nextStage).Forget();
 
-            // ★修正2: 実行したらリストから削除して、次は「次の年代」を見るようにする
+            //  実行したらリストから削除して、次は「次の年代」を見るようにする
             _pendingStages.RemoveAt(0);
         }
     }
@@ -115,5 +125,22 @@ public class DifficultyManager : MonoBehaviour
         
         _obstacleSpawner.spawn = true;
         _isChangingDifficulty = false;
+
+        if (profile.maxDifficulty)
+        {
+            // 最高難易度ならば
+            this.maxDifficultyMode = true;
+            Debug.Log("[DifficultyManager] 最高難易度（鬼畜ステージ）に到達！");
+
+            // BGMを最高難易度用に切り替え
+            if (_bgmManager != null)
+            {
+                _bgmManager.SwitchToMaxDifficultyBGM().Forget();
+            }
+        }
+        else
+        {
+            this.maxDifficultyMode = false;
+        }
     }
 }
