@@ -48,7 +48,7 @@ namespace SocialConnector
 					AndroidJavaObject uri;
 					if(24 <= apiLevel) {
 						var context = activity.Call<AndroidJavaObject> ("getApplicationContext");
-						var fileProvider = new AndroidJavaClass("android.support.v4.content.FileProvider");
+						var fileProvider = new AndroidJavaClass("androidx.core.content.FileProvider");
 						var file = new AndroidJavaObject ("java.io.File", textureUrl);
 						uri = fileProvider.CallStatic<AndroidJavaObject>("getUriForFile", context, Application.identifier + ".fileprovider", file);
 					} else {
