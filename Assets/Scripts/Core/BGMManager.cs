@@ -7,9 +7,9 @@ using DG.Tweening;
 /// BGMを管理するマネージャー
 /// 難易度に応じてBGMを切り替え、クロスフェード処理を行う
 /// </summary>
-public class BGMManager : MonoBehaviour
+public class StageBGMManager : MonoBehaviour
 {
-    public static BGMManager instance;
+    public static StageBGMManager instance;
 
     [Header("BGM Settings")]
     [SerializeField] private AudioClip _normalBGM;           // 通常BGM（開始時）
@@ -30,7 +30,7 @@ public class BGMManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         }
         else
         {

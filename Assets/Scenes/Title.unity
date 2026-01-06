@@ -1939,37 +1939,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4949487847467920078, guid: 12ab20795ab9da3478f0527c5f2db739, type: 3}
   m_PrefabInstance: {fileID: 568719038}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &687566102
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 687566104}
-  m_Layer: 0
-  m_Name: BGMManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &687566104
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 687566102}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 504.56705, y: 1182.9828, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &729943974
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5203,6 +5172,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 115102434}
     - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
+      propertyPath: _dailyButton
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
       propertyPath: _rankingPanel
       value: 
       objectReference: {fileID: 983976006}
@@ -5210,6 +5183,10 @@ PrefabInstance:
       propertyPath: _yourNameText
       value: 
       objectReference: {fileID: 5245048956010763587}
+    - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
+      propertyPath: _allTimeButton
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
       propertyPath: _yourScoreText
       value: 
@@ -6703,7 +6680,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8454414722775077953, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8516948553272013921, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
       propertyPath: m_AnchorMax.y
@@ -6981,4 +6958,3 @@ SceneRoots:
   - {fileID: 9181348533865182427}
   - {fileID: 2137137460}
   - {fileID: 1986892759}
-  - {fileID: 687566104}

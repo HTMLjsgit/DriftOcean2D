@@ -22,3 +22,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b8b552ebc0727084f8051672a5f15e8d, type: 2}
   - {fileID: 11400000, guid: e0657a9485ba34c4fb4ff0ad5543c797, type: 2}
   - {fileID: 11400000, guid: 384e10fc3203d3d4785827f781f42a8a, type: 2}
+  middleDifficulty: 1
+  maxDifficulty: 0

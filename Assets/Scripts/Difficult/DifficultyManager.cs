@@ -9,7 +9,7 @@ public class DifficultyManager : MonoBehaviour
     [Header("References")]
     private ScoreManager _scoreManager;
     private ObstaclesSpawner _obstacleSpawner;
-    private BGMManager _bgmManager;
+    private StageBGMManager _bgmStageManager;
 
     [Header("Stages")]
     [SerializeField] private List<DifficultyProfile> difficultyStages;
@@ -34,7 +34,7 @@ public class DifficultyManager : MonoBehaviour
     {
         _scoreManager = ScoreManager.instance;
         _obstacleSpawner = ObstaclesSpawner.instance;
-        _bgmManager = BGMManager.instance;
+        _bgmStageManager = StageBGMManager.instance;
         InitializePendingStages();
     }
 
@@ -64,9 +64,9 @@ public class DifficultyManager : MonoBehaviour
         maxDifficultyMode = false;
 
         // BGMを通常に戻す
-        if (_bgmManager != null)
+        if (_bgmStageManager != null)
         {
-            _bgmManager.ResetBGM();
+            _bgmStageManager.ResetBGM();
         }
 
         // 最初の難易度プロファイルを適用（1960年の状態）
@@ -133,10 +133,15 @@ public class DifficultyManager : MonoBehaviour
             Debug.Log("[DifficultyManager] 最高難易度（鬼畜ステージ）に到達！");
 
             // BGMを最高難易度用に切り替え
-            if (_bgmManager != null)
-            {
-                _bgmManager.SwitchToMaxDifficultyBGM().Forget();
-            }
+            _bgmStageManager.SwitchToMaxDifficultyBGM().Forget();
+        }
+        else if (profile.middleDifficulty)
+        {
+            // 中間難易度ならば
+            Debug.Log("[DifficultyManager] 中間難易度に到達！");
+
+            // BGMを中間難易度用に切り替え
+            _bgmStageManager.SwitchToMidDifficultyBGM().Forget();
         }
         else
         {
