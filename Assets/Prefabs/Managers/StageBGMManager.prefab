@@ -176,8 +176,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BGMManager
   _normalBGM: {fileID: 8300000, guid: d7bf7383f52bcc1498a4b1a266bd1dcb, type: 3}
-  _midDifficultyBGM: {fileID: 8300000, guid: 666a2f5c93c55bb4894c2806af7ad12d, type: 3}
-  _maxDifficultyBGM: {fileID: 8300000, guid: 796e171e41a492d4788bcf0fcfd88c1f, type: 3}
+  _midDifficultyBGM: {fileID: 8300000, guid: 87ffa89fdb7c77245aea5861c296fa48, type: 3}
+  _maxDifficultyBGM: {fileID: 8300000, guid: 9219783512950bf4497ab5603163a0f8, type: 3}
   _currentAudioSource: {fileID: 5653054634818340714}
   _nextAudioSource: {fileID: 4801439951523201540}
   _crossfadeDuration: 1

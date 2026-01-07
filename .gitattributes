@@ -1,1 +1,2 @@
+Assets/TextMesh[[:space:]]Pro/Resources/Fonts[[:space:]]&[[:space:]]Materials/NotoSansJP-VariableFont_wght[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
 Assets/TextMesh[[:space:]]Pro/Resources/Fonts[[:space:]]&[[:space:]]Materials/*.asset filter=lfs diff=lfs merge=lfs -text

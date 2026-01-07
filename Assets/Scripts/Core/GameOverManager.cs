@@ -90,11 +90,8 @@ public class GameOverManager : MonoBehaviour
         _gameManager.SetGameState(GameManager.GameState.GameOver);
         _gameOverPanel.SetActive(true);
 
-        // コンティニュー済みの場合は即座にボタンを非表示
-        if (_hasUsedContinue && _continueButton != null && _continueButton.gameObject != null)
-        {
-            _continueButton.gameObject.SetActive(false);
-        }
+        // コンティニューボタンの表示/非表示を即座に更新（非同期処理を待たずに）
+        UpdateContinueButton();
 
         float finalScore = _scoreManager.getCurrentScore();
         float finalTime = _stageManager.currentPlayTime;

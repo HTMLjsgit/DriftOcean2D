@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleData
   name: "25. \u7D19\u30B3\u30C3\u30D7"
   prefab: {fileID: 2575805199110171709, guid: 00166b59573a4d8438aa580b72fbe088, type: 3}
-  baseSpeed: 3
+  baseSpeed: 6

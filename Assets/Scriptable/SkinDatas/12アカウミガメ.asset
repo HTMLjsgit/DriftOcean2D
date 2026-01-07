@@ -16,5 +16,5 @@ MonoBehaviour:
   skinName: "\u30A2\u30AB\u30A6\u30DF\u30AC\u30E1"
   skinSprite: {fileID: 3352305271747256887, guid: df7265482638fbf43b8a8a6d7bef5744, type: 3}
   unlockType: 9
-  conditionValue: 1970
+  conditionValue: 0
   lockedDescription: "SNS\u3067\u30B9\u30B3\u30A2\u3092\u30B7\u30A7\u30A2\u3059\u308B"

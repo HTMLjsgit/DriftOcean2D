@@ -89,9 +89,12 @@ public class SceneController : MonoBehaviour
             // 黒画面のままロード待ち
             await SceneManager.LoadSceneAsync(sceneName).ToUniTask(cancellationToken: token);
 
+            // ★ポイント: UGSデータのロード完了を待つ（スキン等の読み込みを黒画面中に完了させる）
+            await WaitForUGSDataLoaded(token);
+
             // ★ポイント: ロード直後に少しだけ待つ（演出的なタメ）
             // これを入れると「ロード終わった！」という切り替わりが綺麗に見えます
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+            await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
 
             // --- 3. 明転 (フェードイン) ---
             // ここで「新たなシーンで黒→明るく」が実行されます
@@ -136,5 +139,48 @@ public class SceneController : MonoBehaviour
         // 強制的にalphaを0にする
         _sceneLoadCanvasGroup.alpha = 0f;
         _sceneLoadCanvasGroup.blocksRaycasts = false;
+    }
+
+    /// <summary>
+    /// UGSデータのロード完了を待つ（スキン等の読み込みを黒画面中に完了させる）
+    /// 最大3秒でタイムアウト
+    /// </summary>
+    private async UniTask WaitForUGSDataLoaded(System.Threading.CancellationToken token)
+    {
+        var cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (cloudSaveManager == null)
+        {
+            Debug.LogWarning("[SceneController] UGSCloudSaveManager not found, skipping wait.");
+            return;
+        }
+
+        // 既にロード済みの場合は即座に戻る
+        if (cloudSaveManager.IsDataLoaded)
+        {
+            Debug.Log("[SceneController] UGS data already loaded.");
+            return;
+        }
+
+        Debug.Log("[SceneController] Waiting for UGS data to load...");
+
+        // 最大3秒待機（タイムアウト付き）
+        float elapsed = 0f;
+        const float timeout = 3f;
+
+        while (!cloudSaveManager.IsDataLoaded && elapsed < timeout)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
+            elapsed += 0.1f;
+        }
+
+        if (cloudSaveManager.IsDataLoaded)
+        {
+            Debug.Log($"[SceneController] UGS data loaded after {elapsed:F1}s");
+        }
+        else
+        {
+            Debug.LogWarning($"[SceneController] UGS data load timed out after {timeout}s");
+        }
     }
 }

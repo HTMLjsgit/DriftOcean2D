@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56b40dcc45ae20046980b47f31faac36, type: 3}
   m_Name: Stage6
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyProfile
-  thresholdYear: 2000
+  thresholdYear: 1975
   restDuration: 0
-  spawnInterval: 0.9
+  spawnInterval: 0.8
   speedMultiplier: 1.1
   newObstaclesToAdd:
   - {fileID: 11400000, guid: b7450fceb447b8c468ab977640624b1c, type: 2}
@@ -23,3 +23,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e0657a9485ba34c4fb4ff0ad5543c797, type: 2}
   - {fileID: 11400000, guid: 384e10fc3203d3d4785827f781f42a8a, type: 2}
   - {fileID: 11400000, guid: 6d7e6493c0b7b7941b8201e0e0ad99d4, type: 2}
+  middleDifficulty: 0
+  maxDifficulty: 0
