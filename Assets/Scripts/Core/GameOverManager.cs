@@ -11,7 +11,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _scoreText;
 
     [Header("Ranking System")]
-
+    [SerializeField] private Button _rankingButton;
     [Header("SNS Share")]
     [SerializeField] private Button _shareButton; // SNSシェアボタン
     [SerializeField] private Button _retryButton;
@@ -71,6 +71,12 @@ public class GameOverManager : MonoBehaviour
             SceneController.instance.SceneLoad("Title");
         });
         _retryButton.onClick.AddListener(OnRetryButtonClicked);
+        // ランキングボタン
+        if (_rankingButton != null)
+        {
+            _rankingButton.onClick.AddListener(OnViewRankingClicked);
+        }
+
         // SNSシェアボタン
         if (_shareButton != null)
         {

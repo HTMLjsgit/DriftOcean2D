@@ -1,0 +1,897 @@
+fileFormatVersion: 2
+guid: 83e55ac459e40694cb052a4152b17dcf
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2867209579845949142
+    second: SkinGET_0
+  - first:
+      213: 1011726729531443108
+    second: SkinGET_1
+  - first:
+      213: 7921902404154830040
+    second: SkinGET_2
+  - first:
+      213: -1775132214895087379
+    second: SkinGET_3
+  - first:
+      213: -8569967955011228341
+    second: SkinGET_4
+  - first:
+      213: -3058076091808905200
+    second: SkinGET_5
+  - first:
+      213: -7382654163463044166
+    second: SkinGET_6
+  - first:
+      213: -9018683005508410090
+    second: SkinGET_7
+  - first:
+      213: -5705646900708351584
+    second: SkinGET_8
+  - first:
+      213: 6523025628979820883
+    second: SkinGET_9
+  - first:
+      213: -1788418148337538594
+    second: SkinGET_10
+  - first:
+      213: -1018304502279012673
+    second: SkinGET_11
+  - first:
+      213: 3058732523736513913
+    second: SkinGET_12
+  - first:
+      213: -1003912336752315128
+    second: SkinGET_13
+  - first:
+      213: 6029422963565068643
+    second: SkinGET_14
+  - first:
+      213: 7225726525879263541
+    second: SkinGET_15
+  - first:
+      213: -3825267797883197578
+    second: SkinGET_16
+  - first:
+      213: 6065767479241756808
+    second: SkinGET_17
+  - first:
+      213: -696631881557127709
+    second: SkinGET_18
+  - first:
+      213: 8092683143064869657
+    second: SkinGET_19
+  - first:
+      213: 7727140011740457349
+    second: SkinGET_20
+  - first:
+      213: 5111960300803202416
+    second: SkinGET_21
+  - first:
+      213: 3522881435652122730
+    second: SkinGET_22
+  - first:
+      213: -5606458646351451589
+    second: SkinGET_23
+  - first:
+      213: -5924181787676123301
+    second: SkinGET_24
+  - first:
+      213: 7410416181064307071
+    second: SkinGET_25
+  - first:
+      213: 2744655445380681679
+    second: SkinGET_26
+  - first:
+      213: 1943002266161046491
+    second: SkinGET_27
+  - first:
+      213: 6952015892141528105
+    second: SkinGET_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SkinGET_0
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 198
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a296fa80410a538d0800000000000000
+      internalID: -2867209579845949142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_1
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 179
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a74d73a9106a0e00800000000000000
+      internalID: 1011726729531443108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_2
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 136
+        width: 29
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8dc26f8b34040fd60800000000000000
+      internalID: 7921902404154830040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_3
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 180
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de073d5d7a67d57e0800000000000000
+      internalID: -1775132214895087379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_4
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 162
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4d2311fc8b511980800000000000000
+      internalID: -8569967955011228341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_5
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 150
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0188d933ff78f85d0800000000000000
+      internalID: -3058076091808905200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_6
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 137
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab30a3f372b8b8990800000000000000
+      internalID: -7382654163463044166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_7
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 142
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 615a1dae69337d280800000000000000
+      internalID: -9018683005508410090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_8
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 99
+        width: 34
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a16875af5871d0b0800000000000000
+      internalID: -5705646900708351584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_9
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 108
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3597c14cf31768a50800000000000000
+      internalID: 6523025628979820883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_10
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 80
+        width: 42
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed9aa766b234e27e0800000000000000
+      internalID: -1788418148337538594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_11
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 114
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbe7a7c43714ed1f0800000000000000
+      internalID: -1018304502279012673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_12
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 94
+        width: 17
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97dbf34460dc27a20800000000000000
+      internalID: 3058732523736513913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_13
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 79
+        width: 43
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 805fe367c036112f0800000000000000
+      internalID: -1003912336752315128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_14
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 112
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36101e77d30dca350800000000000000
+      internalID: 6029422963565068643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_15
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 92
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 531a623edffe64460800000000000000
+      internalID: 7225726525879263541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_16
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 92
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6776e68743be9eac0800000000000000
+      internalID: -3825267797883197578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_17
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 20
+        width: 32
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8805252726fed2450800000000000000
+      internalID: 6065767479241756808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_18
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 21
+        width: 33
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ed4390aef01556f0800000000000000
+      internalID: -696631881557127709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_19
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 58
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91b5c26117cfe4070800000000000000
+      internalID: 8092683143064869657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_20
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 20
+        width: 42
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5896f7986e05c3b60800000000000000
+      internalID: 7727140011740457349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_21
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 21
+        width: 31
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07d164b2fc451f640800000000000000
+      internalID: 5111960300803202416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_22
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 21
+        width: 38
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a68ecdd200ac3e030800000000000000
+      internalID: 3522881435652122730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_23
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 34
+        width: 11
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3aed40c09bd132b0800000000000000
+      internalID: -5606458646351451589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_24
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 34
+        width: 11
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5fd9b04d0419cda0800000000000000
+      internalID: -5924181787676123301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_25
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 21
+        width: 10
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f71152e214617d660800000000000000
+      internalID: 7410416181064307071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_26
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 21
+        width: 34
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcfc1c4f599f61620800000000000000
+      internalID: 2744655445380681679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_27
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 20
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd3ee40444ee6fa10800000000000000
+      internalID: 1943002266161046491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkinGET_28
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 20
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92457fbde958a7060800000000000000
+      internalID: 6952015892141528105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SkinGET_0: -2867209579845949142
+      SkinGET_1: 1011726729531443108
+      SkinGET_10: -1788418148337538594
+      SkinGET_11: -1018304502279012673
+      SkinGET_12: 3058732523736513913
+      SkinGET_13: -1003912336752315128
+      SkinGET_14: 6029422963565068643
+      SkinGET_15: 7225726525879263541
+      SkinGET_16: -3825267797883197578
+      SkinGET_17: 6065767479241756808
+      SkinGET_18: -696631881557127709
+      SkinGET_19: 8092683143064869657
+      SkinGET_2: 7921902404154830040
+      SkinGET_20: 7727140011740457349
+      SkinGET_21: 5111960300803202416
+      SkinGET_22: 3522881435652122730
+      SkinGET_23: -5606458646351451589
+      SkinGET_24: -5924181787676123301
+      SkinGET_25: 7410416181064307071
+      SkinGET_26: 2744655445380681679
+      SkinGET_27: 1943002266161046491
+      SkinGET_28: 6952015892141528105
+      SkinGET_3: -1775132214895087379
+      SkinGET_4: -8569967955011228341
+      SkinGET_5: -3058076091808905200
+      SkinGET_6: -7382654163463044166
+      SkinGET_7: -9018683005508410090
+      SkinGET_8: -5705646900708351584
+      SkinGET_9: 6523025628979820883
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

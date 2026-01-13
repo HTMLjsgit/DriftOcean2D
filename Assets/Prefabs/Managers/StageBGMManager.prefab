@@ -175,9 +175,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0665a8eb24a12fb4b8dc457466035e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BGMManager
-  _normalBGM: {fileID: 8300000, guid: d7bf7383f52bcc1498a4b1a266bd1dcb, type: 3}
-  _midDifficultyBGM: {fileID: 8300000, guid: 87ffa89fdb7c77245aea5861c296fa48, type: 3}
-  _maxDifficultyBGM: {fileID: 8300000, guid: 9219783512950bf4497ab5603163a0f8, type: 3}
+  _normalBGM: {fileID: 8300000, guid: f72ee3b6fd6cace4cb2cc7a524defddf, type: 3}
+  _midDifficultyBGM: {fileID: 8300000, guid: 413033809cd40d340bc2a88ceb8cc37b, type: 3}
+  _maxDifficultyBGM: {fileID: 8300000, guid: 048f72a2cf5e4e44183cf4c1b8ab49f9, type: 3}
   _currentAudioSource: {fileID: 5653054634818340714}
   _nextAudioSource: {fileID: 4801439951523201540}
   _crossfadeDuration: 1
