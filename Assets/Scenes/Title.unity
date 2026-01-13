@@ -714,6 +714,7 @@ GameObject:
   - component: {fileID: 177607635}
   - component: {fileID: 177607634}
   - component: {fileID: 177607633}
+  - component: {fileID: 177607636}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -822,6 +823,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 177607631}
   m_CullTransparentMesh: 1
+--- !u!114 &177607636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177607631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1
 --- !u!1 &193272861
 GameObject:
   m_ObjectHideFlags: 0
@@ -1414,6 +1429,7 @@ GameObject:
   - component: {fileID: 487517508}
   - component: {fileID: 487517507}
   - component: {fileID: 487517506}
+  - component: {fileID: 487517509}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -1522,6 +1538,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 487517504}
   m_CullTransparentMesh: 1
+--- !u!114 &487517509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 487517504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1
 --- !u!1 &498082686
 GameObject:
   m_ObjectHideFlags: 0
@@ -2038,6 +2068,7 @@ GameObject:
   - component: {fileID: 900227455}
   - component: {fileID: 900227454}
   - component: {fileID: 900227456}
+  - component: {fileID: 900227457}
   m_Layer: 0
   m_Name: CloseButton
   m_TagString: Untagged
@@ -2146,6 +2177,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &900227457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900227452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1
 --- !u!1 &983976006 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8454414722775077953, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
@@ -3728,6 +3773,7 @@ GameObject:
   - component: {fileID: 1821258898}
   - component: {fileID: 1821258897}
   - component: {fileID: 1821258896}
+  - component: {fileID: 1821258899}
   m_Layer: 5
   m_Name: SkinButton
   m_TagString: Untagged
@@ -3837,6 +3883,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1821258894}
   m_CullTransparentMesh: 1
+--- !u!114 &1821258899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821258894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1
 --- !u!1 &1830760897
 GameObject:
   m_ObjectHideFlags: 0
@@ -4141,6 +4201,7 @@ GameObject:
   - component: {fileID: 1953836060}
   - component: {fileID: 1953836059}
   - component: {fileID: 1953836058}
+  - component: {fileID: 1953836061}
   m_Layer: 5
   m_Name: RankingButton
   m_TagString: Untagged
@@ -4249,6 +4310,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1953836056}
   m_CullTransparentMesh: 1
+--- !u!114 &1953836061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953836056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1
 --- !u!1 &1986892758
 GameObject:
   m_ObjectHideFlags: 0

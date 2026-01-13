@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4496398978148971093}
   - component: {fileID: 8671650592000927266}
   - component: {fileID: 7905593285552514508}
+  - component: {fileID: 5629739458968393741}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -121,6 +122,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5629739458968393741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591743117401361880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1
 --- !u!1 &631224843821273169
 GameObject:
   m_ObjectHideFlags: 0
@@ -1222,6 +1237,7 @@ GameObject:
   - component: {fileID: 903735759441650868}
   - component: {fileID: 333586365424647537}
   - component: {fileID: 8387993426003008105}
+  - component: {fileID: 7437684110896817380}
   m_Layer: 5
   m_Name: SubmitButton
   m_TagString: Untagged
@@ -1331,3 +1347,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7437684110896817380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8439080584362996564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _moveDistance: 3
+  _duration: 0.1

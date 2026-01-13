@@ -163,6 +163,7 @@ GameObject:
   - component: {fileID: 190183299738575601}
   - component: {fileID: 5346472369664897740}
   - component: {fileID: 4929223787430171217}
+  - component: {fileID: 2421965037414531564}
   m_Layer: 5
   m_Name: SkinUI
   m_TagString: Untagged
@@ -378,6 +379,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2421965037414531564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8264250285217523214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f560962a9703840ba37bb1e6d4ae29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickAnimation
+  _moveDistance: 3
+  _duration: 0.08
 --- !u!1 &8714119478464075779
 GameObject:
   m_ObjectHideFlags: 0

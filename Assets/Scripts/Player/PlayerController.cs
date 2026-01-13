@@ -1,17 +1,13 @@
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
 /// <summary>
 /// プレイヤーの動き、値保持
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float _jumpForce = 5f;
-    [SerializeField] private PlayerInput _playerInput;
     [SerializeField] private AudioSource _jumpAudioSource;
     private Rigidbody2D _rigidbody2D;
-
-    private InputAction _jumpAction;
     private GameManager _gameManager;
     private GameOverManager _gameOverManager;
     public static PlayerController instance;
@@ -41,11 +37,11 @@ public class PlayerController : MonoBehaviour
         // 初期位置を保存
         _initialPosition = transform.position;
     }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _jumpAction = _playerInput.actions.FindAction("Jump");
         _gameManager = GameManager.instance;
         _gameOverManager = GameOverManager.instance;
         _lastInputTime = Time.time;
@@ -56,14 +52,20 @@ public class PlayerController : MonoBehaviour
     {
         if(_gameManager.state == GameManager.GameState.GameOver) return;
 
-        if (_jumpAction.triggered)
-        {
-            Jump();
-            _lastInputTime = Time.time; // 入力時間をリセット
-        }
-
         // 無操作チェック
         CheckNoInput();
+    }
+
+    /// <summary>
+    /// UI Panelからタップで呼ばれるジャンプ処理
+    /// EventTrigger経由で呼び出される
+    /// </summary>
+    public void OnTapJump()
+    {
+        if(_gameManager.state == GameManager.GameState.GameOver) return;
+        
+        Jump();
+        _lastInputTime = Time.time; // 入力時間をリセット
     }
 
     private void CheckNoInput()
