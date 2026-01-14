@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.94, y: -3.84, z: 0}
-  m_LocalScale: {x: 0.81, y: 0.81, z: 1}
+  m_LocalScale: {x: 0.57, y: 0.57, z: 0.57}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1296215075980182312}
@@ -182,9 +182,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _jumpForce: 4
-  _playerInput: {fileID: 8460236517903966966}
   _jumpAudioSource: {fileID: 2123432902767871128}
   _noInputThreshold: 30
+  _squashDuration: 0.15
+  _squashScale: 0.8
+  _squashEase: 6
+  _recoverEase: 27
 --- !u!114 &3737511109626388377
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -635,7 +635,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.20093, y: -5.63, z: 0}
-  m_LocalScale: {x: 1, y: 0.67, z: 1}
+  m_LocalScale: {x: 0.80116403, y: 0.67, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1438948746}
@@ -1428,7 +1428,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5.19
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1453,7 +1453,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: -0.09, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4863,18 +4863,6 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 1621028262008687445, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.57
-      objectReference: {fileID: 0}
-    - target: {fileID: 1621028262008687445, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.57
-      objectReference: {fileID: 0}
-    - target: {fileID: 1621028262008687445, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.7037037
-      objectReference: {fileID: 0}
-    - target: {fileID: 1621028262008687445, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.94
       objectReference: {fileID: 0}
@@ -4913,10 +4901,6 @@ PrefabInstance:
     - target: {fileID: 1621028262008687445, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1621028262008687445, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7720569176953743824, guid: 1cc9d215aef8db7488be108e7d072094, type: 3}
       propertyPath: m_LinearDamping

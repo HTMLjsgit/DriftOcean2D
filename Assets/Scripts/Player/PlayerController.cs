@@ -1,5 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
+using DG.Tweening;
 /// <summary>
 /// プレイヤーの動き、値保持
 /// </summary>
@@ -14,12 +14,21 @@ public class PlayerController : MonoBehaviour
 
     // 初期位置（リトライ時にリセットするため）
     private Vector3 _initialPosition;
-
+    private Vector3 _defaultLocalScale;
     // 無操作トラッキング用
     [Header("No Input Tracking")]
     [SerializeField] private float _noInputThreshold = 30f; // 無操作判定時間（秒）
     private float _lastInputTime;
     private bool _noInputUnlockTriggered = false;
+
+    // ぷにぷにアニメーション用
+    [Header("Bounce Animation Settings")]
+    [SerializeField] private float _squashDuration = 0.15f; // 縮む時間
+    [SerializeField] private float _squashScale = 0.8f; // 縮む大きさ（1.0が元のサイズ、0.8で20%縮む）
+    [SerializeField] private Ease _squashEase = Ease.OutQuad; // 縮むときのイージング
+    [SerializeField] private Ease _recoverEase = Ease.OutBack; // 戻るときのイージング
+    private SpriteRenderer _spriteRenderer;
+    private bool _isAnimating = false; // アニメーション再生中フラグ
 
     // 無操作解放が達成されたかのフラグ（外部からアクセス用）
     public bool NoInputUnlockAchieved { get; private set; } = false;
@@ -42,9 +51,11 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
         _gameManager = GameManager.instance;
         _gameOverManager = GameOverManager.instance;
         _lastInputTime = Time.time;
+        _defaultLocalScale = this.gameObject.transform.localScale;
     }
 
     // Update is called once per frame
@@ -84,6 +95,46 @@ public class PlayerController : MonoBehaviour
     public void Jump(){
         _rigidbody2D.linearVelocityY = _jumpForce;
         _jumpAudioSource.Play();
+        PlayBounceAnimation();
+    }
+
+    /// <summary>
+    /// ぷにぷにバウンスアニメーション再生（ScaleYを縮めて戻す）
+    /// </summary>
+    private void PlayBounceAnimation()
+    {
+        // SpriteRendererが無い場合は何もしない
+        if (_spriteRenderer == null) return;
+
+        // アニメーション再生中は新しいアニメーションを開始しない
+        if (_isAnimating) return;
+
+        _isAnimating = true;
+
+        // 既に再生中のアニメーションがあればキル
+        _spriteRenderer.transform.DOKill();
+
+        // スケールをデフォルトに戻してからアニメーション開始
+        _spriteRenderer.transform.localScale = _defaultLocalScale;
+
+        // シーケンスを作成
+        Sequence sequence = DOTween.Sequence();
+
+        // 1. ScaleYをデフォルトから縮める（デフォルトスケールの_squashScale倍）
+        float shrunkY = _defaultLocalScale.y * _squashScale;
+        sequence.Append(_spriteRenderer.transform.DOScaleY(shrunkY, _squashDuration).SetEase(_squashEase));
+
+        // 2. ScaleYをデフォルトに戻す
+        sequence.Append(_spriteRenderer.transform.DOScaleY(_defaultLocalScale.y, _squashDuration).SetEase(_recoverEase));
+
+        // アニメーション終了時にフラグをリセット
+        sequence.OnComplete(() =>
+        {
+            _isAnimating = false;
+        });
+
+        // シーケンス再生
+        sequence.Play();
     }
 
     void OnTriggerEnter2D(Collider2D collider)
