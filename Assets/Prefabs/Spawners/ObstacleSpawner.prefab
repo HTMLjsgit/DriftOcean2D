@@ -47,7 +47,17 @@ MonoBehaviour:
   _currentObstacleDatas: []
   _spawnedObstacles: []
   spawn: 1
-  _obstaclePos: {fileID: 0}
+  _spawnPositions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _obstacles: {fileID: 0}
   _spawnTime: 1
   _spawnTimeNow: 0
   _randomSpawnYRange: 5

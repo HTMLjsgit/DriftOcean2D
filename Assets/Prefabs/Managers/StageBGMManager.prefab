@@ -178,6 +178,9 @@ MonoBehaviour:
   _normalBGM: {fileID: 8300000, guid: f72ee3b6fd6cace4cb2cc7a524defddf, type: 3}
   _midDifficultyBGM: {fileID: 8300000, guid: 413033809cd40d340bc2a88ceb8cc37b, type: 3}
   _maxDifficultyBGM: {fileID: 8300000, guid: 048f72a2cf5e4e44183cf4c1b8ab49f9, type: 3}
+  _normalBGMVolume: 0.8
+  _midDifficultyBGMVolume: 0.4
+  _maxDifficultyBGMVolume: 0.4
   _currentAudioSource: {fileID: 5653054634818340714}
   _nextAudioSource: {fileID: 4801439951523201540}
   _crossfadeDuration: 1

@@ -6,20 +6,21 @@ public class ObstaclesSpawner : MonoBehaviour
     public static ObstaclesSpawner instance;
 
     [Header("Spawn Settings")]
-    [SerializeField] private List<ObstacleData> _currentObstacleDatas = new List<ObstacleData>(); 
-    
+    [SerializeField] private List<ObstacleData> _currentObstacleDatas = new List<ObstacleData>();
+
     [SerializeField] private List<GameObject> _spawnedObstacles = new List<GameObject>();
     public List<GameObject> spawnedObstacles => _spawnedObstacles;
-    
+
     public bool spawn = true;
-    [SerializeField] private GameObject _obstaclePos; 
+
+    [Header("Spawn Position Settings")]
+    [SerializeField] private List<Transform> _spawnPositions = new List<Transform>(); // ランダムスポーン位置リスト
+    [SerializeField] private GameObject _obstacles; // 後方互換のため残す（使用されない場合はnull可）
 
     [SerializeField] private float _spawnTime = 2.0f;
-    [SerializeField]private float _spawnTimeNow;
-    
-    private float _globalSpeedMultiplier = 1.0f;
+    [SerializeField] private float _spawnTimeNow;
 
-    [SerializeField] private int _randomSpawnYRange = 5;
+    private float _globalSpeedMultiplier = 1.0f;
 
     void Awake()
     {
@@ -50,21 +51,56 @@ public class ObstaclesSpawner : MonoBehaviour
     {
         if (_currentObstacleDatas == null || _currentObstacleDatas.Count == 0) return;
 
+        // スポーン位置を決定（リストからランダム選択、もしくは_obstaclePosフォールバック）
+        Transform spawnTransform = GetRandomSpawnPosition();
+        if (spawnTransform == null)
+        {
+            Debug.LogWarning("[ObstaclesSpawner] No spawn position available!");
+            return;
+        }
+
         int dataIndex = Random.Range(0, _currentObstacleDatas.Count);
         ObstacleData selectedData = _currentObstacleDatas[dataIndex];
 
-        GameObject obstacle = Instantiate(selectedData.prefab, _obstaclePos.transform);
-        
-        float r = Random.Range(-1f * _randomSpawnYRange, (float)_randomSpawnYRange);
-        obstacle.transform.position = new Vector2(obstacle.transform.position.x, obstacle.transform.position.y + r);
+        // _obstaclesの子として生成（スポーン位置そのままを使用）
+        GameObject obstacle = Instantiate(selectedData.prefab, spawnTransform.position, spawnTransform.rotation);
+        if (_obstacles != null)
+        {
+            obstacle.transform.SetParent(_obstacles.transform);
+        }
 
         _spawnedObstacles.Add(obstacle);
 
         ObstacleMover obstacleMover = obstacle.GetComponent<ObstacleMover>();
-        
+
         // ゴミ固有速度 × 全体倍率
         float finalSpeed = selectedData.baseSpeed * _globalSpeedMultiplier;
         obstacleMover.Move(finalSpeed);
+    }
+
+    /// <summary>
+    /// ランダムなスポーン位置を取得
+    /// </summary>
+    /// <returns>選択されたスポーン位置のTransform</returns>
+    private Transform GetRandomSpawnPosition()
+    {
+        // _spawnPositionsリストが有効な場合はランダムに選択
+        if (_spawnPositions != null && _spawnPositions.Count > 0)
+        {
+            int randomIndex = Random.Range(0, _spawnPositions.Count);
+            Transform selectedTransform = _spawnPositions[randomIndex];
+
+            if (selectedTransform != null)
+            {
+                return selectedTransform;
+            }
+            else
+            {
+                Debug.LogWarning($"[ObstaclesSpawner] Spawn position at index {randomIndex} is null!");
+            }
+        }
+
+        return null;
     }
 
     public void ObstacleListRemove(GameObject key)
@@ -115,5 +151,30 @@ public class ObstaclesSpawner : MonoBehaviour
         }
         
         Debug.Log($"現在のゴミの種類数: {_currentObstacleDatas.Count}");
+    }
+
+    /// <summary>
+    /// スポーン位置をGizmosで視覚化（エディタで常に表示）
+    /// </summary>
+    void OnDrawGizmos()
+    {
+        // スポーン位置リストの可視化（緑色）
+        if (_spawnPositions != null && _spawnPositions.Count > 0)
+        {
+            Gizmos.color = Color.green;
+            for (int i = 0; i < _spawnPositions.Count; i++)
+            {
+                Transform spawnPos = _spawnPositions[i];
+                if (spawnPos != null)
+                {
+                    // 球体で位置を表示
+                    Gizmos.DrawWireSphere(spawnPos.position, 0.5f);
+
+                    // 番号を表示するために十字マークを追加
+                    Gizmos.DrawLine(spawnPos.position + Vector3.up * 0.3f, spawnPos.position - Vector3.up * 0.3f);
+                    Gizmos.DrawLine(spawnPos.position + Vector3.right * 0.3f, spawnPos.position - Vector3.right * 0.3f);
+                }
+            }
+        }
     }
 }

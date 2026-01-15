@@ -197,13 +197,13 @@ public class RankingUIManager : MonoBehaviour
         if (_currentRankingType == RankingType.Daily)
         {
             ugsRankings = _ugsLeaderboardManager.GetCachedDailyRankings();
-            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "デイリーランキング";
+            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "Dailay Ranking";
             Debug.Log($"Daily Ranking count: {ugsRankings.Count}");
         }
         else
         {
             ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
-            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "総合ランキング";
+            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "All Score Ranking";
             Debug.Log($"All-Time Ranking count: {ugsRankings.Count}");
         }
 

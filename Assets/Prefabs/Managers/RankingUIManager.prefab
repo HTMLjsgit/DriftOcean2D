@@ -49,6 +49,10 @@ MonoBehaviour:
   _rankingRowPrefab: {fileID: 6926538554645176359, guid: 0b9ed3c6031198e4c874e7f5b0c2569d, type: 3}
   _closeButton: {fileID: 0}
   _changeNameButton: {fileID: 0}
+  _allTimeButton: {fileID: 0}
+  _dailyButton: {fileID: 0}
+  _rankingTypeLabel: {fileID: 0}
+  _defaultRankingType: 1
   _yourSkinImage: {fileID: 0}
   _yourNameText: {fileID: 0}
   _yourScoreText: {fileID: 0}

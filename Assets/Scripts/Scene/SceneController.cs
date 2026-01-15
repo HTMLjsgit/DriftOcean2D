@@ -41,12 +41,13 @@ public class SceneController : MonoBehaviour
         // 0.5秒待ってからフェードイン（いきなり始まると慌ただしいので）
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
 
+        // フェードイン開始と同時に入力を有効化
+        _sceneLoadCanvasGroup.blocksRaycasts = false;
+
         await _sceneLoadCanvasGroup.DOFade(0f, 1f)
             .SetUpdate(true) // Time.timeScaleに影響されないようにする
             .SetLink(this.gameObject)
             .ToUniTask(cancellationToken: token);
-
-        _sceneLoadCanvasGroup.blocksRaycasts = false;
     }
 
     public void SceneLoad(string sceneName)
@@ -100,12 +101,14 @@ public class SceneController : MonoBehaviour
             // ここで「新たなシーンで黒→明るく」が実行されます
             Debug.Log($"[SceneController] Starting fade in... alpha={_sceneLoadCanvasGroup.alpha}");
 
+            // フェードイン開始と同時に入力を有効化（すぐに操作できるようにする）
+            _sceneLoadCanvasGroup.blocksRaycasts = false;
+
             await _sceneLoadCanvasGroup.DOFade(0f, 1f)
                 .SetUpdate(true) // Time.timeScaleに影響されないようにする
                 .SetLink(this.gameObject)
                 .ToUniTask(cancellationToken: token);
 
-            _sceneLoadCanvasGroup.blocksRaycasts = false;
             Debug.Log($"[SceneController] Fade in complete. alpha={_sceneLoadCanvasGroup.alpha}");
         }
         catch (OperationCanceledException)
@@ -143,7 +146,7 @@ public class SceneController : MonoBehaviour
 
     /// <summary>
     /// UGSデータのロード完了を待つ（スキン等の読み込みを黒画面中に完了させる）
-    /// 最大3秒でタイムアウト
+    /// 最大5秒でタイムアウト
     /// </summary>
     private async UniTask WaitForUGSDataLoaded(System.Threading.CancellationToken token)
     {
@@ -164,9 +167,9 @@ public class SceneController : MonoBehaviour
 
         Debug.Log("[SceneController] Waiting for UGS data to load...");
 
-        // 最大3秒待機（タイムアウト付き）
+        // 最大5秒待機（タイムアウト付き）
         float elapsed = 0f;
-        const float timeout = 3f;
+        const float timeout = 5f;
 
         while (!cloudSaveManager.IsDataLoaded && elapsed < timeout)
         {

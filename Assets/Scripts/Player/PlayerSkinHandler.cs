@@ -12,6 +12,13 @@ public class PlayerSkinHandler : MonoBehaviour
     void Start()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (_spriteRenderer == null)
+        {
+            Debug.LogError("[PlayerSkinHandler] SpriteRenderer component not found on this GameObject!");
+            return;
+        }
+
         _skinManager = SkinManager.instance;
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
@@ -60,6 +67,17 @@ public class PlayerSkinHandler : MonoBehaviour
     /// </summary>
     private void ApplySkin()
     {
+        // SpriteRendererの再確認（シーン遷移後に消えている可能性対策）
+        if (_spriteRenderer == null)
+        {
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            if (_spriteRenderer == null)
+            {
+                Debug.LogError("[PlayerSkinHandler] SpriteRenderer is null in ApplySkin! Cannot apply skin.");
+                return;
+            }
+        }
+
         // 最新の参照を取得（シーン遷移対策）
         _skinManager = SkinManager.instance;
         _skinDatabase = SkinDatabase.instance;
@@ -87,15 +105,24 @@ public class PlayerSkinHandler : MonoBehaviour
             {
                 SetSkin(skinData.skinSprite);
             }
+            else
+            {
+                Debug.LogError("[PlayerSkinHandler] Fallback skin (ID=1) not found! Player will have no sprite.");
+            }
         }
     }
 
     public void SetSkin(Sprite skin)
     {
         _currentSkinSprite = skin;
+
         if (_spriteRenderer != null)
         {
             _spriteRenderer.sprite = _currentSkinSprite;
+        }
+        else
+        {
+            Debug.LogError("[PlayerSkinHandler] Cannot set skin - SpriteRenderer is null!");
         }
     }
 }
