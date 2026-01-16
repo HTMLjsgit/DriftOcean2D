@@ -45,12 +45,20 @@ public class PlayerController : MonoBehaviour
 
         // 初期位置を保存
         _initialPosition = transform.position;
+
+        // Rigidbody2Dを取得してgravityScaleを0に設定（シーン開始時は落下させない）
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        if (_rigidbody2D != null)
+        {
+            _rigidbody2D.gravityScale = 0;
+            Debug.Log("[PlayerController] gravityScale set to 0 in Awake");
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
+        // _rigidbody2DはAwakeで既に取得済み
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _gameManager = GameManager.instance;
         _gameOverManager = GameOverManager.instance;
@@ -74,7 +82,14 @@ public class PlayerController : MonoBehaviour
     public void OnTapJump()
     {
         if(_gameManager.state == GameManager.GameState.GameOver) return;
-        
+
+        // gravityScaleが0の場合はジャンプできない（ゲーム開始前）
+        if(_rigidbody2D.gravityScale == 0)
+        {
+            Debug.Log("[PlayerController] Jump blocked - gravityScale is 0");
+            return;
+        }
+
         Jump();
         _lastInputTime = Time.time; // 入力時間をリセット
     }
@@ -151,6 +166,18 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
+    /// ゲーム開始時に呼ばれる
+    /// SceneControllerのロード完了1秒後に呼ばれる
+    /// </summary>
+    public void StartGame()
+    {
+        Debug.Log("[PlayerController] Game started");
+    }
+    public void SetGravityScale(float gravityScale)
+    {
+        _rigidbody2D.gravityScale = gravityScale;
+    }
+    /// <summary>
     /// リトライ時にプレイヤーの状態をリセット
     /// </summary>
     public void ResetForRetry()
@@ -159,10 +186,7 @@ public class PlayerController : MonoBehaviour
         transform.position = _initialPosition;
 
         // 速度をリセット
-        if (_rigidbody2D != null)
-        {
-            _rigidbody2D.linearVelocity = Vector2.zero;
-        }
+        _rigidbody2D.linearVelocity = Vector2.zero;
 
         // 無操作トラッキングをリセット
         _lastInputTime = Time.time;

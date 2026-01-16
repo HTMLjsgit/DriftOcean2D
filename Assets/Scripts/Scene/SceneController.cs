@@ -97,6 +97,12 @@ public class SceneController : MonoBehaviour
             // これを入れると「ロード終わった！」という切り替わりが綺麗に見えます
             await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
 
+            // シーンロード完了後、1秒待ってからゲームを開始（Mainシーンの場合）
+            if(sceneName == "Main")
+            {
+                StartGameAfterLoad(token).Forget();
+            }
+
             // --- 3. 明転 (フェードイン) ---
             // ここで「新たなシーンで黒→明るく」が実行されます
             Debug.Log($"[SceneController] Starting fade in... alpha={_sceneLoadCanvasGroup.alpha}");
@@ -116,12 +122,16 @@ public class SceneController : MonoBehaviour
             Debug.LogWarning("[SceneController] Scene load was cancelled.");
             // キャンセルされた場合でもフェードインを完了させる
             ForceCompleteFadeIn();
+            // ゲーム開始処理を実行（エラー時は即座に開始）
+            StartGameImmediately();
         }
         catch (Exception e)
         {
             Debug.LogError($"[SceneController] Error during scene load: {e.Message}\n{e.StackTrace}");
             // エラーが発生した場合でもフェードインを完了させる
             ForceCompleteFadeIn();
+            // ゲーム開始処理を実行（エラー時は即座に開始）
+            StartGameImmediately();
         }
         finally
         {
@@ -184,6 +194,46 @@ public class SceneController : MonoBehaviour
         else
         {
             Debug.LogWarning($"[SceneController] UGS data load timed out after {timeout}s");
+        }
+    }
+
+    /// <summary>
+    /// シーンロード完了後、1秒待ってからゲームを開始する
+    /// GameManagerの状態をPlayingに変更し、PlayerControllerのgravityScaleを1に設定
+    /// </summary>
+    private async UniTaskVoid StartGameAfterLoad(System.Threading.CancellationToken token)
+    {
+        // 1秒待機
+        Debug.Log("[SceneController] Waiting 1 second before starting game...");
+        await UniTask.Delay(TimeSpan.FromSeconds(0.01f), cancellationToken: token);
+
+        var gameManager = GameManager.instance;
+        gameManager.SetGameState(GameManager.GameState.Playing);
+        Debug.Log("[SceneController] Game state set to Playing");
+
+        var playerController = PlayerController.instance;
+        playerController.StartGame();
+        playerController.SetGravityScale(1);
+        Debug.Log("[SceneController] Player gravityScale set to 1 - Game started");
+    }
+
+    /// <summary>
+    /// エラー時に即座にゲームを開始する（待機なし）
+    /// </summary>
+    private void StartGameImmediately()
+    {
+        var gameManager = GameManager.instance;
+        if (gameManager != null)
+        {
+            gameManager.SetGameState(GameManager.GameState.Playing);
+            Debug.Log("[SceneController] Game state set to Playing (immediate)");
+        }
+
+        var playerController = PlayerController.instance;
+        if (playerController != null)
+        {
+            playerController.StartGame();
+            Debug.Log("[SceneController] Player game started (immediate)");
         }
     }
 }
