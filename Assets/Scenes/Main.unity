@@ -2632,8 +2632,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u2026GameOver\u2026"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3e9a1013a24dd0543b1d6c13ef3c9b9f, type: 2}
-  m_sharedMaterial: {fileID: -2931151750394891298, guid: 3e9a1013a24dd0543b1d6c13ef3c9b9f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2397398443b369c4f815871b61e4738b, type: 2}
+  m_sharedMaterial: {fileID: 7164497713928546170, guid: 2397398443b369c4f815871b61e4738b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2699,7 +2699,7 @@ MonoBehaviour:
   m_margin: {x: -158.2109, y: 0, z: -161.51276, w: 44.127808}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1058356452
@@ -3136,8 +3136,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1950.000
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3e9a1013a24dd0543b1d6c13ef3c9b9f, type: 2}
-  m_sharedMaterial: {fileID: -2931151750394891298, guid: 3e9a1013a24dd0543b1d6c13ef3c9b9f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2397398443b369c4f815871b61e4738b, type: 2}
+  m_sharedMaterial: {fileID: 7164497713928546170, guid: 2397398443b369c4f815871b61e4738b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3171,7 +3171,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
-  m_characterSpacing: 30
+  m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -3501,8 +3501,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1969.58
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3e9a1013a24dd0543b1d6c13ef3c9b9f, type: 2}
-  m_sharedMaterial: {fileID: -2931151750394891298, guid: 3e9a1013a24dd0543b1d6c13ef3c9b9f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2397398443b369c4f815871b61e4738b, type: 2}
+  m_sharedMaterial: {fileID: 7164497713928546170, guid: 2397398443b369c4f815871b61e4738b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3526,8 +3526,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 114.2
-  m_fontSizeBase: 114.2
+  m_fontSize: 90
+  m_fontSizeBase: 90
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
