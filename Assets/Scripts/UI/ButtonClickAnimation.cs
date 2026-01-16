@@ -32,7 +32,7 @@ public class ButtonClickAnimation : MonoBehaviour
                     // 元に戻る
                     _rectTransform.DOAnchorPosY(currentY, _duration)
                         .SetEase(Ease.OutQuad)
-                        .OnComplete(() => _isAnimating = false);
+                        .OnComplete(() => _isAnimating = false).SetUpdate(true);
                 });
         });
     }
