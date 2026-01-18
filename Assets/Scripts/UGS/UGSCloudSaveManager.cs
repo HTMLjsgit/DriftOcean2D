@@ -39,23 +39,15 @@ public class UGSCloudSaveManager : MonoBehaviour
     async void Start()
     {
         _ugsManager = UGSManager.instance;
+        // サインイン成功後にデータをロード
+        _ugsManager.OnSignInSuccess += OnUGSSignInSuccess;
 
-        if (_ugsManager != null)
+        // 既にサインイン済みの場合（2回目以降のシーン読み込み）は即座にリロード
+        if (_ugsManager.IsSignedIn())
         {
-            // サインイン成功後にデータをロード
-            _ugsManager.OnSignInSuccess += OnUGSSignInSuccess;
-
-            // 既にサインイン済みの場合（2回目以降のシーン読み込み）は即座にリロード
-            if (_ugsManager.IsSignedIn())
-            {
-                Debug.Log("[UGSCloudSaveManager] Already signed in, reloading player data...");
-                await System.Threading.Tasks.Task.Delay(100); // 少し待ってから実行
-                await LoadPlayerData();
-            }
-        }
-        else
-        {
-            Debug.LogError("UGSManager not found. UGSCloudSaveManager requires UGSManager.");
+            Debug.Log("[UGSCloudSaveManager] Already signed in, reloading player data...");
+            await System.Threading.Tasks.Task.Delay(100); // 少し待ってから実行
+            await LoadPlayerData();
         }
     }
 

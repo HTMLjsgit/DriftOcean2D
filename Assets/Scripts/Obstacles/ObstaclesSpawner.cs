@@ -64,10 +64,7 @@ public class ObstaclesSpawner : MonoBehaviour
 
         // _obstaclesの子として生成（スポーン位置そのままを使用）
         GameObject obstacle = Instantiate(selectedData.prefab, spawnTransform.position, spawnTransform.rotation);
-        if (_obstacles != null)
-        {
-            obstacle.transform.SetParent(_obstacles.transform);
-        }
+        obstacle.transform.SetParent(_obstacles.transform);
 
         _spawnedObstacles.Add(obstacle);
 
@@ -85,7 +82,7 @@ public class ObstaclesSpawner : MonoBehaviour
     private Transform GetRandomSpawnPosition()
     {
         // _spawnPositionsリストが有効な場合はランダムに選択
-        if (_spawnPositions != null && _spawnPositions.Count > 0)
+        if ( _spawnPositions.Count > 0)
         {
             int randomIndex = Random.Range(0, _spawnPositions.Count);
             Transform selectedTransform = _spawnPositions[randomIndex];
@@ -119,10 +116,7 @@ public class ObstaclesSpawner : MonoBehaviour
         // リスト内の全てのオブジェクトを破壊
         foreach (var obstacle in _spawnedObstacles)
         {
-            if (obstacle != null)
-            {
-                Destroy(obstacle);
-            }
+            Destroy(obstacle);
         }
         
         // リストの中身を空にする
@@ -159,21 +153,18 @@ public class ObstaclesSpawner : MonoBehaviour
     void OnDrawGizmos()
     {
         // スポーン位置リストの可視化（緑色）
-        if (_spawnPositions != null && _spawnPositions.Count > 0)
+        if (_spawnPositions.Count > 0)
         {
             Gizmos.color = Color.green;
             for (int i = 0; i < _spawnPositions.Count; i++)
             {
                 Transform spawnPos = _spawnPositions[i];
-                if (spawnPos != null)
-                {
-                    // 球体で位置を表示
-                    Gizmos.DrawWireSphere(spawnPos.position, 0.5f);
+                // 球体で位置を表示
+                Gizmos.DrawWireSphere(spawnPos.position, 0.5f);
 
-                    // 番号を表示するために十字マークを追加
-                    Gizmos.DrawLine(spawnPos.position + Vector3.up * 0.3f, spawnPos.position - Vector3.up * 0.3f);
-                    Gizmos.DrawLine(spawnPos.position + Vector3.right * 0.3f, spawnPos.position - Vector3.right * 0.3f);
-                }
+                // 番号を表示するために十字マークを追加
+                Gizmos.DrawLine(spawnPos.position + Vector3.up * 0.3f, spawnPos.position - Vector3.up * 0.3f);
+                Gizmos.DrawLine(spawnPos.position + Vector3.right * 0.3f, spawnPos.position - Vector3.right * 0.3f);
             }
         }
     }

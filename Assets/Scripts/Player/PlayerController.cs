@@ -48,11 +48,8 @@ public class PlayerController : MonoBehaviour
 
         // Rigidbody2Dを取得してgravityScaleを0に設定（シーン開始時は落下させない）
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        if (_rigidbody2D != null)
-        {
-            _rigidbody2D.gravityScale = 0;
-            Debug.Log("[PlayerController] gravityScale set to 0 in Awake");
-        }
+        _rigidbody2D.gravityScale = 0;
+        Debug.Log("[PlayerController] gravityScale set to 0 in Awake");
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

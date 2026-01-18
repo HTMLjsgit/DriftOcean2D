@@ -34,27 +34,18 @@ public class SkinUnlockNoticeManager : MonoBehaviour
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
         // 閉じるボタンのリスナー
-        if (_closeButton != null)
-        {
-            _closeButton.onClick.AddListener(OnCloseButtonClicked);
-        }
+        _closeButton.onClick.AddListener(OnCloseButtonClicked);
 
         // パネルを初期非表示
-        if (_noticePanel != null)
-        {
-            _noticePanel.SetActive(false);
-        }
+        _noticePanel.SetActive(false);
 
         // UGSデータロード完了後にお知らせチェック
-        if (_cloudSaveManager != null)
-        {
-            _cloudSaveManager.OnDataLoaded += CheckAndShowNotification;
+        _cloudSaveManager.OnDataLoaded += CheckAndShowNotification;
 
-            // 既にロード済みの場合は即座にチェック
-            if (_cloudSaveManager.IsDataLoaded)
-            {
-                CheckAndShowNotification();
-            }
+        // 既にロード済みの場合は即座にチェック
+        if (_cloudSaveManager.IsDataLoaded)
+        {
+            CheckAndShowNotification();
         }
     }
 
@@ -71,8 +62,6 @@ public class SkinUnlockNoticeManager : MonoBehaviour
     /// </summary>
     private void CheckAndShowNotification()
     {
-        if (_cloudSaveManager == null) return;
-
         // 未通知のスキンIDを取得
         _pendingNotifications = _cloudSaveManager.GetUnnotifiedSkinIDs();
 

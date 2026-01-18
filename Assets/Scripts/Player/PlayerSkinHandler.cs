@@ -22,25 +22,15 @@ public class PlayerSkinHandler : MonoBehaviour
         _skinManager = SkinManager.instance;
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
-
-        if (_cloudSaveManager != null)
+        // データが既にロード済みの場合は即座に適用
+        if (_cloudSaveManager.IsDataLoaded)
         {
-            // データが既にロード済みの場合は即座に適用
-            if (_cloudSaveManager.IsDataLoaded)
-            {
-                ApplySkin();
-            }
-            else
-            {
-                // データロード完了を待つ
-                _cloudSaveManager.OnDataLoaded += OnDataLoaded;
-            }
+            ApplySkin();
         }
         else
         {
-            // UGSCloudSaveManagerがない場合はフォールバック
-            Debug.LogWarning("[PlayerSkinHandler] UGSCloudSaveManager not found. Using default skin.");
-            ApplySkin();
+            // データロード完了を待つ
+            _cloudSaveManager.OnDataLoaded += OnDataLoaded;
         }
     }
 
@@ -115,14 +105,6 @@ public class PlayerSkinHandler : MonoBehaviour
     public void SetSkin(Sprite skin)
     {
         _currentSkinSprite = skin;
-
-        if (_spriteRenderer != null)
-        {
-            _spriteRenderer.sprite = _currentSkinSprite;
-        }
-        else
-        {
-            Debug.LogError("[PlayerSkinHandler] Cannot set skin - SpriteRenderer is null!");
-        }
+        _spriteRenderer.sprite = _currentSkinSprite;
     }
 }

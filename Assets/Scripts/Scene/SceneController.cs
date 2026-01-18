@@ -223,17 +223,11 @@ public class SceneController : MonoBehaviour
     private void StartGameImmediately()
     {
         var gameManager = GameManager.instance;
-        if (gameManager != null)
-        {
-            gameManager.SetGameState(GameManager.GameState.Playing);
-            Debug.Log("[SceneController] Game state set to Playing (immediate)");
-        }
+        gameManager.SetGameState(GameManager.GameState.Playing);
+        Debug.Log("[SceneController] Game state set to Playing (immediate)");
 
         var playerController = PlayerController.instance;
-        if (playerController != null)
-        {
-            playerController.StartGame();
-            Debug.Log("[SceneController] Player game started (immediate)");
-        }
+        playerController.StartGame();
+        Debug.Log("[SceneController] Player game started (immediate)");
     }
 }

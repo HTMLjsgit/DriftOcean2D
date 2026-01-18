@@ -80,11 +80,8 @@ public class SNSShareManager : MonoBehaviour
 #endif
 
         // スキン解放処理（テスト環境でも動作確認できる）
-        if (_skinManager != null)
-        {
-            await _skinManager.UnlockBySNSShare();
-            Debug.Log("SNS share completed - skin unlock triggered");
-        }
+        await _skinManager.UnlockBySNSShare();
+        Debug.Log("SNS share completed - skin unlock triggered");
     }
 
     /// <summary>

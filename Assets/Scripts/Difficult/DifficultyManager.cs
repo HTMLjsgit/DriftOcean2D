@@ -64,10 +64,7 @@ public class DifficultyManager : MonoBehaviour
         maxDifficultyMode = false;
 
         // BGMを通常に戻す
-        if (_bgmStageManager != null)
-        {
-            _bgmStageManager.ResetBGM();
-        }
+        _bgmStageManager.ResetBGM();
 
         // 最初の難易度プロファイルを適用（1960年の状態）
         if (difficultyStages.Count > 0)

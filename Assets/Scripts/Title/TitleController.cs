@@ -13,7 +13,6 @@ public class TitleController : MonoBehaviour
     private SkinInventryManager _startSkinManager;
     private RankingUIManager _rankingUIManager;
     private SceneController _sceneController;
-    private PlayerNameManager _playerNameManager;
     private NicknameInputUI _nicknameInputUI;
     private UGSCloudSaveManager _cloudSaveManager;
     private SkinDatabase _skinDatabase;
@@ -34,34 +33,25 @@ public class TitleController : MonoBehaviour
         _rankingUIManager = RankingUIManager.instance;
         _startSkinManager = SkinInventryManager.instance;
         _sceneController = SceneController.instance;
-        _playerNameManager = PlayerNameManager.instance;
         _nicknameInputUI = NicknameInputUI.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _skinDatabase = SkinDatabase.instance;
 
         // UGSデータロード完了後に名前入力チェック
-        if (_cloudSaveManager != null)
-        {
-            _cloudSaveManager.OnDataLoaded += CheckAndShowFirstTimeNameInput;
-            _cloudSaveManager.OnDataLoaded += UpdateSkinButtonNewLabel;
+        _cloudSaveManager.OnDataLoaded += CheckAndShowFirstTimeNameInput;
+        _cloudSaveManager.OnDataLoaded += UpdateSkinButtonNewLabel;
 
-            // 既にロード済みの場合は即座に更新
-            if (_cloudSaveManager.IsDataLoaded)
-            {
-                UpdateSkinButtonNewLabel();
-            }
-        }
-        else
+        // 既にロード済みの場合は即座に更新
+        if (_cloudSaveManager.IsDataLoaded)
         {
-            // UGS未使用時は即座にチェック
-            CheckAndShowFirstTimeNameInput();
+            UpdateSkinButtonNewLabel();
         }
 
         // _startButton.onClick.AddListener();
         _skinButton.onClick.AddListener(async () =>
         {
             // Skinビューを開く前に最新データを再ロード
-            if (_cloudSaveManager != null && _cloudSaveManager.IsDataLoaded)
+            if (_cloudSaveManager.IsDataLoaded)
             {
                 Debug.Log("[TitleController] Reloading data before showing skins...");
                 await _cloudSaveManager.ReloadPlayerData();
@@ -71,10 +61,7 @@ public class TitleController : MonoBehaviour
             _startSkinManager.ApplySkinSprites();
 
             // スキン一覧を見たとしてマーク（SkinボタンのNewラベルを消す）
-            if (_cloudSaveManager != null)
-            {
-                await _cloudSaveManager.MarkSkinInventoryAsViewed();
-            }
+            await _cloudSaveManager.MarkSkinInventoryAsViewed();
 
             // Newラベルを更新
             UpdateSkinButtonNewLabel();
@@ -98,14 +85,7 @@ public class TitleController : MonoBehaviour
 
         // UGS使用時はCloudSaveから名前を取得
         string currentName = "";
-        if (_cloudSaveManager != null)
-        {
-            currentName = _cloudSaveManager.GetPlayerName();
-        }
-        else if (_playerNameManager != null)
-        {
-            currentName = _playerNameManager.GetPlayerName();
-        }
+        currentName = _cloudSaveManager.GetPlayerName();
 
         if (string.IsNullOrEmpty(currentName))
         {
@@ -138,8 +118,7 @@ public class TitleController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Failed to save player name to UGS. Falling back to local save.");
-            _playerNameManager?.SavePlayerName(playerName);
+            Debug.LogWarning("Failed to save player name to UGS.");
         }
     }
 

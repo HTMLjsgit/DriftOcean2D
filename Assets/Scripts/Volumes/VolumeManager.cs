@@ -19,10 +19,7 @@ public class VolumeManager : MonoBehaviour
         LoadVolumeSetting();
 
         // ボタンがセットされているか確認し、クリックイベントを登録
-        if (_volumeButton != null)
-        {
-            _volumeButton.onClick.AddListener(ToggleVolume);
-        }
+        _volumeButton.onClick.AddListener(ToggleVolume);
 
         // 初期スプライトを設定
         UpdateVolumeUI();
@@ -78,11 +75,8 @@ public class VolumeManager : MonoBehaviour
     /// </summary>
     private void UpdateVolumeUI()
     {
-        if (_volumeSwitcherImage != null)
-        {
-            // ミュート中（音OFF）→ OFFスプライト、ミュート解除（音ON）→ ONスプライト
-            _volumeSwitcherImage.sprite = isMuted ? _offSprite : _onSprite;
-        }
+        // ミュート中（音OFF）→ OFFスプライト、ミュート解除（音ON）→ ONスプライト
+        _volumeSwitcherImage.sprite = isMuted ? _offSprite : _onSprite;
     }
 
     // スクリプトが破棄されるときにリスナーを解除（メモリリーク防止のベストプラクティス）

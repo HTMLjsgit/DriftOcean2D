@@ -27,26 +27,20 @@ public class SkinInventryManager : MonoBehaviour
         _closeButton.onClick.AddListener(() => _flowUI.SwitchView("Start"));
         // UGSCloudSaveManagerのデータロード完了を待つ
         _cloudSaveManager = UGSCloudSaveManager.instance;
-        if (_cloudSaveManager != null)
-        {
-            // OnDataLoadedイベントに登録
-            _cloudSaveManager.OnDataLoaded += OnUGSDataLoaded;
+        // OnDataLoadedイベントに登録
+        _cloudSaveManager.OnDataLoaded += OnUGSDataLoaded;
 
-            // 既にロード済みの場合は即座に初期化
-            if (_cloudSaveManager.IsDataLoaded)
-            {
-                Debug.Log("[SkinInventryManager] UGS data already loaded, initializing immediately");
-                OnUGSDataLoaded();
-            }
-            else
-            {
-                Debug.Log("[SkinInventryManager] Waiting for UGS data to load...");
-            }
+        // 既にロード済みの場合は即座に初期化
+        if (_cloudSaveManager.IsDataLoaded)
+        {
+            Debug.Log("[SkinInventryManager] UGS data already loaded, initializing immediately");
+            OnUGSDataLoaded();
         }
         else
         {
-            Debug.LogWarning("[SkinInventryManager] UGSCloudSaveManager not found");
+            Debug.Log("[SkinInventryManager] Waiting for UGS data to load...");
         }
+
     }
 
     void OnDestroy()

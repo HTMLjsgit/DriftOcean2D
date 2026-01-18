@@ -33,20 +33,13 @@ public class SkinManager : MonoBehaviour
         _adsManager = AdsManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        if (_cloudSaveManager != null)
-        {
-            _cloudSaveManager.OnDataLoaded += LoadFromUGS;
+        _cloudSaveManager.OnDataLoaded += LoadFromUGS;
 
-            // データが既に読み込まれている場合は即座にロード
-            if (_cloudSaveManager.IsDataLoaded)
-            {
-                LoadFromUGS();
-                Debug.Log("[DEBUG] SkinManager: Data already loaded, LoadFromUGS called immediately");
-            }
-        }
-        else
+        // データが既に読み込まれている場合は即座にロード
+        if (_cloudSaveManager.IsDataLoaded)
         {
-            Debug.LogError("UGSCloudSaveManager not found. SkinManager requires UGSCloudSaveManager.");
+            LoadFromUGS();
+            Debug.Log("[DEBUG] SkinManager: Data already loaded, LoadFromUGS called immediately");
         }
     }
 
@@ -105,7 +98,7 @@ public class SkinManager : MonoBehaviour
         // 最高難易度での生存時間を計算（新しいスキン条件用：イカ、オオグソクムシ）
         float maxDifficultySurvivalTime = 0f;
         bool reachedMaxDifficulty = false;
-        if (DifficultyManager.instance != null && DifficultyManager.instance.maxDifficultyMode)
+        if (DifficultyManager.instance.maxDifficultyMode)
         {
             reachedMaxDifficulty = true;
             // 最高難易度到達後の経過時間を使用

@@ -50,7 +50,7 @@ public class SkinUI : MonoBehaviour
         // スキンが解放されているかチェック
         bool isUnlocked = SkinManager.instance.IsUnlocked(_skinID);
         bool isEquipped = SkinManager.instance.currentSkinID == _skinID;
-        bool isNew = _cloudSaveManager != null && _cloudSaveManager.IsSkinNew(_skinID);
+        bool isNew = _cloudSaveManager.IsSkinNew(_skinID);
 
         Debug.Log($"[SkinUI {_skinID}] UpdateUIState - isUnlocked={isUnlocked}, isEquipped={isEquipped}, isNew={isNew}");
 
@@ -78,17 +78,6 @@ public class SkinUI : MonoBehaviour
 
         // タップ回数テキストを更新（TapUnlockタイプの場合のみ表示）
         UpdateTapCountText();
-    }
-
-    /// <summary>
-    /// このスキンがTapUnlockタイプかチェック
-    /// </summary>
-    private bool IsTapUnlockType()
-    {
-        if (_skinDatabase == null) return false;
-
-        var skinData = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == _skinID);
-        return skinData != null && skinData.unlockType == SkinData.UnlockType.TapUnlock;
     }
 
     /// <summary>
@@ -150,10 +139,7 @@ public class SkinUI : MonoBehaviour
             Debug.Log($"Equipped Skin ID: {_skinID}");
 
             // スキンを見た（装備した）としてマーク（Newラベルを消す）
-            if (_cloudSaveManager != null)
-            {
-                await _cloudSaveManager.MarkSkinAsSeen(_skinID);
-            }
+            await _cloudSaveManager.MarkSkinAsSeen(_skinID);
 
             SkinInventryManager.instance.RefreshAllSlots();
         }
@@ -229,10 +215,7 @@ public class SkinUI : MonoBehaviour
         _isAnimating = true;
 
         // ぷにぷに音を再生
-        if (_audioSource != null && _bounceSound != null)
-        {
-            _audioSource.PlayOneShot(_bounceSound);
-        }
+        _audioSource.PlayOneShot(_bounceSound);
 
         // 既に再生中のアニメーションがあればキル
         _skinImageUI.transform.DOKill();

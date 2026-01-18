@@ -21,8 +21,6 @@ public class GameOverManager : MonoBehaviour
     private ScoreManager _scoreManager;
     private StageManager _stageManager;
     private RankingManager _rankingManager;
-    private NicknameInputUI _nicknameInputUI;
-    private PlayerNameManager _playerNameManager;
     private AdsManager _adsManager;
     private UGSCloudSaveManager _cloudSaveManager;
     private UGSLeaderboardManager _leaderboardManager;
@@ -53,8 +51,6 @@ public class GameOverManager : MonoBehaviour
         _scoreManager = ScoreManager.instance;
         _stageManager = StageManager.instance;
         _rankingManager = RankingManager.instance;
-        _nicknameInputUI = NicknameInputUI.instance;
-        _playerNameManager = PlayerNameManager.instance;
         _adsManager = AdsManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _leaderboardManager = UGSLeaderboardManager.instance;
@@ -72,16 +68,10 @@ public class GameOverManager : MonoBehaviour
         });
         _retryButton.onClick.AddListener(OnRetryButtonClicked);
         // ランキングボタン
-        if (_rankingButton != null)
-        {
-            _rankingButton.onClick.AddListener(OnViewRankingClicked);
-        }
+        _rankingButton.onClick.AddListener(OnViewRankingClicked);
 
         // SNSシェアボタン
-        if (_shareButton != null)
-        {
-            _shareButton.onClick.AddListener(OnShareButtonClicked);
-        }
+        _shareButton.onClick.AddListener(OnShareButtonClicked);
     }
 
     public async void GameOver()
@@ -112,7 +102,7 @@ public class GameOverManager : MonoBehaviour
             Debug.Log("Stats updated to UGS Cloud Save");
 
             // 無操作条件の達成チェック
-            bool noInputAchieved = _playerController != null && _playerController.NoInputUnlockAchieved;
+            bool noInputAchieved =  _playerController.NoInputUnlockAchieved;
 
             // スキン解放チェック（更新された統計データを使用）
             await _skinManager.ReportGameResult(finalScore, finalTime, noInputAchieved, _hasUsedContinue);
@@ -137,29 +127,6 @@ public class GameOverManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ランキング圏内かチェックし、自動登録
-    /// </summary>
-    private void CheckAndShowRankingInput(float score)
-    {
-        Debug.Log("_rankingManager:" + _rankingManager);
-        if (_rankingManager.IsRankingEligible(score))
-        {
-            // ランキング入り！現在のプレイヤー名で自動登録
-            string playerName = _playerNameManager.GetPlayerName();
-            int currentSkinID = _skinManager.currentSkinID;
-            bool success = _rankingManager.TryAddScore(playerName, score, currentSkinID);
-
-            if (success)
-            {
-                Debug.Log($"ランキング登録成功: {playerName} - {score}");
-            }
-            else
-            {
-                Debug.LogWarning("ランキング登録に失敗しました。");
-            }
-        }
-    }
-    /// <summary>
     /// ランキング確認ボタンがクリックされたときの処理
     /// </summary>
     private void OnViewRankingClicked()
@@ -175,15 +142,7 @@ public class GameOverManager : MonoBehaviour
     private void OnShareButtonClicked()
     {
         float currentScore = _scoreManager.getCurrentScore();
-
-        if (SNSShareManager.instance != null)
-        {
-            SNSShareManager.instance.ShareScore(currentScore);
-        }
-        else
-        {
-            Debug.LogWarning("SNSShareManager not found. Cannot share.");
-        }
+        SNSShareManager.instance.ShareScore(currentScore);
     }
 
     /// <summary>
@@ -200,10 +159,7 @@ public class GameOverManager : MonoBehaviour
                 _hasUsedContinue = true;
 
                 // コンティニューボタンを即座に非表示
-                if (_continueButton != null && _continueButton.gameObject != null)
-                {
-                    _continueButton.gameObject.SetActive(false);
-                }
+                _continueButton.gameObject.SetActive(false);
 
                 ExecuteContinue();
             },
@@ -253,10 +209,10 @@ public class GameOverManager : MonoBehaviour
         else
         {
             // 広告が利用可能かチェック
-            bool adReady = _adsManager != null && _adsManager.IsRewardedAdReady();
+            bool adReady = _adsManager.IsRewardedAdReady();
             _continueButton.gameObject.SetActive(adReady || _adsManager == null); // テスト用：AdsManagerがない場合は表示
 
-            if (!adReady && _adsManager != null)
+            if (!adReady)
             {
                 Debug.LogWarning("Rewarded ad is not ready. Continue button hidden.");
             }
@@ -281,10 +237,7 @@ public class GameOverManager : MonoBehaviour
         _gameManager.SetGameState(GameManager.GameState.Playing);
 
         // 4. PlayerControllerの状態をリセット
-        if (_playerController != null)
-        {
-            _playerController.ResetForRetry();
-        }
+        _playerController.ResetForRetry();
 
         // 5. リトライ処理を実行（StageManager側で広告チェック→timeScale=1→ゲーム開始）
         _stageManager.StageRetry();
