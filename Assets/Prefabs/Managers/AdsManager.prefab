@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdsManager
   useTestAds: 1
-  androidRewardedAdUnitId: ca-app-pub-3940256099942544/5224354917
-  androidInterstitialAdUnitId: ca-app-pub-3940256099942544/1033173712
+  androidRewardedAdUnitId: 
+  androidInterstitialAdUnitId: 
+  iosRewardedAdUnitId: 
+  iosInterstitialAdUnitId: 
   adIntervalPlayCount: 5

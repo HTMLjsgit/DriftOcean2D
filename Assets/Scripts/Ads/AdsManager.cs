@@ -16,8 +16,10 @@ public class AdsManager : MonoBehaviour
     [SerializeField] private bool useTestAds = true; // テスト広告を使用するか
 
     [Header("Ad Unit IDs (本番用)")]
-    [SerializeField] private string androidRewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917"; // テストID
-    [SerializeField] private string androidInterstitialAdUnitId = "ca-app-pub-3940256099942544/1033173712"; // テストID
+    [SerializeField] private string androidRewardedAdUnitId = ""; // テストID
+    [SerializeField] private string androidInterstitialAdUnitId = ""; // テストID
+    [SerializeField] private string iosRewardedAdUnitId = ""; // iOS テストID
+    [SerializeField] private string iosInterstitialAdUnitId = ""; // iOS テストID
 
     [Header("Play Count Ad Settings")]
     [SerializeField] private int adIntervalPlayCount = 5; // 5回ごとに広告表示
@@ -100,7 +102,15 @@ public class AdsManager : MonoBehaviour
             rewardedAd = null;
         }
 
-        string adUnitId = useTestAds ? TEST_REWARDED_AD_UNIT_ID : androidRewardedAdUnitId;
+        // プラットフォームに応じた広告ユニットIDを選択
+        string adUnitId;
+#if UNITY_IOS
+        adUnitId = useTestAds ? TEST_REWARDED_AD_UNIT_ID : iosRewardedAdUnitId;
+#elif UNITY_ANDROID
+        adUnitId = useTestAds ? TEST_REWARDED_AD_UNIT_ID : androidRewardedAdUnitId;
+#else
+        adUnitId = TEST_REWARDED_AD_UNIT_ID; // エディタ等ではテストIDを使用
+#endif
         Debug.Log($"Loading rewarded ad with ID: {adUnitId}");
 
         // 広告リクエストを作成
@@ -198,7 +208,15 @@ public class AdsManager : MonoBehaviour
             interstitialAd = null;
         }
 
-        string adUnitId = useTestAds ? TEST_INTERSTITIAL_AD_UNIT_ID : androidInterstitialAdUnitId;
+        // プラットフォームに応じた広告ユニットIDを選択
+        string adUnitId;
+#if UNITY_IOS
+        adUnitId = useTestAds ? TEST_INTERSTITIAL_AD_UNIT_ID : iosInterstitialAdUnitId;
+#elif UNITY_ANDROID
+        adUnitId = useTestAds ? TEST_INTERSTITIAL_AD_UNIT_ID : androidInterstitialAdUnitId;
+#else
+        adUnitId = TEST_INTERSTITIAL_AD_UNIT_ID; // エディタ等ではテストIDを使用
+#endif
         Debug.Log($"Loading interstitial ad with ID: {adUnitId}");
 
         // 広告リクエストを作成
