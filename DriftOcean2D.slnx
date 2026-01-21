@@ -44,6 +44,7 @@
   <Project Path="Unity.Services.Core.Editor.csproj" />
   <Project Path="Unity.Burst.CodeGen.csproj" />
   <Project Path="Unity.Services.Core.csproj" />
+  <Project Path="IngameDebugConsole.Runtime.csproj" />
   <Project Path="Unity.VisualScripting.Flow.csproj" />
   <Project Path="Unity.PerformanceTesting.csproj" />
   <Project Path="Unity.2D.Tilemap.Extras.Editor.csproj" />
@@ -102,6 +103,7 @@
   <Project Path="Unity.2D.Sprite.AIIntegration.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Unity.Services.Core.Networking.csproj" />
+  <Project Path="IngameDebugConsole.Editor.csproj" />
   <Project Path="Unity.VisualScripting.DocCodeExamples.csproj" />
   <Project Path="Unity.PlasticSCM.Editor.Entities.csproj" />
   <Project Path="UniTask.Addressables.csproj" />
