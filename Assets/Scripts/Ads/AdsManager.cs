@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 using GoogleMobileAds.Api;
 
@@ -24,6 +25,8 @@ public class AdsManager : MonoBehaviour
     [Header("Play Count Ad Settings")]
     [SerializeField] private int adIntervalPlayCount = 5; // 5回ごとに広告表示
 
+    [SerializeField] private bool openAdInspectorOnInitialize = false;
+
     private UGSCloudSaveManager _cloudSaveManager;
 
     private RewardedAd rewardedAd;
@@ -41,6 +44,7 @@ public class AdsManager : MonoBehaviour
     // テスト用広告ユニットID
     private const string TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
     private const string TEST_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
+    private const string TEMP_ANDROID_TEST_DEVICE_ID = "96B9BAB37DA5A59B2CC9370965924D47";
 
     void Awake()
     {
@@ -70,6 +74,14 @@ public class AdsManager : MonoBehaviour
         {
             Debug.Log("AdMob SDK initialization started...");
 
+            if (openAdInspectorOnInitialize)
+            {
+                MobileAds.SetRequestConfiguration(new RequestConfiguration
+                {
+                    TestDeviceIds = new List<string> { TEMP_ANDROID_TEST_DEVICE_ID }
+                });
+            }
+
             // AdMob SDK初期化
             MobileAds.Initialize(initStatus =>
             {
@@ -79,6 +91,11 @@ public class AdsManager : MonoBehaviour
                 // 初期化完了後に広告をロード
                 LoadRewardedAd();
                 LoadInterstitialAd();
+
+                if (openAdInspectorOnInitialize)
+                {
+                    OpenAdInspector();
+                }
             });
         }
         catch (Exception e)
@@ -87,6 +104,27 @@ public class AdsManager : MonoBehaviour
         }
     }
 
+
+    public void OpenAdInspector()
+    {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("AdMob SDK is not initialized yet. Cannot open Ad Inspector.");
+            return;
+        }
+
+        Debug.Log("Attempting to open Ad Inspector...");
+        MobileAds.OpenAdInspector(error =>
+        {
+            if (error != null)
+            {
+                Debug.LogError($"Ad Inspector failed. {FormatAdInspectorError(error)}");
+                return;
+            }
+
+            Debug.Log("Ad Inspector finished without errors.");
+        });
+    }
 
     #region Rewarded Ad
 
@@ -121,11 +159,11 @@ public class AdsManager : MonoBehaviour
         {
             if (error != null || ad == null)
             {
-                Debug.LogError($"Rewarded ad failed to load: {error}");
+                Debug.LogError($"Rewarded ad failed to load. {FormatLoadAdError(error)}");
                 return;
             }
 
-            Debug.Log("Rewarded ad loaded successfully!");
+            Debug.Log($"Rewarded ad loaded successfully. {FormatResponseInfo(ad.GetResponseInfo())}");
             rewardedAd = ad;
 
             // イベントリスナーを登録
@@ -180,7 +218,7 @@ public class AdsManager : MonoBehaviour
         // 広告の表示に失敗したとき
         ad.OnAdFullScreenContentFailed += (AdError error) =>
         {
-            Debug.LogError($"Rewarded ad failed to show: {error}");
+            Debug.LogError($"Rewarded ad failed to show. {FormatAdError(error)}");
 
             onRewardedAdFailed?.Invoke();
             rewardGranted = false;
@@ -227,11 +265,11 @@ public class AdsManager : MonoBehaviour
         {
             if (error != null || ad == null)
             {
-                Debug.LogError($"Interstitial ad failed to load: {error}");
+                Debug.LogError($"Interstitial ad failed to load. {FormatLoadAdError(error)}");
                 return;
             }
 
-            Debug.Log("Interstitial ad loaded successfully!");
+            Debug.Log($"Interstitial ad loaded successfully. {FormatResponseInfo(ad.GetResponseInfo())}");
             interstitialAd = ad;
 
             // イベントリスナーを登録
@@ -272,7 +310,8 @@ public class AdsManager : MonoBehaviour
         // 広告の表示に失敗したとき
         ad.OnAdFullScreenContentFailed += (AdError error) =>
         {
-            Debug.LogError($"Interstitial ad failed to show: {error}");
+            Debug.LogError($"Interstitial ad failed to show. {FormatAdError(error)}");
+            onInterstitialAdClosed?.Invoke();
 
             // 失敗してもコールバックを呼ぶ（ゲームを続行できるように）
             onInterstitialAdClosed?.Invoke();
@@ -428,6 +467,60 @@ public class AdsManager : MonoBehaviour
     }
 
     #endregion
+
+    private static string FormatLoadAdError(LoadAdError error)
+    {
+        if (error == null)
+        {
+            return "error=null";
+        }
+
+        return
+            $"code={error.GetCode()}, " +
+            $"domain={error.GetDomain()}, " +
+            $"message={error.GetMessage()}, " +
+            $"cause={FormatAdError(error.GetCause())}, " +
+            $"{FormatResponseInfo(error.GetResponseInfo())}";
+    }
+
+    private static string FormatAdError(AdError error)
+    {
+        if (error == null)
+        {
+            return "null";
+        }
+
+        return
+            $"code={error.GetCode()}, " +
+            $"domain={error.GetDomain()}, " +
+            $"message={error.GetMessage()}";
+    }
+
+    private static string FormatAdInspectorError(AdInspectorError error)
+    {
+        if (error == null)
+        {
+            return "null";
+        }
+
+        return
+            $"code={error.GetCode()}, " +
+            $"domain={error.GetDomain()}, " +
+            $"message={error.GetMessage()}";
+    }
+
+    private static string FormatResponseInfo(ResponseInfo responseInfo)
+    {
+        if (responseInfo == null)
+        {
+            return "responseInfo=null";
+        }
+
+        return
+            $"responseId={responseInfo.GetResponseId()}, " +
+            $"mediationAdapter={responseInfo.GetMediationAdapterClassName()}, " +
+            $"responseInfo={responseInfo}";
+    }
 
     #region Test Simulation
 

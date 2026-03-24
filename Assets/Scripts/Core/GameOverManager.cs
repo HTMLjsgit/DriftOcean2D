@@ -7,6 +7,7 @@ public class GameOverManager : MonoBehaviour
 {
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField]private Button _continueButton;
+    [SerializeField] private TextMeshProUGUI _noAddText;
     [SerializeField]private Button _backToTitleButton;
     [SerializeField] private TextMeshProUGUI _scoreText;
 
@@ -16,6 +17,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private Button _shareButton; // SNSシェアボタン
     [SerializeField] private Button _retryButton;
     public static GameOverManager instance;
+    private string _defaultContinueButtonText;
     private SkinManager _skinManager;
     private GameManager _gameManager;
     private ScoreManager _scoreManager;
@@ -55,7 +57,6 @@ public class GameOverManager : MonoBehaviour
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _leaderboardManager = UGSLeaderboardManager.instance;
         _playerController = PlayerController.instance;
-
         Debug.Log("OnStart _rankingManager: " + _rankingManager);
 
         _continueButton.onClick.AddListener(OnContinueButtonClicked);
@@ -157,14 +158,15 @@ public class GameOverManager : MonoBehaviour
                 // 広告視聴成功 - コンティニュー実行
                 Debug.Log("Rewarded ad success - Continue game");
                 _hasUsedContinue = true;
-
+                _noAddText.gameObject.SetActive(false);
                 // コンティニューボタンを即座に非表示
                 _continueButton.gameObject.SetActive(false);
-
                 ExecuteContinue();
             },
             onFailed: () =>
             {
+                _noAddText.gameObject.SetActive(true);
+                ExecuteContinue();
                 // 広告視聴失敗 - エラーメッセージ表示
                 Debug.LogWarning("Rewarded ad failed - Cannot continue");
                 // TODO: ユーザーに広告が利用できないことを通知
@@ -210,8 +212,17 @@ public class GameOverManager : MonoBehaviour
         {
             // 広告が利用可能かチェック
             bool adReady = _adsManager.IsRewardedAdReady();
-            _continueButton.gameObject.SetActive(adReady || _adsManager == null); // テスト用：AdsManagerがない場合は表示
 
+            //_continueButton.gameObject.SetActive(adReady); // テスト用：AdsManagerがない場合は表示
+
+
+            //広告を読み込めなくても即座に表示。
+
+            _continueButton.gameObject.SetActive(true);
+
+            if (adReady)
+            {
+            }
             if (!adReady)
             {
                 Debug.LogWarning("Rewarded ad is not ready. Continue button hidden.");
