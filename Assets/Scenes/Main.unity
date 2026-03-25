@@ -5097,7 +5097,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 935722914753734894, guid: 7dd4b01e1c976d140a5b8c429c00e69c, type: 3}
       propertyPath: useTestAds
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2493333413565667899, guid: 7dd4b01e1c976d140a5b8c429c00e69c, type: 3}
       propertyPath: m_Name
