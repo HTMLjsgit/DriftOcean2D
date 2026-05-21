@@ -82,8 +82,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _volumeButton: {fileID: 587132266673507477}
-  _onSprite: {fileID: 6297055232021531023, guid: 28dfdefcc7fcc5449ba49b545a15a1b5, type: 3}
-  _offSprite: {fileID: 1161608823702266113, guid: fb02f26635fbea24b83243af7cc26c7b, type: 3}
+  _normalSprite: {fileID: 6297055232021531023, guid: 28dfdefcc7fcc5449ba49b545a15a1b5, type: 3}
+  _allMutedSprite: {fileID: 1161608823702266113, guid: fb02f26635fbea24b83243af7cc26c7b, type: 3}
+  _bgmMutedSprite: {fileID: 21300000, guid: 75c64af5fbdfba442bdfd2357d86fb70, type: 3}
   _volumeSwitcherImage: {fileID: 4457637260098364342}
 --- !u!1 &2695976948032851552
 GameObject:

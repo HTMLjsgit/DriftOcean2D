@@ -1,86 +1,113 @@
 using UnityEngine;
-using UnityEngine.UI; // Buttonを扱うために必要
+using UnityEngine.UI;
 
 public class VolumeManager : MonoBehaviour
 {
-    [SerializeField] private Button _volumeButton; // インスペクターでボタンをアサイン
-    private bool isMuted = false;
-
-    [SerializeField] private Sprite _onSprite; // 音がONの時のスプライト
-    [SerializeField] private Sprite _offSprite; // 音がOFFの時のスプライト
-
+    [SerializeField] private Button _volumeButton;
+    [SerializeField] private Sprite _normalSprite;
+    [SerializeField] private Sprite _allMutedSprite;
+    [SerializeField] private Sprite _bgmMutedSprite;
     [SerializeField] private Image _volumeSwitcherImage;
 
-    private const string VOLUME_PREF_KEY = "AudioMuted";
+    private const string BgmTag = "BGM";
+    private const string VolumeModePrefKey = "AudioVolumeMode";
 
-    void Start()
+    private enum VolumeMode
     {
-        // 保存された設定を読み込む
+        Normal = 0,
+        AllMuted = 1,
+        BgmMuted = 2,
+    }
+
+    private VolumeMode _volumeMode = VolumeMode.Normal;
+
+    private void Start()
+    {
         LoadVolumeSetting();
 
-        // ボタンがセットされているか確認し、クリックイベントを登録
-        _volumeButton.onClick.AddListener(ToggleVolume);
+        if (_volumeButton != null)
+        {
+            _volumeButton.onClick.AddListener(ToggleVolume);
+        }
 
-        // 初期スプライトを設定
         UpdateVolumeUI();
     }
 
-    /// <summary>
-    /// 保存された音量設定を読み込む
-    /// </summary>
     private void LoadVolumeSetting()
     {
-        // PlayerPrefsから読み込み（0 = OFF, 1 = ON）
-        isMuted = PlayerPrefs.GetInt(VOLUME_PREF_KEY, 0) == 1;
+        int savedMode = PlayerPrefs.GetInt(VolumeModePrefKey, (int)VolumeMode.Normal);
+        _volumeMode = IsValidVolumeMode(savedMode) ? (VolumeMode)savedMode : VolumeMode.Normal;
 
-        // AudioListenerに反映
-        AudioListener.volume = isMuted ? 0 : 1;
-
-        Debug.Log($"[VolumeManager] Loaded setting: {(isMuted ? "Muted" : "Unmuted")}");
+        ApplyVolumeMode();
+        Debug.Log($"[VolumeManager] Loaded setting: {_volumeMode}");
     }
 
-    /// <summary>
-    /// 音量設定を保存
-    /// </summary>
     private void SaveVolumeSetting()
     {
-        // PlayerPrefsに保存（0 = OFF, 1 = ON）
-        PlayerPrefs.SetInt(VOLUME_PREF_KEY, isMuted ? 1 : 0);
+        PlayerPrefs.SetInt(VolumeModePrefKey, (int)_volumeMode);
         PlayerPrefs.Save();
 
-        Debug.Log($"[VolumeManager] Saved setting: {(isMuted ? "Muted" : "Unmuted")}");
+        Debug.Log($"[VolumeManager] Saved setting: {_volumeMode}");
     }
 
-    /// <summary>
-    /// 音のON/OFFを切り替えるメソッド
-    /// </summary>
     public void ToggleVolume()
     {
-        isMuted = !isMuted;
+        _volumeMode = _volumeMode switch
+        {
+            VolumeMode.Normal => VolumeMode.AllMuted,
+            VolumeMode.AllMuted => VolumeMode.BgmMuted,
+            _ => VolumeMode.Normal,
+        };
 
-        // isMutedがtrueなら音量を0に、falseなら1にする
-        AudioListener.volume = isMuted ? 0 : 1;
-
-        // 設定を保存
+        ApplyVolumeMode();
         SaveVolumeSetting();
-
-        // UIを更新
         UpdateVolumeUI();
 
-        Debug.Log(isMuted ? "Muted" : "Unmuted");
+        Debug.Log($"[VolumeManager] Current mode: {_volumeMode}");
     }
 
-    /// <summary>
-    /// ボリュームボタンのスプライトを更新
-    /// </summary>
+    private void ApplyVolumeMode()
+    {
+        AudioListener.volume = _volumeMode == VolumeMode.AllMuted ? 0f : 1f;
+        SetBgmMuted(_volumeMode == VolumeMode.BgmMuted);
+    }
+
+    private void SetBgmMuted(bool isMuted)
+    {
+        foreach (GameObject bgmObject in GameObject.FindGameObjectsWithTag(BgmTag))
+        {
+            if (bgmObject.TryGetComponent(out AudioSource audioSource))
+            {
+                audioSource.mute = isMuted;
+            }
+        }
+    }
+
     private void UpdateVolumeUI()
     {
-        // ミュート中（音OFF）→ OFFスプライト、ミュート解除（音ON）→ ONスプライト
-        _volumeSwitcherImage.sprite = isMuted ? _offSprite : _onSprite;
+        if (_volumeSwitcherImage != null)
+        {
+            _volumeSwitcherImage.sprite = GetSpriteForCurrentMode();
+        }
     }
 
-    // スクリプトが破棄されるときにリスナーを解除（メモリリーク防止のベストプラクティス）
-    void OnDestroy()
+    private Sprite GetSpriteForCurrentMode()
+    {
+        return _volumeMode switch
+        {
+            VolumeMode.Normal => _normalSprite,
+            VolumeMode.AllMuted => _allMutedSprite,
+            VolumeMode.BgmMuted => _bgmMutedSprite,
+            _ => _normalSprite,
+        };
+    }
+
+    private static bool IsValidVolumeMode(int mode)
+    {
+        return mode >= (int)VolumeMode.Normal && mode <= (int)VolumeMode.BgmMuted;
+    }
+
+    private void OnDestroy()
     {
         if (_volumeButton != null)
         {
