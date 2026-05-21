@@ -3089,14 +3089,14 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 498082690}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 1080, y: 1920}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1297270967
 MonoBehaviour:
@@ -3120,7 +3120,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -4985266124198244854, guid: c4bed0354ce58894e82de119be5b1bac, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -5553,6 +5553,18 @@ PrefabInstance:
     - target: {fileID: 1103599741061268553, guid: 30fe8b80163b51e4094c8732f39c107f, type: 3}
       propertyPath: m_Name
       value: SceneController
+      objectReference: {fileID: 0}
+    - target: {fileID: 4167346859692382935, guid: 30fe8b80163b51e4094c8732f39c107f, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4167346859692382935, guid: 30fe8b80163b51e4094c8732f39c107f, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4167346859692382935, guid: 30fe8b80163b51e4094c8732f39c107f, type: 3}
+      propertyPath: m_Color.r
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7939781969902701672, guid: 30fe8b80163b51e4094c8732f39c107f, type: 3}
       propertyPath: m_LocalPosition.x
