@@ -51,6 +51,16 @@ public class UGSLeaderboardManager : MonoBehaviour
     /// </summary>
     public async Task<bool> SubmitScore(float score)
     {
+        if (_ugsManager == null)
+        {
+            _ugsManager = UGSManager.instance;
+        }
+
+        if (_cloudSaveManager == null)
+        {
+            _cloudSaveManager = UGSCloudSaveManager.instance;
+        }
+
         Debug.Log($"[DEBUG] SubmitScore called. _ugsManager is null: {_ugsManager == null}");
         if (_ugsManager != null)
         {

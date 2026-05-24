@@ -44,4 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b3b54f003c4ae64d8ce0b5a66d96b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkinManager
+  _offlineModeSkinID: 0
   currentSkinID: 1

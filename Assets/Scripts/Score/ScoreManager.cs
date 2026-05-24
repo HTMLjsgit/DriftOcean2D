@@ -5,7 +5,7 @@ public class ScoreManager : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI _scoreTextUI;
-    [SerializeField] private TextMeshProUGUI _offlineModeText;
+    [SerializeField] private GameObject _offlinePanel;
 
     [Header("Settings")]
     [SerializeField] private float _scorePerSecond = 1.0f;
@@ -40,7 +40,7 @@ public class ScoreManager : MonoBehaviour
     {
         gameManager = GameManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
-        UpdateOfflineModeUI();
+        UpdateOfflinePanel();
     }
 
     void Update()
@@ -56,7 +56,7 @@ public class ScoreManager : MonoBehaviour
             }
         }
 
-        UpdateOfflineModeUI();
+        UpdateOfflinePanel();
     }
 
     public void ScoreMeasureInit()
@@ -90,16 +90,15 @@ public class ScoreManager : MonoBehaviour
         return currentScore;
     }
 
-    private void UpdateOfflineModeUI()
+    private void UpdateOfflinePanel()
     {
-        if (_offlineModeText == null)
+        if (_offlinePanel == null)
         {
             return;
         }
 
         _cloudSaveManager = UGSCloudSaveManager.instance;
         bool isOffline = _cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive();
-        _offlineModeText.gameObject.SetActive(isOffline);
-        _offlineModeText.text = "Offline Mode";
+        _offlinePanel.SetActive(isOffline);
     }
 }

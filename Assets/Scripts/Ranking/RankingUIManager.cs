@@ -31,7 +31,7 @@ public class RankingUIManager : MonoBehaviour
     [SerializeField] private FlowUI _flowUI;
 
     [Header("Offline Mode")]
-    [SerializeField] private TextMeshProUGUI _offlineModeText;
+    [SerializeField] private GameObject _offlinePanel;
 
     public static RankingUIManager instance;
 
@@ -197,11 +197,6 @@ public class RankingUIManager : MonoBehaviour
 
         if (IsOfflineModeActive())
         {
-            if (_rankingTypeLabel != null)
-            {
-                _rankingTypeLabel.text = "Offline Mode";
-            }
-
             return;
         }
 
@@ -264,7 +259,6 @@ public class RankingUIManager : MonoBehaviour
 
         if (IsOfflineModeActive())
         {
-            _untilRankingText.text = "Offline Mode";
             return;
         }
 
@@ -386,10 +380,9 @@ public class RankingUIManager : MonoBehaviour
     {
         bool isOffline = IsOfflineModeActive();
 
-        if (_offlineModeText != null)
+        if (_offlinePanel != null)
         {
-            _offlineModeText.gameObject.SetActive(isOffline);
-            _offlineModeText.text = "Offline Mode";
+            _offlinePanel.SetActive(isOffline);
         }
 
         if (_changeNameButton != null)
@@ -407,18 +400,6 @@ public class RankingUIManager : MonoBehaviour
             _dailyButton.interactable = !isOffline;
         }
 
-        if (isOffline)
-        {
-            if (_rankingTypeLabel != null)
-            {
-                _rankingTypeLabel.text = "Offline Mode";
-            }
-
-            if (_untilRankingText != null)
-            {
-                _untilRankingText.text = "Offline Mode";
-            }
-        }
     }
 
     private bool IsOfflineModeActive()

@@ -14,6 +14,7 @@ public class UGSCloudSaveManager : MonoBehaviour
 
     private const string CLOUD_SAVE_KEY_PLAYER_DATA = "PlayerData";
     private const string OFFLINE_PENDING_BEST_SCORE_KEY = "OfflinePendingBestScore";
+    private const string OFFLINE_PENDING_LEADERBOARD_SCORE_KEY = "OfflinePendingLeaderboardScore";
 
     private UGSManager _ugsManager;
     private PlayerCloudData _playerData;
@@ -154,25 +155,26 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         float pendingOfflineBest = GetPendingOfflineBestScore();
-        if (pendingOfflineBest <= 0f)
+        if (pendingOfflineBest > 0f)
         {
-            return;
-        }
+            if (pendingOfflineBest > _playerData.stats.bestScore)
+            {
+                _playerData.stats.bestScore = pendingOfflineBest;
+                Debug.Log($"[UGSCloudSaveManager] Applying pending offline best score: {pendingOfflineBest:F2}");
 
-        if (pendingOfflineBest <= _playerData.stats.bestScore)
-        {
+                bool saved = await SavePlayerData();
+                if (!saved)
+                {
+                    return;
+                }
+
+                SetPendingOfflineLeaderboardScore(pendingOfflineBest);
+            }
+
             ClearPendingOfflineBestScore();
-            return;
         }
 
-        _playerData.stats.bestScore = pendingOfflineBest;
-        Debug.Log($"[UGSCloudSaveManager] Applying pending offline best score: {pendingOfflineBest:F2}");
-
-        bool saved = await SavePlayerData();
-        if (saved)
-        {
-            ClearPendingOfflineBestScore();
-        }
+        await SubmitPendingOfflineLeaderboardScoreIfNeeded();
     }
 
     public async Task ReloadPlayerData()
@@ -221,6 +223,55 @@ public class UGSCloudSaveManager : MonoBehaviour
     private void ClearPendingOfflineBestScore()
     {
         PlayerPrefs.DeleteKey(OFFLINE_PENDING_BEST_SCORE_KEY);
+        PlayerPrefs.Save();
+    }
+
+    private void SetPendingOfflineLeaderboardScore(float score)
+    {
+        float pendingScore = GetPendingOfflineLeaderboardScore();
+        if (score <= pendingScore)
+        {
+            return;
+        }
+
+        PlayerPrefs.SetFloat(OFFLINE_PENDING_LEADERBOARD_SCORE_KEY, score);
+        PlayerPrefs.Save();
+        Debug.Log($"[UGSCloudSaveManager] Recorded offline pending leaderboard score: {score:F2}");
+    }
+
+    private float GetPendingOfflineLeaderboardScore()
+    {
+        return PlayerPrefs.GetFloat(OFFLINE_PENDING_LEADERBOARD_SCORE_KEY, 0f);
+    }
+
+    private async Task SubmitPendingOfflineLeaderboardScoreIfNeeded()
+    {
+        float pendingScore = GetPendingOfflineLeaderboardScore();
+        if (pendingScore <= 0f)
+        {
+            return;
+        }
+
+        UGSLeaderboardManager leaderboardManager = UGSLeaderboardManager.instance;
+        if (leaderboardManager == null)
+        {
+            Debug.LogWarning("[UGSCloudSaveManager] Leaderboard manager is missing. Keeping pending offline leaderboard score.");
+            return;
+        }
+
+        bool submitted = await leaderboardManager.SubmitScore(pendingScore);
+        if (!submitted)
+        {
+            Debug.LogWarning($"[UGSCloudSaveManager] Failed to submit pending offline leaderboard score: {pendingScore:F2}");
+            return;
+        }
+
+        ClearPendingOfflineLeaderboardScore();
+    }
+
+    private void ClearPendingOfflineLeaderboardScore()
+    {
+        PlayerPrefs.DeleteKey(OFFLINE_PENDING_LEADERBOARD_SCORE_KEY);
         PlayerPrefs.Save();
     }
 

@@ -8,6 +8,7 @@ public class TitleController : MonoBehaviour
     [SerializeField] private Button _skinButton;
     [SerializeField] private Button _rankingButton;
     [SerializeField] private FlowUI _flowUI;
+    [SerializeField] private GameObject _offlinePanel;
     [SerializeField] private TextMeshProUGUI _skinButtonNewLabel; // Skinボタンの「New」ラベル
 
     private SkinInventryManager _startSkinManager;
@@ -36,6 +37,7 @@ public class TitleController : MonoBehaviour
         _nicknameInputUI = NicknameInputUI.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _skinDatabase = SkinDatabase.instance;
+        UpdateOfflinePanel();
 
         // UGSデータロード完了後に名前入力チェック
         _cloudSaveManager.OnDataLoaded += CheckAndShowFirstTimeNameInput;
@@ -157,6 +159,18 @@ public class TitleController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateOfflinePanel();
+    }
 
+    private void UpdateOfflinePanel()
+    {
+        if (_offlinePanel == null)
+        {
+            return;
+        }
+
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        bool isOffline = _cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive();
+        _offlinePanel.SetActive(isOffline);
     }
 }

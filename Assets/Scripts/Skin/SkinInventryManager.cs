@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +14,7 @@ public class SkinInventryManager : MonoBehaviour
     [SerializeField] private List<SkinUI> _skinSlots;
 
     [Header("Offline Mode")]
-    [SerializeField] private TextMeshProUGUI _offlineModeText;
+    [SerializeField] private GameObject _offlinePanel;
 
     private UGSCloudSaveManager _cloudSaveManager;
     private bool _isInitialized;
@@ -30,6 +29,13 @@ public class SkinInventryManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        UpdateOfflinePanel();
+    }
+
+    void Update()
+    {
+        UpdateOfflinePanel();
     }
 
     void Start()
@@ -50,13 +56,6 @@ public class SkinInventryManager : MonoBehaviour
                 OnUGSDataLoaded();
             }
         }
-
-        UpdateOfflineModeUI();
-    }
-
-    void Update()
-    {
-        UpdateOfflineModeUI();
     }
 
     void OnDestroy()
@@ -71,7 +70,7 @@ public class SkinInventryManager : MonoBehaviour
     {
         _isInitialized = true;
         RefreshAllSlots();
-        UpdateOfflineModeUI();
+        UpdateOfflinePanel();
     }
 
     public void ApplySkinSprites()
@@ -102,19 +101,18 @@ public class SkinInventryManager : MonoBehaviour
             return;
         }
 
-        UpdateOfflineModeUI();
+        UpdateOfflinePanel();
     }
 
-    private void UpdateOfflineModeUI()
+    private void UpdateOfflinePanel()
     {
-        if (_offlineModeText == null)
+        if (_offlinePanel == null)
         {
             return;
         }
 
         bool isOffline = IsOfflineModeActive();
-        _offlineModeText.gameObject.SetActive(isOffline);
-        _offlineModeText.text = "Offline Mode";
+        _offlinePanel.SetActive(isOffline);
     }
 
     private bool IsOfflineModeActive()
