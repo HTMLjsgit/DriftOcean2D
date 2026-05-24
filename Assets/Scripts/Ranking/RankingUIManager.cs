@@ -1,53 +1,60 @@
+using System.Collections.Generic;
+using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using TMPro;
-using System.Threading;
 
-/// <summary>
-/// ランキング表示UI管理（TitleシーンとMainシーン共通）
-/// </summary>
 public class RankingUIManager : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private GameObject _rankingPanel; // ランキング表示パネル
-    [SerializeField] private Transform _contentTransform; // ScrollViewのContent
-    [SerializeField] private GameObject _rankingRowPrefab; // 1行分のプレハブ
-    [SerializeField] private Button _closeButton; // 閉じるボタン
-    [SerializeField] private Button _changeNameButton; // 名前変更ボタン
+    [SerializeField] private GameObject _rankingPanel;
+    [SerializeField] private Transform _contentTransform;
+    [SerializeField] private GameObject _rankingRowPrefab;
+    [SerializeField] private Button _closeButton;
+    [SerializeField] private Button _changeNameButton;
 
     [Header("Ranking Type Switch")]
-    [SerializeField] private Button _allTimeButton; // 総合ランキングボタン
-    [SerializeField] private Button _dailyButton; // デイリーランキングボタン
-    [SerializeField] private TextMeshProUGUI _rankingTypeLabel; // ランキング種別ラベル（例: "総合ランキング"）
+    [SerializeField] private Button _allTimeButton;
+    [SerializeField] private Button _dailyButton;
+    [SerializeField] private TextMeshProUGUI _rankingTypeLabel;
 
     [Header("Default Ranking Type")]
-    [SerializeField] private DefaultRankingType _defaultRankingType = DefaultRankingType.AllTime; // デフォルトで表示するランキング種別
+    [SerializeField] private DefaultRankingType _defaultRankingType = DefaultRankingType.AllTime;
 
     [Header("Your High Score UI")]
-    [SerializeField] private Image _yourSkinImage; // プレイヤーのスキン画像
-    [SerializeField] private TextMeshProUGUI _yourNameText; // プレイヤー名
-    [SerializeField] private TextMeshProUGUI _yourScoreText; // スコア
-    [SerializeField] private TextMeshProUGUI _untilRankingText; // ランキング入りまでの差分（Titleシーンのみ）
+    [SerializeField] private Image _yourSkinImage;
+    [SerializeField] private TextMeshProUGUI _yourNameText;
+    [SerializeField] private TextMeshProUGUI _yourScoreText;
+    [SerializeField] private TextMeshProUGUI _untilRankingText;
 
     [Header("Optional - For Title Scene")]
-    [SerializeField] private FlowUI _flowUI; // Titleシーンのみ使用
+    [SerializeField] private FlowUI _flowUI;
+
+    [Header("Offline Mode")]
+    [SerializeField] private TextMeshProUGUI _offlineModeText;
 
     public static RankingUIManager instance;
-    private RankingManager _rankingManager;
+
     private PlayerNameManager _playerNameManager;
     private SkinManager _skinManager;
     private SkinDatabase _skinDatabase;
     private NicknameInputUI _nicknameInputUI;
     private UGSLeaderboardManager _ugsLeaderboardManager;
     private UGSCloudSaveManager _cloudSaveManager;
-
-    // 非同期処理のキャンセル用
     private CancellationTokenSource _cancellationTokenSource;
 
-    // ランキング種別の定義
-    private enum RankingType { AllTime, Daily }
-    public enum DefaultRankingType { AllTime, Daily } // Inspector用のpublic enum
+    private enum RankingType
+    {
+        AllTime,
+        Daily
+    }
+
+    public enum DefaultRankingType
+    {
+        AllTime,
+        Daily
+    }
+
     private RankingType _currentRankingType;
 
     void Awake()
@@ -56,9 +63,9 @@ public class RankingUIManager : MonoBehaviour
         {
             instance = this;
             _cancellationTokenSource = new CancellationTokenSource();
-
-            // デフォルトのランキングタイプを設定
-            _currentRankingType = _defaultRankingType == DefaultRankingType.Daily ? RankingType.Daily : RankingType.AllTime;
+            _currentRankingType = _defaultRankingType == DefaultRankingType.Daily
+                ? RankingType.Daily
+                : RankingType.AllTime;
         }
         else
         {
@@ -66,16 +73,8 @@ public class RankingUIManager : MonoBehaviour
         }
     }
 
-    void OnDestroy()
-    {
-        // 非同期処理をキャンセル
-        _cancellationTokenSource?.Cancel();
-        _cancellationTokenSource?.Dispose();
-    }
-
     void Start()
     {
-        _rankingManager = RankingManager.instance;
         _playerNameManager = PlayerNameManager.instance;
         _skinManager = SkinManager.instance;
         _skinDatabase = SkinDatabase.instance;
@@ -83,62 +82,83 @@ public class RankingUIManager : MonoBehaviour
         _ugsLeaderboardManager = UGSLeaderboardManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        // 閉じるボタンのリスナー登録
-        _closeButton.onClick.AddListener(OnCloseClicked);
+        if (_closeButton != null)
+        {
+            _closeButton.onClick.AddListener(OnCloseClicked);
+        }
 
-        // 名前変更ボタンのリスナー登録
-        _changeNameButton.onClick.AddListener(OnChangeNameClicked);
+        if (_changeNameButton != null)
+        {
+            _changeNameButton.onClick.AddListener(OnChangeNameClicked);
+        }
 
-        // ランキング切り替えボタンのリスナー登録
         if (_allTimeButton != null)
         {
             _allTimeButton.onClick.AddListener(() => SwitchRankingType(RankingType.AllTime));
         }
+
         if (_dailyButton != null)
         {
             _dailyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Daily));
         }
 
-        // Mainシーンの場合は初期状態で非表示
         if (_flowUI == null)
         {
             HideRanking();
         }
+
+        UpdateOfflineModeUI();
     }
 
-    /// <summary>
-    /// ランキングビューを開く（FlowUIまたはパネルで表示）
-    /// </summary>
+    void Update()
+    {
+        UpdateOfflineModeUI();
+    }
+
+    void OnDestroy()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+    }
+
     public async void ShowRanking()
     {
         if (_flowUI != null)
         {
-            // Titleシーン: FlowUIを使用
             _flowUI.SwitchView("Ranking");
         }
-        else
+        else if (_rankingPanel != null)
         {
-            // Mainシーン: パネルを直接表示
             _rankingPanel.SetActive(true);
+        }
+
+        UpdateOfflineModeUI();
+
+        if (IsOfflineModeActive())
+        {
+            RefreshRankingList();
+            UpdateYourHighScore();
+            return;
         }
 
         try
         {
-            // キャンセルトークンを取得
             var token = _cancellationTokenSource.Token;
 
-            // クラウドから最新のプレイヤーデータを再ロード
-            Debug.Log("[RankingUIManager] Reloading player data from cloud...");
-            await _cloudSaveManager.ReloadPlayerData();
+            if (_cloudSaveManager != null)
+            {
+                Debug.Log("[RankingUIManager] Reloading player data from cloud...");
+                await _cloudSaveManager.ReloadPlayerData();
+            }
 
-            // キャンセルチェック
             token.ThrowIfCancellationRequested();
 
-            // 総合とデイリーの両方のリーダーボードを更新
-            await _ugsLeaderboardManager.RefreshLeaderboard();
-            await _ugsLeaderboardManager.RefreshDailyLeaderboard();
+            if (_ugsLeaderboardManager != null)
+            {
+                await _ugsLeaderboardManager.RefreshLeaderboard();
+                await _ugsLeaderboardManager.RefreshDailyLeaderboard();
+            }
 
-            // キャンセルチェック
             token.ThrowIfCancellationRequested();
 
             RefreshRankingList();
@@ -146,7 +166,7 @@ public class RankingUIManager : MonoBehaviour
         }
         catch (System.OperationCanceledException)
         {
-            Debug.Log("[RankingUIManager] ShowRanking was cancelled (scene transition or destroy)");
+            Debug.Log("[RankingUIManager] ShowRanking was cancelled.");
         }
         catch (System.Exception e)
         {
@@ -154,153 +174,138 @@ public class RankingUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ランキングビューを閉じる
-    /// </summary>
     public void HideRanking()
     {
         if (_flowUI != null)
         {
-            // Titleシーン: FlowUIでStartビューに戻る
             _flowUI.SwitchView("Start");
         }
-        else
+        else if (_rankingPanel != null)
         {
-            // Mainシーン: パネルを非表示
             _rankingPanel.SetActive(false);
         }
     }
 
-    /// <summary>
-    /// 閉じるボタンがクリックされたときの処理
-    /// </summary>
     private void OnCloseClicked()
     {
         HideRanking();
     }
 
-    /// <summary>
-    /// ランキングリストを更新して表示
-    /// </summary>
     private void RefreshRankingList()
     {
-        Debug.Log("RefreshRankingList called");
+        ClearRankingRows();
 
-        // 既存の表示を全削除
-        foreach (Transform child in _contentTransform)
+        if (IsOfflineModeActive())
         {
-            Destroy(child.gameObject);
-        }
+            if (_rankingTypeLabel != null)
+            {
+                _rankingTypeLabel.text = "Offline Mode";
+            }
 
-        // 現在のランキング種別に応じて表示
-        List<UGSRankingEntry> ugsRankings;
-        if (_currentRankingType == RankingType.Daily)
-        {
-            ugsRankings = _ugsLeaderboardManager.GetCachedDailyRankings();
-            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "Dailay Ranking";
-            Debug.Log($"Daily Ranking count: {ugsRankings.Count}");
-        }
-        else
-        {
-            ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
-            if (_rankingTypeLabel != null) _rankingTypeLabel.text = "All Score Ranking";
-            Debug.Log($"All-Time Ranking count: {ugsRankings.Count}");
-        }
-
-        for (int i = 0; i < ugsRankings.Count; i++)
-        {
-            var entry = ugsRankings[i];
-
-            // プレハブ生成
-            GameObject row = Instantiate(_rankingRowPrefab, _contentTransform);
-
-            // テキスト設定
-            RankingUI rowScript = row.GetComponent<RankingUI>();
-            rowScript.SetData(entry.rank, entry.playerName, entry.score, entry.skinID);
-        }
-    }
-
-    /// <summary>
-    /// Your High Score情報を更新
-    /// </summary>
-    private void UpdateYourHighScore()
-    {
-        // UGSから取得（常に使用）
-        float bestScore = _cloudSaveManager.GetStats().bestScore;
-        string playerName = _cloudSaveManager.GetPlayerName();
-
-        // 現在装備中のスキンを取得
-        int currentSkinID = _skinManager.currentSkinID;
-        SkinData skinData = _skinDatabase.GetSkinById(currentSkinID);
-
-        // UIに反映
-        _yourNameText.text = playerName;
-        _yourScoreText.text = bestScore.ToString("F2");
-        _yourSkinImage.sprite = skinData.skinSprite;
-
-        // ランキング入りまでの差分を計算（Titleシーンのみ）
-        if (_untilRankingText != null)
-        {
-            UpdateUntilRankingText(bestScore);
-        }
-    }
-
-    /// <summary>
-    /// ランキング入りまでの差分を計算して表示
-    /// </summary>
-    private void UpdateUntilRankingText(float yourScore)
-    {
-        // UGSランキングから計算（常に使用）
-        var ugsRankings = _ugsLeaderboardManager.GetCachedRankings();
-
-        if (ugsRankings.Count == 0)
-        {
-            _untilRankingText.text = "まだランキングがありません";
             return;
         }
 
-        // すでにランキング入りしているかチェック
-        bool isInRanking = false;
-        int yourRank = -1;
+        List<UGSRankingEntry> rankings = GetCurrentRankingEntries();
 
-        for (int i = 0; i < ugsRankings.Count; i++)
+        if (_rankingTypeLabel != null)
         {
-            if (ugsRankings[i].score <= yourScore)
-            {
-                isInRanking = true;
-                yourRank = i + 1;
-                break;
-            }
+            _rankingTypeLabel.text = _currentRankingType == RankingType.Daily
+                ? "Daily Ranking"
+                : "All Score Ranking";
         }
 
-        if (isInRanking)
+        if (_contentTransform == null || _rankingRowPrefab == null)
         {
-            _untilRankingText.text = $"現在 {yourRank}位！";
+            return;
         }
-        else
+
+        foreach (UGSRankingEntry entry in rankings)
         {
-            // ランキング圏外の場合、10位との差を表示
-            if (ugsRankings.Count >= 10)
+            GameObject row = Instantiate(_rankingRowPrefab, _contentTransform);
+            RankingUI rowScript = row.GetComponent<RankingUI>();
+            if (rowScript != null)
             {
-                float tenthScore = ugsRankings[9].score;
-                float difference = tenthScore - yourScore;
-                _untilRankingText.text = $"ランキング入りまで あと {difference:F2}";
-            }
-            else
-            {
-                // ランキングが10件未満の場合は必ずランキング入りできる
-                _untilRankingText.text = "次回プレイでランキング入り確定！";
+                rowScript.SetData(entry.rank, entry.playerName, entry.score, entry.skinID);
             }
         }
     }
 
-    /// <summary>
-    /// 名前変更ボタンがクリックされたときの処理
-    /// </summary>
+    private void UpdateYourHighScore()
+    {
+        float bestScore = _cloudSaveManager != null ? _cloudSaveManager.GetDisplayBestScore() : 0f;
+        string playerName = _cloudSaveManager != null ? _cloudSaveManager.GetPlayerName() : "Player";
+        int currentSkinID = _skinManager != null ? _skinManager.currentSkinID : 1;
+        SkinData skinData = _skinDatabase != null ? _skinDatabase.GetSkinById(currentSkinID) : null;
+
+        if (_yourNameText != null)
+        {
+            _yourNameText.text = playerName;
+        }
+
+        if (_yourScoreText != null)
+        {
+            _yourScoreText.text = bestScore.ToString("F2");
+        }
+
+        if (_yourSkinImage != null && skinData != null)
+        {
+            _yourSkinImage.sprite = skinData.skinSprite;
+        }
+
+        UpdateUntilRankingText(bestScore);
+    }
+
+    private void UpdateUntilRankingText(float yourScore)
+    {
+        if (_untilRankingText == null)
+        {
+            return;
+        }
+
+        if (IsOfflineModeActive())
+        {
+            _untilRankingText.text = "Offline Mode";
+            return;
+        }
+
+        List<UGSRankingEntry> rankings = GetCurrentRankingEntries();
+        if (rankings.Count == 0)
+        {
+            _untilRankingText.text = "No ranking data";
+            return;
+        }
+
+        for (int i = 0; i < rankings.Count; i++)
+        {
+            if (rankings[i].score <= yourScore)
+            {
+                _untilRankingText.text = $"Rank {i + 1}";
+                return;
+            }
+        }
+
+        if (rankings.Count >= 10)
+        {
+            float difference = rankings[9].score - yourScore;
+            _untilRankingText.text = $"Need {difference:F2} for Top 10";
+            return;
+        }
+
+        _untilRankingText.text = "Ranking updates soon";
+    }
+
     private void OnChangeNameClicked()
     {
-        // UGSから名前を取得（常に使用）
-        string currentName = _cloudSaveManager.GetPlayerName();
+        if (IsOfflineModeActive())
+        {
+            Debug.LogWarning("[RankingUIManager] Offline mode active. Name change is disabled.");
+            return;
+        }
+
+        if (_nicknameInputUI == null)
+        {
+            return;
+        }
 
         _nicknameInputUI.ShowPanel(
             "What's your name",
@@ -309,40 +314,30 @@ public class RankingUIManager : MonoBehaviour
         );
     }
 
-    /// <summary>
-    /// 名前が変更されたときの処理
-    /// </summary>
     private async void OnNameChanged(string newName)
     {
+        if (IsOfflineModeActive() || _cloudSaveManager == null)
+        {
+            return;
+        }
+
         try
         {
-            // キャンセルトークンを取得
             var token = _cancellationTokenSource.Token;
-
-            // UGSに保存（常に使用）
             bool success = await _cloudSaveManager.SetPlayerName(newName);
 
-            // キャンセルチェック
             token.ThrowIfCancellationRequested();
 
-            if (success)
+            if (success && _playerNameManager != null)
             {
-                Debug.Log($"プレイヤー名をUGSに保存しました: {newName}");
-
-                // PlayerNameManagerに同期保存（InputField用）
                 _playerNameManager.SavePlayerName(newName);
             }
-            else
-            {
-                Debug.LogError("Failed to save player name to UGS.");
-            }
 
-            // 名前を更新したらYour High Scoreの表示も更新
             UpdateYourHighScore();
         }
         catch (System.OperationCanceledException)
         {
-            Debug.Log("[RankingUIManager] OnNameChanged was cancelled (scene transition or destroy)");
+            Debug.Log("[RankingUIManager] OnNameChanged was cancelled.");
         }
         catch (System.Exception e)
         {
@@ -350,24 +345,85 @@ public class RankingUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ランキング種別を切り替える
-    /// </summary>
     private void SwitchRankingType(RankingType type)
     {
         if (_currentRankingType == type)
         {
-            // 既に同じ種別が選択されている場合は何もしない
             return;
         }
 
         _currentRankingType = type;
-        Debug.Log($"Ranking type switched to: {type}");
-
-        // ランキングリストを再描画
         RefreshRankingList();
-
-        // Your High Scoreも更新（デイリーの場合は今日のスコアを表示）
         UpdateYourHighScore();
+    }
+
+    private void ClearRankingRows()
+    {
+        if (_contentTransform == null)
+        {
+            return;
+        }
+
+        foreach (Transform child in _contentTransform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    private List<UGSRankingEntry> GetCurrentRankingEntries()
+    {
+        if (_ugsLeaderboardManager == null)
+        {
+            return new List<UGSRankingEntry>();
+        }
+
+        return _currentRankingType == RankingType.Daily
+            ? _ugsLeaderboardManager.GetCachedDailyRankings()
+            : _ugsLeaderboardManager.GetCachedRankings();
+    }
+
+    private void UpdateOfflineModeUI()
+    {
+        bool isOffline = IsOfflineModeActive();
+
+        if (_offlineModeText != null)
+        {
+            _offlineModeText.gameObject.SetActive(isOffline);
+            _offlineModeText.text = "Offline Mode";
+        }
+
+        if (_changeNameButton != null)
+        {
+            _changeNameButton.interactable = !isOffline;
+        }
+
+        if (_allTimeButton != null)
+        {
+            _allTimeButton.interactable = !isOffline;
+        }
+
+        if (_dailyButton != null)
+        {
+            _dailyButton.interactable = !isOffline;
+        }
+
+        if (isOffline)
+        {
+            if (_rankingTypeLabel != null)
+            {
+                _rankingTypeLabel.text = "Offline Mode";
+            }
+
+            if (_untilRankingText != null)
+            {
+                _untilRankingText.text = "Offline Mode";
+            }
+        }
+    }
+
+    private bool IsOfflineModeActive()
+    {
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        return _cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive();
     }
 }

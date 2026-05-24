@@ -1,18 +1,23 @@
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
+
 public class SkinManager : MonoBehaviour
 {
     public static SkinManager instance;
+
     private SkinDatabase _skinDatabase;
     private AdsManager _adsManager;
     private UGSCloudSaveManager _cloudSaveManager;
 
+    [Header("Offline Mode")]
+    [SerializeField] private int _offlineModeSkinID = 1;
+
     [Header("Current Status")]
-    // 現在装備中のスキンのID
     public int currentSkinID;
-    bool anyNewUnlock = false;
+
+    private bool anyNewUnlock;
 
     void Awake()
     {
@@ -33,96 +38,134 @@ public class SkinManager : MonoBehaviour
         _adsManager = AdsManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        _cloudSaveManager.OnDataLoaded += LoadFromUGS;
-
-        // データが既に読み込まれている場合は即座にロード
-        if (_cloudSaveManager.IsDataLoaded)
+        if (_cloudSaveManager != null)
         {
-            LoadFromUGS();
-            Debug.Log("[DEBUG] SkinManager: Data already loaded, LoadFromUGS called immediately");
+            _cloudSaveManager.OnDataLoaded += LoadFromUGS;
+
+            if (_cloudSaveManager.IsDataLoaded)
+            {
+                LoadFromUGS();
+            }
         }
     }
 
-    /// <summary>
-    /// UGS Cloud Saveからデータをロード
-    /// </summary>
-    private void LoadFromUGS()
+    void OnDestroy()
     {
-        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
+        if (_cloudSaveManager != null)
+        {
+            _cloudSaveManager.OnDataLoaded -= LoadFromUGS;
+        }
+    }
+
+    private async void LoadFromUGS()
+    {
         _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (IsOfflineModeActive())
+        {
+            currentSkinID = _offlineModeSkinID;
+            return;
+        }
 
         if (_cloudSaveManager == null)
         {
-            Debug.LogError("Cannot load from UGS: UGSCloudSaveManager is not available");
+            Debug.LogError("Cannot load skins because UGSCloudSaveManager is missing.");
             return;
         }
 
         currentSkinID = _cloudSaveManager.GetCurrentSkinID();
-        Debug.Log($"SkinManager loaded from UGS: currentSkinID={currentSkinID}");
+        await SyncUnlocksFromCurrentStats();
     }
 
-    /// <summary>
-    /// ゲームオーバー時に呼ばれる：統計を更新し、スキンの解放チェックを行う
-    /// </summary>
-    /// <param name="runScore">今回のスコア</param>
-    /// <param name="runTime">今回の生存時間(秒)</param>
-    /// <param name="noInputAchieved">無操作条件達成フラグ</param>
-    /// <param name="usedContinue">コンティニュー使用フラグ</param>
     public async Task ReportGameResult(float runScore, float runTime, bool noInputAchieved = false, bool usedContinue = false)
     {
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
+        if (IsOfflineModeActive() || _cloudSaveManager == null)
+        {
+            return;
+        }
+
         PlayerStats stats = _cloudSaveManager.GetStats();
 
-        // 連続生存条件の更新（イルカ用：1分以上生存したか）
-        float survivalThreshold = 60f; // 1分
+        float survivalThreshold = 60f;
         bool survivedLongEnough = runTime >= survivalThreshold;
         await _cloudSaveManager.UpdateConsecutiveSurvival(survivedLongEnough);
         int consecutiveSurvivalCount = _cloudSaveManager.GetConsecutiveSurvivalCount();
 
-        // 無操作解放フラグの更新（海綿体用）
         if (noInputAchieved && !_cloudSaveManager.HasNoInputUnlocked())
         {
             await _cloudSaveManager.SetNoInputUnlocked();
         }
 
-        // ノーコンティニューでハードモード到達の判定（カニ用）
-        // ハードモード = 6分（360秒）以上生存
         float hardModeThreshold = 360f;
         if (!usedContinue && runTime >= hardModeThreshold && !_cloudSaveManager.HasNoContinueHardModeUnlocked())
         {
             await _cloudSaveManager.SetNoContinueHardModeUnlocked();
         }
 
-        // 最高難易度での生存時間を計算（新しいスキン条件用：イカ、オオグソクムシ）
         float maxDifficultySurvivalTime = 0f;
         bool reachedMaxDifficulty = false;
-        if (DifficultyManager.instance.maxDifficultyMode)
+        if (DifficultyManager.instance != null && DifficultyManager.instance.maxDifficultyMode)
         {
             reachedMaxDifficulty = true;
-            // 最高難易度到達後の経過時間を使用
-            // TODO: より正確な計測が必要な場合、DifficultyManagerに最高難易度到達時刻を記録する
             maxDifficultySurvivalTime = runTime;
         }
 
-        // 解放条件のチェック
         await CheckUnlockConditions(
-            runScore, runTime,
-            stats.totalPlayCount, stats.totalPlayTime, stats.deathCount, stats.bestScore,
-            consecutiveSurvivalCount, noInputAchieved, usedContinue,
-            reachedMaxDifficulty, maxDifficultySurvivalTime
+            runScore,
+            runTime,
+            stats.totalPlayCount,
+            stats.totalPlayTime,
+            stats.deathCount,
+            stats.bestScore,
+            consecutiveSurvivalCount,
+            noInputAchieved,
+            usedContinue,
+            reachedMaxDifficulty,
+            maxDifficultySurvivalTime
         );
     }
 
-    /// <summary>
-    /// 全スキンをチェックして解放処理を行う
-    /// </summary>
+    public async Task SyncUnlocksFromCurrentStats()
+    {
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        _skinDatabase = SkinDatabase.instance;
+
+        if (_cloudSaveManager == null || IsOfflineModeActive())
+        {
+            return;
+        }
+
+        PlayerStats stats = _cloudSaveManager.GetStats();
+        await CheckUnlockConditions(
+            0f,
+            0f,
+            stats.totalPlayCount,
+            stats.totalPlayTime,
+            stats.deathCount,
+            stats.bestScore,
+            stats.consecutiveSurvivalCount,
+            false,
+            false,
+            false,
+            0f
+        );
+    }
+
     private async Task CheckUnlockConditions(
-        float runScore, float runTime,
-        int playCount, float totalTime, int deathCount, float bestScore,
-        int consecutiveSurvivalCount, bool noInputAchieved, bool usedContinue,
-        bool reachedMaxDifficulty, float maxDifficultySurvivalTime)
+        float runScore,
+        float runTime,
+        int playCount,
+        float totalTime,
+        int deathCount,
+        float bestScore,
+        int consecutiveSurvivalCount,
+        bool noInputAchieved,
+        bool usedContinue,
+        bool reachedMaxDifficulty,
+        float maxDifficultySurvivalTime)
     {
         if (_skinDatabase == null)
         {
@@ -131,8 +174,13 @@ public class SkinManager : MonoBehaviour
 
         int unlockedCount = 0;
 
-        foreach (var skin in _skinDatabase.GetAllSkins())
+        foreach (SkinData skin in _skinDatabase.GetAllSkins())
         {
+            if (skin == null)
+            {
+                continue;
+            }
+
             if (IsUnlocked(skin.id))
             {
                 unlockedCount++;
@@ -147,221 +195,205 @@ public class SkinManager : MonoBehaviour
                     unlock = true;
                     break;
                 case SkinData.UnlockType.ScoreReach:
-                    if (bestScore >= skin.conditionValue) unlock = true;
+                    unlock = bestScore >= skin.conditionValue;
                     break;
                 case SkinData.UnlockType.PlayCount:
-                    if (playCount >= (int)skin.conditionValue) unlock = true;
+                    unlock = playCount >= (int)skin.conditionValue;
                     break;
                 case SkinData.UnlockType.SurvivalTime:
-                    if (runTime >= skin.conditionValue) unlock = true;
+                    unlock = runTime >= skin.conditionValue;
                     break;
                 case SkinData.UnlockType.TotalPlayTime:
-                    if (totalTime >= skin.conditionValue) unlock = true;
+                    unlock = totalTime >= skin.conditionValue;
                     break;
                 case SkinData.UnlockType.DeathCount:
-                    if (deathCount >= (int)skin.conditionValue) unlock = true;
+                    unlock = deathCount >= (int)skin.conditionValue;
                     break;
-
-                // 新しい解放条件
                 case SkinData.UnlockType.NoInput:
-                    // 無操作条件（海綿体用）: 30秒操作なしで解放
-                    if (_cloudSaveManager.HasNoInputUnlocked()) unlock = true;
+                    unlock = _cloudSaveManager.HasNoInputUnlocked();
                     break;
                 case SkinData.UnlockType.SNSShare:
-                    // SNSシェア条件（アカウミガメ用）: SNSでシェアすると解放
-                    if (_cloudSaveManager.HasSNSShared()) unlock = true;
+                    unlock = _cloudSaveManager.HasSNSShared();
                     break;
                 case SkinData.UnlockType.ConsecutiveSurvival:
-                    // 連続生存条件（イルカ用）: conditionValue回連続で1分以上生存
-                    if (consecutiveSurvivalCount >= (int)skin.conditionValue) unlock = true;
+                    unlock = consecutiveSurvivalCount >= (int)skin.conditionValue;
                     break;
                 case SkinData.UnlockType.NoContinueHardMode:
-                    // ノーコンティニューでハードモード到達（カニ用）
-                    if (_cloudSaveManager.HasNoContinueHardModeUnlocked()) unlock = true;
+                    unlock = _cloudSaveManager.HasNoContinueHardModeUnlocked();
                     break;
                 case SkinData.UnlockType.MaxDifficultySurvival:
-                    // 最高難易度生存条件（イカ、オオグソクムシ用）
-                    // conditionValue=0の場合はハードモード到達のみ、>0の場合は生存時間も確認
-                    if (reachedMaxDifficulty)
-                    {
-                        if (skin.conditionValue == 0 || maxDifficultySurvivalTime >= skin.conditionValue)
-                        {
-                            unlock = true;
-                        }
-                    }
+                    unlock = reachedMaxDifficulty &&
+                             (skin.conditionValue == 0f || maxDifficultySurvivalTime >= skin.conditionValue);
+                    break;
+                case SkinData.UnlockType.AdWatch:
+                case SkinData.UnlockType.CompleteAll:
+                case SkinData.UnlockType.TapUnlock:
                     break;
             }
 
-            if (unlock)
+            if (!unlock)
             {
-                await UnlockSkin(skin.id);
-                unlockedCount++;
-                anyNewUnlock = true;
-                Debug.Log($"Skin Unlocked! : {skin.skinName}");
+                continue;
             }
+
+            await UnlockSkin(skin.id);
+            unlockedCount++;
+            anyNewUnlock = true;
+            Debug.Log($"Skin unlocked: {skin.skinName}");
         }
 
-        // コンプリート条件（ゴールドクラゲ）のチェック
-        SkinData goldSkin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.unlockType == SkinData.UnlockType.CompleteAll);
+        SkinData goldSkin = _skinDatabase
+            .GetAllSkins()
+            .FirstOrDefault(s => s != null && s.unlockType == SkinData.UnlockType.CompleteAll);
+
         if (goldSkin != null && !IsUnlocked(goldSkin.id))
         {
             if (unlockedCount >= _skinDatabase.GetAllSkins().Count - 1)
             {
                 await UnlockSkin(goldSkin.id);
-                Debug.Log("ALL COMPLETE! Gold Skin Unlocked!");
             }
         }
     }
 
-    /// <summary>
-    /// SNSシェアによるスキン解放（アカウミガメ用）
-    /// 外部から呼び出される
-    /// </summary>
     public async Task UnlockBySNSShare()
     {
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        if (_cloudSaveManager == null)
+        if (IsOfflineModeActive() || _cloudSaveManager == null)
         {
-            Debug.LogError("Cannot unlock by SNS share: UGSCloudSaveManager is not available");
             return;
         }
 
-        // SNSシェアフラグを設定
         await _cloudSaveManager.SetSNSShared();
 
-        // SNSShare条件のスキンを探して解放
         _skinDatabase = SkinDatabase.instance;
-        var snsSkin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.unlockType == SkinData.UnlockType.SNSShare);
+        SkinData snsSkin = _skinDatabase
+            .GetAllSkins()
+            .FirstOrDefault(s => s != null && s.unlockType == SkinData.UnlockType.SNSShare);
+
         if (snsSkin != null && !IsUnlocked(snsSkin.id))
         {
             await UnlockSkin(snsSkin.id);
-            Debug.Log($"Skin unlocked by SNS share: {snsSkin.skinName}");
         }
     }
 
-    /// <summary>
-    /// スキンを解放状態にする
-    /// </summary>
     public async Task UnlockSkin(int id)
     {
-        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        if (_cloudSaveManager == null)
+        if (IsOfflineModeActive() || _cloudSaveManager == null)
         {
-            Debug.LogError("Cannot unlock skin: UGSCloudSaveManager is not available");
             return;
         }
 
         await _cloudSaveManager.UnlockSkin(id);
     }
 
-    /// <summary>
-    /// スキンが解放されているか確認
-    /// </summary>
     public bool IsUnlocked(int id)
     {
-        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
         _cloudSaveManager = UGSCloudSaveManager.instance;
+
+        if (IsOfflineModeActive())
+        {
+            return id == _offlineModeSkinID;
+        }
 
         if (_cloudSaveManager == null)
         {
-            Debug.LogError("Cannot check unlock status: UGSCloudSaveManager is not available");
             return false;
         }
 
-        bool unlocked = _cloudSaveManager.IsSkinUnlocked(id);
-        Debug.Log($"[DEBUG] SkinManager.IsUnlocked({id}): {unlocked} (from UGS)");
-        return unlocked;
+        return _cloudSaveManager.IsSkinUnlocked(id);
     }
 
-    /// <summary>
-    /// スキンを装備する
-    /// </summary>
     public async Task EquipSkin(int id)
     {
-        // 常に最新のインスタンスを取得（シーン遷移時の参照切れを防ぐ）
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        Debug.Log($"EquipSkin called: id={id}, IsUnlocked={IsUnlocked(id)}");
-
-        if (_cloudSaveManager == null)
+        if (IsOfflineModeActive())
         {
-            Debug.LogError("Cannot equip skin: UGSCloudSaveManager is not available");
+            currentSkinID = _offlineModeSkinID;
             return;
         }
 
-        if (IsUnlocked(id))
+        if (_cloudSaveManager == null)
         {
-            currentSkinID = id;
-            await _cloudSaveManager.EquipSkin(id);
-            Debug.Log($"Skin {id} equipped and saved to UGS Cloud Save");
+            Debug.LogError("Cannot equip skin because UGSCloudSaveManager is missing.");
+            return;
         }
-        else
+
+        if (!IsUnlocked(id))
         {
-            Debug.LogWarning($"Skin ID {id} is locked!");
+            Debug.LogWarning($"Skin ID {id} is locked.");
+            return;
         }
+
+        currentSkinID = id;
+        await _cloudSaveManager.EquipSkin(id);
     }
 
-    /// <summary>
-    /// 現在装備中のスキンのSpriteを取得（Playerが表示するときに使う）
-    /// </summary>
     public Sprite GetCurrentSkinSprite()
     {
-        var skin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == currentSkinID);
+        if (_skinDatabase == null)
+        {
+            _skinDatabase = SkinDatabase.instance;
+        }
+
+        SkinData skin = _skinDatabase != null
+            ? _skinDatabase.GetAllSkins().FirstOrDefault(s => s != null && s.id == currentSkinID)
+            : null;
+
         return skin != null ? skin.skinSprite : null;
     }
 
-    /// <summary>
-    /// 広告視聴でスキンを解放する（AdWatchタイプのスキン用）
-    /// </summary>
-    /// <param name="skinID">解放するスキンのID</param>
-    /// <param name="onSuccess">解放成功時のコールバック</param>
-    /// <param name="onFailed">解放失敗時のコールバック</param>
     public async void UnlockSkinByAd(int skinID, System.Action onSuccess = null, System.Action onFailed = null)
     {
-        // スキンが存在するかチェック
-        var skin = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == skinID);
-        if (skin == null)
+        if (IsOfflineModeActive())
         {
-            Debug.LogError($"Skin ID {skinID} not found!");
             onFailed?.Invoke();
             return;
         }
 
-        // すでに解放済みかチェック
+        _skinDatabase = SkinDatabase.instance;
+        SkinData skin = _skinDatabase
+            .GetAllSkins()
+            .FirstOrDefault(s => s != null && s.id == skinID);
+
+        if (skin == null)
+        {
+            onFailed?.Invoke();
+            return;
+        }
+
         if (IsUnlocked(skinID))
         {
-            Debug.LogWarning($"Skin ID {skinID} is already unlocked!");
             onSuccess?.Invoke();
             return;
         }
 
-        // 広告がない場合の処理
         if (_adsManager == null)
         {
-            Debug.LogWarning("AdsManager not found. Unlocking skin without ad (test mode).");
             await UnlockSkin(skinID);
             onSuccess?.Invoke();
             return;
         }
 
-        // 広告を表示
         _adsManager.ShowRewardedAd(
             onSuccess: async () =>
             {
-                // 広告視聴成功 - スキンを解放
                 await UnlockSkin(skinID);
-                Debug.Log($"Skin unlocked by ad: {skin.skinName}");
                 onSuccess?.Invoke();
             },
             onFailed: () =>
             {
-                // 広告視聴失敗
-                Debug.LogWarning($"Failed to unlock skin {skinID} by ad.");
                 onFailed?.Invoke();
             }
         );
+    }
+
+    private bool IsOfflineModeActive()
+    {
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        return _cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive();
     }
 }

@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class SkinInventryManager : MonoBehaviour
 {
@@ -13,81 +14,112 @@ public class SkinInventryManager : MonoBehaviour
     [Header("Skin List Settings")]
     [SerializeField] private List<SkinUI> _skinSlots;
 
+    [Header("Offline Mode")]
+    [SerializeField] private TextMeshProUGUI _offlineModeText;
+
     private UGSCloudSaveManager _cloudSaveManager;
-    private bool _isInitialized = false;
+    private bool _isInitialized;
 
     void Awake()
     {
-        if(instance == null) instance = this;
-        else Destroy(this.gameObject);
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Start()
     {
-        _closeButton.onClick.AddListener(() => _flowUI.SwitchView("Start"));
-        // UGSCloudSaveManagerのデータロード完了を待つ
+        if (_closeButton != null && _flowUI != null)
+        {
+            _closeButton.onClick.AddListener(() => _flowUI.SwitchView("Start"));
+        }
+
         _cloudSaveManager = UGSCloudSaveManager.instance;
-        // OnDataLoadedイベントに登録
-        _cloudSaveManager.OnDataLoaded += OnUGSDataLoaded;
 
-        // 既にロード済みの場合は即座に初期化
-        if (_cloudSaveManager.IsDataLoaded)
+        if (_cloudSaveManager != null)
         {
-            Debug.Log("[SkinInventryManager] UGS data already loaded, initializing immediately");
-            OnUGSDataLoaded();
-        }
-        else
-        {
-            Debug.Log("[SkinInventryManager] Waiting for UGS data to load...");
+            _cloudSaveManager.OnDataLoaded += OnUGSDataLoaded;
+
+            if (_cloudSaveManager.IsDataLoaded)
+            {
+                OnUGSDataLoaded();
+            }
         }
 
+        UpdateOfflineModeUI();
+    }
+
+    void Update()
+    {
+        UpdateOfflineModeUI();
     }
 
     void OnDestroy()
     {
-        // イベントリスナーを解除
         if (_cloudSaveManager != null)
         {
             _cloudSaveManager.OnDataLoaded -= OnUGSDataLoaded;
         }
     }
 
-    /// <summary>
-    /// UGSデータロード完了時の処理
-    /// </summary>
     private void OnUGSDataLoaded()
     {
-        Debug.Log("[SkinInventryManager] UGS data loaded, refreshing skin UI");
         _isInitialized = true;
-
-        // スキンUIを更新
         RefreshAllSlots();
+        UpdateOfflineModeUI();
     }
 
     public void ApplySkinSprites()
     {
-        Debug.Log("[SkinInventryManager] ApplySkinSprites called");
-
-        // 最新のUGSCloudSaveManagerインスタンスを取得
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        // スキンスプライトを初期化
-        foreach (var slot in _skinSlots)
+        foreach (SkinUI slot in _skinSlots)
         {
-            Debug.Log("skinDatabase: " + SkinDatabase.instance);
-            Debug.Log("slot: "+ slot);
-            var data = SkinDatabase.instance.GetSkinById(slot.skinId);
-            slot.Initialize(data.skinSprite);
+            SkinData data = SkinDatabase.instance.GetSkinById(slot.skinId);
+            if (data != null)
+            {
+                slot.Initialize(data.skinSprite);
+            }
         }
 
-        // ロック状態を更新（データロード状態に関わらず実行）
-        Debug.Log($"[SkinInventryManager] Refreshing lock states. IsDataLoaded={_cloudSaveManager?.IsDataLoaded}, _isInitialized={_isInitialized}");
         RefreshAllSlots();
     }
 
     public void RefreshAllSlots()
     {
-        Debug.Log("[SkinInventryManager] RefreshAllSlots called");
-        _skinSlots.ForEach(slot => slot.UpdateUIState());
+        foreach (SkinUI slot in _skinSlots)
+        {
+            slot.UpdateUIState();
+        }
+
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        UpdateOfflineModeUI();
+    }
+
+    private void UpdateOfflineModeUI()
+    {
+        if (_offlineModeText == null)
+        {
+            return;
+        }
+
+        bool isOffline = IsOfflineModeActive();
+        _offlineModeText.gameObject.SetActive(isOffline);
+        _offlineModeText.text = "Offline Mode";
+    }
+
+    private bool IsOfflineModeActive()
+    {
+        _cloudSaveManager = UGSCloudSaveManager.instance;
+        return _cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive();
     }
 }

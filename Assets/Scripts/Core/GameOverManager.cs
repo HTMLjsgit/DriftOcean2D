@@ -1,256 +1,279 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GameOverManager : MonoBehaviour
 {
     [SerializeField] private GameObject _gameOverPanel;
-    [SerializeField]private Button _continueButton;
+    [SerializeField] private Button _continueButton;
     [SerializeField] private TextMeshProUGUI _noAddText;
-    [SerializeField]private Button _backToTitleButton;
+    [SerializeField] private Button _backToTitleButton;
     [SerializeField] private TextMeshProUGUI _scoreText;
 
     [Header("Ranking System")]
     [SerializeField] private Button _rankingButton;
+
     [Header("SNS Share")]
-    [SerializeField] private Button _shareButton; // SNSシェアボタン
+    [SerializeField] private Button _shareButton;
     [SerializeField] private Button _retryButton;
+
     public static GameOverManager instance;
-    private string _defaultContinueButtonText;
+
     private SkinManager _skinManager;
     private GameManager _gameManager;
     private ScoreManager _scoreManager;
     private StageManager _stageManager;
-    private RankingManager _rankingManager;
     private AdsManager _adsManager;
     private UGSCloudSaveManager _cloudSaveManager;
     private UGSLeaderboardManager _leaderboardManager;
     private PlayerController _playerController;
 
-    // コンティニュー制限
-    private const string KEY_CONTINUE_USED = "ContinueUsed";
-    private bool _hasUsedContinue = false;
+    private bool _hasUsedContinue;
 
-    // 外部からアクセス用
     public bool HasUsedContinue => _hasUsedContinue;
 
     void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
+
     void Start()
     {
         _gameManager = GameManager.instance;
         _skinManager = SkinManager.instance;
         _scoreManager = ScoreManager.instance;
         _stageManager = StageManager.instance;
-        _rankingManager = RankingManager.instance;
         _adsManager = AdsManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _leaderboardManager = UGSLeaderboardManager.instance;
         _playerController = PlayerController.instance;
-        Debug.Log("OnStart _rankingManager: " + _rankingManager);
 
-        _continueButton.onClick.AddListener(OnContinueButtonClicked);
-        _backToTitleButton.onClick.AddListener(() =>
+        if (_continueButton != null)
         {
-            Debug.Log("[GameOverManager] BackToTitle button clicked");
-            // Time.timeScaleはSceneControllerで適切なタイミングで設定される
-            Debug.Log("[GameOverManager] Calling SceneController.SceneLoad(Title)");
-            SceneController.instance.SceneLoad("Title");
-        });
-        _retryButton.onClick.AddListener(OnRetryButtonClicked);
-        // ランキングボタン
-        _rankingButton.onClick.AddListener(OnViewRankingClicked);
+            _continueButton.onClick.AddListener(OnContinueButtonClicked);
+        }
 
-        // SNSシェアボタン
-        _shareButton.onClick.AddListener(OnShareButtonClicked);
+        if (_backToTitleButton != null)
+        {
+            _backToTitleButton.onClick.AddListener(() => SceneController.instance.SceneLoad("Title"));
+        }
+
+        if (_retryButton != null)
+        {
+            _retryButton.onClick.AddListener(OnRetryButtonClicked);
+        }
+
+        if (_rankingButton != null)
+        {
+            _rankingButton.onClick.AddListener(OnViewRankingClicked);
+        }
+
+        if (_shareButton != null)
+        {
+            _shareButton.onClick.AddListener(OnShareButtonClicked);
+        }
     }
 
     public async void GameOver()
     {
-        // 既にGameOver状態の場合は処理をスキップ（多重呼び出し防止）
-        if (_gameManager.state == GameManager.GameState.GameOver)
+        if (_gameManager != null && _gameManager.state == GameManager.GameState.GameOver)
         {
-            Debug.LogWarning("[GameOverManager] GameOver already in progress, skipping duplicate call");
+            Debug.LogWarning("[GameOverManager] GameOver already in progress.");
             return;
         }
 
-        _gameManager.SetGameState(GameManager.GameState.GameOver);
-        _gameOverPanel.SetActive(true);
+        if (_gameManager != null)
+        {
+            _gameManager.SetGameState(GameManager.GameState.GameOver);
+        }
 
-        // コンティニューボタンの表示/非表示を即座に更新（非同期処理を待たずに）
+        if (_gameOverPanel != null)
+        {
+            _gameOverPanel.SetActive(true);
+        }
+
         UpdateContinueButton();
 
-        float finalScore = _scoreManager.getCurrentScore();
-        float finalTime = _stageManager.currentPlayTime;
+        float finalScore = _scoreManager != null ? _scoreManager.getCurrentScore() : 0f;
+        float finalTime = _stageManager != null ? _stageManager.currentPlayTime : 0f;
 
-        _scoreText.SetText($"{finalScore.ToString("F2")}");
-        Time.timeScale = 0;
+        if (_scoreText != null)
+        {
+            _scoreText.SetText(finalScore.ToString("F2"));
+        }
+
+        Time.timeScale = 0f;
+
+        if (_cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive())
+        {
+            _cloudSaveManager.RecordOfflineBestScore(finalScore);
+
+            if (_stageManager != null)
+            {
+                _stageManager.SetCurrentPlay(false);
+            }
+
+            UpdateContinueButton();
+            return;
+        }
 
         try
         {
-            // UGSに統計データを保存（スキン解放チェックの前に実行）
-            await _cloudSaveManager.UpdateStats(finalScore, finalTime);
-            Debug.Log("Stats updated to UGS Cloud Save");
-
-            // 無操作条件の達成チェック
-            bool noInputAchieved =  _playerController.NoInputUnlockAchieved;
-
-            // スキン解放チェック（更新された統計データを使用）
-            await _skinManager.ReportGameResult(finalScore, finalTime, noInputAchieved, _hasUsedContinue);
-            _stageManager.SetCurrentPlay(false);
-
-            // UGSリーダーボードにスコアを送信
-            bool success = await _leaderboardManager.SubmitScore(finalScore);
-            if (success)
+            if (_cloudSaveManager != null)
             {
-                Debug.Log($"Score submitted to UGS Leaderboard: {finalScore}");
+                await _cloudSaveManager.UpdateStats(finalScore, finalTime);
             }
 
-            // コンティニューボタンの表示/非表示を更新
+            bool noInputAchieved = _playerController != null && _playerController.NoInputUnlockAchieved;
+
+            if (_skinManager != null)
+            {
+                await _skinManager.ReportGameResult(finalScore, finalTime, noInputAchieved, _hasUsedContinue);
+            }
+
+            if (_stageManager != null)
+            {
+                _stageManager.SetCurrentPlay(false);
+            }
+
+            if (_leaderboardManager != null)
+            {
+                await _leaderboardManager.SubmitScore(finalScore);
+            }
+
             UpdateContinueButton();
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[GameOverManager] Error during GameOver processing: {e.Message}\n{e.StackTrace}");
-            // エラーが発生してもUIは更新する
             UpdateContinueButton();
         }
     }
 
-    /// <summary>
-    /// ランキング確認ボタンがクリックされたときの処理
-    /// </summary>
     private void OnViewRankingClicked()
     {
-        // ゲームシーン内でランキングを表示
-        RankingUIManager.instance.ShowRanking();
-        Debug.Log("ランキング画面を表示します");
+        if (RankingUIManager.instance != null)
+        {
+            RankingUIManager.instance.ShowRanking();
+        }
     }
 
-    /// <summary>
-    /// SNSシェアボタンがクリックされたときの処理
-    /// </summary>
     private void OnShareButtonClicked()
     {
-        float currentScore = _scoreManager.getCurrentScore();
-        SNSShareManager.instance.ShareScore(currentScore);
+        if (SNSShareManager.instance != null && _scoreManager != null)
+        {
+            SNSShareManager.instance.ShareScore(_scoreManager.getCurrentScore());
+        }
     }
 
-    /// <summary>
-    /// コンティニューボタンクリック時の処理
-    /// </summary>
     private void OnContinueButtonClicked()
     {
-        // 広告を視聴してコンティニュー
+        if (_adsManager == null)
+        {
+            ExecuteContinue();
+            return;
+        }
+
         _adsManager.ShowRewardedAd(
             onSuccess: () =>
             {
-                // 広告視聴成功 - コンティニュー実行
-                Debug.Log("Rewarded ad success - Continue game");
                 _hasUsedContinue = true;
-                _noAddText.gameObject.SetActive(false);
-                // コンティニューボタンを即座に非表示
-                _continueButton.gameObject.SetActive(false);
+
+                if (_noAddText != null)
+                {
+                    _noAddText.gameObject.SetActive(false);
+                }
+
+                if (_continueButton != null)
+                {
+                    _continueButton.gameObject.SetActive(false);
+                }
+
                 ExecuteContinue();
             },
             onFailed: () =>
             {
-                _noAddText.gameObject.SetActive(true);
+                if (_noAddText != null)
+                {
+                    _noAddText.gameObject.SetActive(true);
+                }
+
                 ExecuteContinue();
-                // 広告視聴失敗 - エラーメッセージ表示
-                Debug.LogWarning("Rewarded ad failed - Cannot continue");
-                // TODO: ユーザーに広告が利用できないことを通知
             }
         );
     }
 
-    /// <summary>
-    /// コンティニュー処理を実行
-    /// </summary>
     private void ExecuteContinue()
     {
-        // 1. 時間を再開させる
-        Time.timeScale = 1;
+        Time.timeScale = 1f;
 
-        // 2. ゲームオーバー画面を隠す
-        _gameOverPanel.SetActive(false);
+        if (_gameOverPanel != null)
+        {
+            _gameOverPanel.SetActive(false);
+        }
 
-        // 3. ゲームステートをプレイ中に戻す
-        _gameManager.SetGameState(GameManager.GameState.Playing);
+        if (_gameManager != null)
+        {
+            _gameManager.SetGameState(GameManager.GameState.Playing);
+        }
 
-        // 4. ステージ進行を再開（スコアは維持）
-        _stageManager.StageResume();
+        if (_stageManager != null)
+        {
+            _stageManager.StageResume();
+        }
     }
 
-    /// <summary>
-    /// コンティニューボタンの表示/非表示を更新
-    /// </summary>
     private void UpdateContinueButton()
     {
-        // シーン遷移中にボタンが破棄されている可能性があるのでnullチェック
-        if (_continueButton == null || _continueButton.gameObject == null)
+        if (_continueButton == null)
         {
             return;
         }
 
-        // 1回のプレイで1回のみコンティニュー可能
         if (_hasUsedContinue)
         {
             _continueButton.gameObject.SetActive(false);
+            return;
         }
-        else
+
+        bool adReady = _adsManager != null && _adsManager.IsRewardedAdReady();
+        _continueButton.gameObject.SetActive(true);
+
+        if (!adReady)
         {
-            // 広告が利用可能かチェック
-            bool adReady = _adsManager.IsRewardedAdReady();
-
-            //_continueButton.gameObject.SetActive(adReady); // テスト用：AdsManagerがない場合は表示
-
-
-            //広告を読み込めなくても即座に表示。
-
-            _continueButton.gameObject.SetActive(true);
-
-            if (adReady)
-            {
-            }
-            if (!adReady)
-            {
-                Debug.LogWarning("Rewarded ad is not ready. Continue button hidden.");
-            }
+            Debug.LogWarning("Rewarded ad is not ready.");
         }
     }
 
-    /// <summary>
-    /// リトライボタンクリック時の処理
-    /// 完全に最初からやり直し（プレイ回数としてカウント）
-    /// </summary>
     private void OnRetryButtonClicked()
     {
-        Debug.Log("[GameOverManager] Retry button clicked");
-
-        // 1. コンティニューフラグをリセット（新しいプレイなので）
         _hasUsedContinue = false;
 
-        // 2. ゲームオーバー画面を閉じる
-        _gameOverPanel.SetActive(false);
+        if (_gameOverPanel != null)
+        {
+            _gameOverPanel.SetActive(false);
+        }
 
-        // 3. ゲーム状態をプレイ中に戻す
-        _gameManager.SetGameState(GameManager.GameState.Playing);
+        if (_gameManager != null)
+        {
+            _gameManager.SetGameState(GameManager.GameState.Playing);
+        }
 
-        // 4. PlayerControllerの状態をリセット
-        _playerController.ResetForRetry();
+        if (_playerController != null)
+        {
+            _playerController.ResetForRetry();
+        }
 
-        // 5. リトライ処理を実行（StageManager側で広告チェック→timeScale=1→ゲーム開始）
-        _stageManager.StageRetry();
+        if (_stageManager != null)
+        {
+            _stageManager.StageRetry();
+        }
     }
 }

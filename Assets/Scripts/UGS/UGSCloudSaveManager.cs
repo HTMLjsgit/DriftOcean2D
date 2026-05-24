@@ -13,6 +13,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     public static UGSCloudSaveManager instance;
 
     private const string CLOUD_SAVE_KEY_PLAYER_DATA = "PlayerData";
+    private const string OFFLINE_PENDING_BEST_SCORE_KEY = "OfflinePendingBestScore";
 
     private UGSManager _ugsManager;
     private PlayerCloudData _playerData;
@@ -120,6 +121,8 @@ public class UGSCloudSaveManager : MonoBehaviour
             }
         }
 
+        await ApplyPendingOfflineBestScoreIfNeeded();
+
         IsDataLoaded = true;
 
         // PlayerNameManagerに名前を同期（常に使用）
@@ -143,6 +146,35 @@ public class UGSCloudSaveManager : MonoBehaviour
         Debug.Log("[DEBUG] OnDataLoaded event invoked for unavailable/offline state");
     }
 
+    private async Task ApplyPendingOfflineBestScoreIfNeeded()
+    {
+        if (_playerData == null)
+        {
+            return;
+        }
+
+        float pendingOfflineBest = GetPendingOfflineBestScore();
+        if (pendingOfflineBest <= 0f)
+        {
+            return;
+        }
+
+        if (pendingOfflineBest <= _playerData.stats.bestScore)
+        {
+            ClearPendingOfflineBestScore();
+            return;
+        }
+
+        _playerData.stats.bestScore = pendingOfflineBest;
+        Debug.Log($"[UGSCloudSaveManager] Applying pending offline best score: {pendingOfflineBest:F2}");
+
+        bool saved = await SavePlayerData();
+        if (saved)
+        {
+            ClearPendingOfflineBestScore();
+        }
+    }
+
     public async Task ReloadPlayerData()
     {
         Debug.Log("[DEBUG] ReloadPlayerData called - forcing reload from cloud...");
@@ -155,6 +187,41 @@ public class UGSCloudSaveManager : MonoBehaviour
 
         await LoadPlayerData();
         Debug.Log("[DEBUG] ReloadPlayerData completed");
+    }
+
+    public void RecordOfflineBestScore(float score)
+    {
+        float pendingBest = GetPendingOfflineBestScore();
+        if (score <= pendingBest)
+        {
+            return;
+        }
+
+        PlayerPrefs.SetFloat(OFFLINE_PENDING_BEST_SCORE_KEY, score);
+        PlayerPrefs.Save();
+        Debug.Log($"[UGSCloudSaveManager] Recorded offline pending best score: {score:F2}");
+    }
+
+    public float GetPendingOfflineBestScore()
+    {
+        return PlayerPrefs.GetFloat(OFFLINE_PENDING_BEST_SCORE_KEY, 0f);
+    }
+
+    public float GetDisplayBestScore()
+    {
+        float cloudBest = _playerData?.stats.bestScore ?? 0f;
+        return Mathf.Max(cloudBest, GetPendingOfflineBestScore());
+    }
+
+    public bool IsOfflineModeActive()
+    {
+        return IsDataLoaded && (_ugsManager == null || !_ugsManager.IsSignedIn());
+    }
+
+    private void ClearPendingOfflineBestScore()
+    {
+        PlayerPrefs.DeleteKey(OFFLINE_PENDING_BEST_SCORE_KEY);
+        PlayerPrefs.Save();
     }
 
     /// <summary>

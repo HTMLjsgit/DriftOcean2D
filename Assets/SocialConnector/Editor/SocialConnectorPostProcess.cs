@@ -1,71 +1,82 @@
-﻿using UnityEngine;
-using UnityEditor.Callbacks;
-using UnityEditor;
-using System.IO;
-using UnityEditor.iOS.Xcode;
-using System.Linq;
+#if UNITY_EDITOR_OSX
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
+
 namespace SocialConnector
 {
-	public class SocialConnectorPostProcess
-	{
-		[PostProcessBuild]
-		public static void OnPostProcessBuild (BuildTarget target, string path)
-		{
-			if (target != BuildTarget.iOS)
-				return;
-			AddLanguage (path, "ja");
+    public class SocialConnectorPostProcess
+    {
+        [PostProcessBuild]
+        public static void OnPostProcessBuild(BuildTarget target, string path)
+        {
+            if (target != BuildTarget.iOS)
+            {
+                return;
+            }
 
-			AddPermissions(path, new []{
-				new KeyValuePair<string,string>("NSPhotoLibraryUsageDescription", "Save the Application's screenshot.")
-			});			
-		}
+            AddLanguage(path, "ja");
+            AddPermissions(path, new[]
+            {
+                new KeyValuePair<string, string>("NSPhotoLibraryUsageDescription", "Save the Application's screenshot.")
+            });
+        }
 
-		static void AddLanguage (string path, params string[] languages)
-		{
-			var plistPath = Path.Combine (path, "Info.plist");
-			var plist = new PlistDocument ();
+        private static void AddLanguage(string path, params string[] languages)
+        {
+            string plistPath = Path.Combine(path, "Info.plist");
+            PlistDocument plist = new PlistDocument();
 
-			plist.ReadFromFile (plistPath);
+            plist.ReadFromFile(plistPath);
 
-			var localizationKey = "CFBundleLocalizations";
+            const string localizationKey = "CFBundleLocalizations";
+            PlistElementArray localizations = plist.root.values
+                .Where(kv => kv.Key == localizationKey)
+                .Select(kv => kv.Value)
+                .Cast<PlistElementArray>()
+                .FirstOrDefault();
 
-			var localizations = plist.root.values
-			.Where (kv => kv.Key == localizationKey)
-			.Select (kv => kv.Value)
-			.Cast<PlistElementArray> ()
-			.FirstOrDefault ();
-		
-			if (localizations == null)
-				localizations = plist.root.CreateArray (localizationKey);
+            if (localizations == null)
+            {
+                localizations = plist.root.CreateArray(localizationKey);
+            }
 
-			foreach (var language in languages) {
-				if (localizations.values.Select (el => el.AsString ()).Contains (language) == false)
-					localizations.AddString (language);
-			}
-			
-			plist.WriteToFile (plistPath);
-		}
+            foreach (string language in languages)
+            {
+                if (!localizations.values.Select(el => el.AsString()).Contains(language))
+                {
+                    localizations.AddString(language);
+                }
+            }
 
-		static void AddPermissions(string path , params KeyValuePair<string,string>[] permissions){
-			var plistPath = Path.Combine (path, "Info.plist");
-			var plist = new PlistDocument ();
+            plist.WriteToFile(plistPath);
+        }
 
-			plist.ReadFromFile (plistPath);
-			foreach(var permission in permissions){
+        private static void AddPermissions(string path, params KeyValuePair<string, string>[] permissions)
+        {
+            string plistPath = Path.Combine(path, "Info.plist");
+            PlistDocument plist = new PlistDocument();
 
+            plist.ReadFromFile(plistPath);
 
-				var count = plist.root.values
-					.Where (kv => kv.Key == permission.Key)
-					.Select (kv => kv.Value)
-					.Count();
+            foreach (KeyValuePair<string, string> permission in permissions)
+            {
+                int count = plist.root.values
+                    .Where(kv => kv.Key == permission.Key)
+                    .Select(kv => kv.Value)
+                    .Count();
 
-				if(count == 0){
-					plist.root.SetString(permission.Key,permission.Value);
-				}
-			}
+                if (count == 0)
+                {
+                    plist.root.SetString(permission.Key, permission.Value);
+                }
+            }
 
-			plist.WriteToFile (plistPath);
-		}
-	}
+            plist.WriteToFile(plistPath);
+        }
+    }
 }
+#endif
