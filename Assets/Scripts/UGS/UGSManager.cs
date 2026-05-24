@@ -19,6 +19,13 @@ public class UGSManager : MonoBehaviour
 {
     public static UGSManager instance;
 
+#if UNITY_EDITOR
+    [Header("Debug")]
+    [SerializeField] private bool simulateOfflineInEditor = false;
+    private bool _lastSimulateOfflineInEditor = false;
+    private bool _isApplyingDebugConnectionState = false;
+#endif
+
     [Header("Settings")]
     [SerializeField] private bool useUGS = true; // UGSを使用するか
 
@@ -37,6 +44,9 @@ public class UGSManager : MonoBehaviour
             Debug.Log($"[DEBUG] UGSManager Awake: Creating new singleton instance");
             instance = this;
             DontDestroyOnLoad(gameObject);
+#if UNITY_EDITOR
+            _lastSimulateOfflineInEditor = simulateOfflineInEditor;
+#endif
         }
         else
         {
@@ -51,6 +61,24 @@ public class UGSManager : MonoBehaviour
         await InitializeUGS();
     }
 
+    void Update()
+    {
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        if (_lastSimulateOfflineInEditor == simulateOfflineInEditor || _isApplyingDebugConnectionState)
+        {
+            return;
+        }
+
+        _lastSimulateOfflineInEditor = simulateOfflineInEditor;
+        ApplyDebugConnectionStateChange();
+#endif
+    }
+
     void OnDestroy()
     {
         Debug.Log($"[DEBUG] UGSManager OnDestroy called");
@@ -61,9 +89,9 @@ public class UGSManager : MonoBehaviour
     /// </summary>
     private async Task InitializeUGS()
     {
-        if (!useUGS)
+        if (!IsServiceEnabled())
         {
-            Debug.LogWarning("UGS is disabled in settings.");
+            SetOfflineState("UGS is disabled or offline simulation is enabled.");
             return;
         }
 
@@ -78,13 +106,12 @@ public class UGSManager : MonoBehaviour
             // 匿名サインイン
             await SignInAnonymously();
 
-            isInitialized = true;
+            isInitialized = isSignedIn;
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to initialize UGS: {e.Message}");
-            isInitialized = false;
-            OnSignInFailed?.Invoke();
+            SetOfflineState($"Failed to initialize UGS: {e.Message}");
         }
     }
 
@@ -118,10 +145,40 @@ public class UGSManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Failed to sign in: {e.Message}");
-            isSignedIn = false;
-            OnSignInFailed?.Invoke();
+            SetOfflineState($"Failed to sign in: {e.Message}");
         }
     }
+
+    private void SetOfflineState(string reason)
+    {
+        isInitialized = false;
+        isSignedIn = false;
+        Debug.LogWarning(reason);
+        OnSignInFailed?.Invoke();
+    }
+
+#if UNITY_EDITOR
+    private async void ApplyDebugConnectionStateChange()
+    {
+        _isApplyingDebugConnectionState = true;
+
+        try
+        {
+            if (simulateOfflineInEditor)
+            {
+                SetOfflineState("[DEBUG] Offline simulation enabled in Editor.");
+                return;
+            }
+
+            Debug.Log("[DEBUG] Offline simulation disabled. Reinitializing UGS...");
+            await InitializeUGS();
+        }
+        finally
+        {
+            _isApplyingDebugConnectionState = false;
+        }
+    }
+#endif
 
     #region Cloud Save
 
@@ -321,6 +378,20 @@ public class UGSManager : MonoBehaviour
     public bool IsSignedIn()
     {
         return isSignedIn;
+    }
+
+    public bool IsServiceEnabled()
+    {
+        return useUGS && !IsOfflineSimulationActive();
+    }
+
+    public bool IsOfflineSimulationActive()
+    {
+#if UNITY_EDITOR
+        return simulateOfflineInEditor;
+#else
+        return false;
+#endif
     }
 
     /// <summary>

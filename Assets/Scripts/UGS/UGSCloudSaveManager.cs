@@ -39,6 +39,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     async void Start()
     {
         _ugsManager = UGSManager.instance;
+        _ugsManager.OnSignInFailed += OnUGSSignInFailed;
         // サインイン成功後にデータをロード
         _ugsManager.OnSignInSuccess += OnUGSSignInSuccess;
 
@@ -49,6 +50,24 @@ public class UGSCloudSaveManager : MonoBehaviour
             await System.Threading.Tasks.Task.Delay(100); // 少し待ってから実行
             await LoadPlayerData();
         }
+    }
+
+    void Update()
+    {
+        if (_ugsManager == null)
+        {
+            return;
+        }
+
+        if (!_ugsManager.IsServiceEnabled() && !IsDataLoaded)
+        {
+            ApplyUnavailablePlayerDataState("[UGSCloudSaveManager] UGS is unavailable. Applying offline simulation state.");
+        }
+    }
+
+    private void OnUGSSignInFailed()
+    {
+        ApplyUnavailablePlayerDataState("[UGSCloudSaveManager] UGS sign-in unavailable. Clearing cloud-backed player data.");
     }
 
     /// <summary>
@@ -113,9 +132,27 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// <summary>
     /// Cloud Saveからプレイヤーデータを強制的に再ロード（公開メソッド）
     /// </summary>
+    private void ApplyUnavailablePlayerDataState(string logMessage)
+    {
+        Debug.LogWarning(logMessage);
+
+        _playerData = null;
+        IsDataLoaded = true;
+
+        OnDataLoaded?.Invoke();
+        Debug.Log("[DEBUG] OnDataLoaded event invoked for unavailable/offline state");
+    }
+
     public async Task ReloadPlayerData()
     {
         Debug.Log("[DEBUG] ReloadPlayerData called - forcing reload from cloud...");
+
+        if (_ugsManager == null || !_ugsManager.IsSignedIn())
+        {
+            ApplyUnavailablePlayerDataState("[UGSCloudSaveManager] Reload skipped because UGS is unavailable.");
+            return;
+        }
+
         await LoadPlayerData();
         Debug.Log("[DEBUG] ReloadPlayerData completed");
     }
