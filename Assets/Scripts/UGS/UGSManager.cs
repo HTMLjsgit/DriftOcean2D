@@ -350,7 +350,12 @@ public class UGSManager : MonoBehaviour
 
         try
         {
-            var playerEntry = await LeaderboardsService.Instance.GetPlayerScoreAsync(leaderboardId);
+            var options = new GetPlayerScoreOptions
+            {
+                IncludeMetadata = true
+            };
+
+            var playerEntry = await LeaderboardsService.Instance.GetPlayerScoreAsync(leaderboardId, options);
             Debug.Log($"Player score retrieved: Rank {playerEntry.Rank}, Score {playerEntry.Score}");
             return playerEntry;
         }

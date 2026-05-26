@@ -2,10 +2,17 @@ using System.Collections.Generic;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class RankingUIManager : MonoBehaviour
 {
+    private static readonly Color SelectedButtonColor = new Color(0.12f, 0.45f, 0.84f, 0.95f);
+    private static readonly Color UnselectedButtonColor = new Color(0f, 0f, 0f, 0.45f);
+    private static readonly Color DisabledButtonColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+    private static readonly Color SelectedTextColor = Color.white;
+    private static readonly Color UnselectedTextColor = new Color(0.92f, 0.92f, 0.92f, 1f);
+
     [Header("UI References")]
     [SerializeField] private GameObject _rankingPanel;
     [SerializeField] private Transform _contentTransform;
@@ -14,12 +21,13 @@ public class RankingUIManager : MonoBehaviour
     [SerializeField] private Button _changeNameButton;
 
     [Header("Ranking Type Switch")]
-    [SerializeField] private Button _allTimeButton;
+    [FormerlySerializedAs("_allTimeButton")]
+    [SerializeField] private Button _weeklyButton;
     [SerializeField] private Button _dailyButton;
     [SerializeField] private TextMeshProUGUI _rankingTypeLabel;
 
     [Header("Default Ranking Type")]
-    [SerializeField] private DefaultRankingType _defaultRankingType = DefaultRankingType.AllTime;
+    [SerializeField] private DefaultRankingType _defaultRankingType = DefaultRankingType.Weekly;
 
     [Header("Your High Score UI")]
     [SerializeField] private Image _yourSkinImage;
@@ -42,16 +50,18 @@ public class RankingUIManager : MonoBehaviour
     private UGSLeaderboardManager _ugsLeaderboardManager;
     private UGSCloudSaveManager _cloudSaveManager;
     private CancellationTokenSource _cancellationTokenSource;
+    private UGSRankingEntry _playerWeeklyEntry;
+    private UGSRankingEntry _playerDailyEntry;
 
     private enum RankingType
     {
-        AllTime,
+        Weekly,
         Daily
     }
 
     public enum DefaultRankingType
     {
-        AllTime,
+        Weekly,
         Daily
     }
 
@@ -65,7 +75,7 @@ public class RankingUIManager : MonoBehaviour
             _cancellationTokenSource = new CancellationTokenSource();
             _currentRankingType = _defaultRankingType == DefaultRankingType.Daily
                 ? RankingType.Daily
-                : RankingType.AllTime;
+                : RankingType.Weekly;
         }
         else
         {
@@ -82,31 +92,14 @@ public class RankingUIManager : MonoBehaviour
         _ugsLeaderboardManager = UGSLeaderboardManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
-        if (_closeButton != null)
-        {
-            _closeButton.onClick.AddListener(OnCloseClicked);
-        }
-
-        if (_changeNameButton != null)
-        {
-            _changeNameButton.onClick.AddListener(OnChangeNameClicked);
-        }
-
-        if (_allTimeButton != null)
-        {
-            _allTimeButton.onClick.AddListener(() => SwitchRankingType(RankingType.AllTime));
-        }
-
-        if (_dailyButton != null)
-        {
-            _dailyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Daily));
-        }
+        BindButtons();
 
         if (_flowUI == null)
         {
             HideRanking();
         }
 
+        RefreshRankingHeader();
         UpdateOfflineModeUI();
     }
 
@@ -132,6 +125,7 @@ public class RankingUIManager : MonoBehaviour
             _rankingPanel.SetActive(true);
         }
 
+        RefreshRankingHeader();
         UpdateOfflineModeUI();
 
         if (IsOfflineModeActive())
@@ -147,7 +141,6 @@ public class RankingUIManager : MonoBehaviour
 
             if (_cloudSaveManager != null)
             {
-                Debug.Log("[RankingUIManager] Reloading player data from cloud...");
                 await _cloudSaveManager.ReloadPlayerData();
             }
 
@@ -155,8 +148,10 @@ public class RankingUIManager : MonoBehaviour
 
             if (_ugsLeaderboardManager != null)
             {
-                await _ugsLeaderboardManager.RefreshLeaderboard();
+                await _ugsLeaderboardManager.RefreshWeeklyLeaderboard();
                 await _ugsLeaderboardManager.RefreshDailyLeaderboard();
+                _playerWeeklyEntry = await _ugsLeaderboardManager.GetPlayerWeeklyRank();
+                _playerDailyEntry = await _ugsLeaderboardManager.GetPlayerDailyRank();
             }
 
             token.ThrowIfCancellationRequested();
@@ -186,6 +181,38 @@ public class RankingUIManager : MonoBehaviour
         }
     }
 
+    private void BindButtons()
+    {
+        if (_closeButton != null)
+        {
+            _closeButton.onClick.RemoveListener(OnCloseClicked);
+            _closeButton.onClick.AddListener(OnCloseClicked);
+        }
+
+        if (_changeNameButton != null)
+        {
+            _changeNameButton.onClick.RemoveListener(OnChangeNameClicked);
+            _changeNameButton.onClick.AddListener(OnChangeNameClicked);
+        }
+
+        if (_weeklyButton != null)
+        {
+            _weeklyButton.onClick.RemoveAllListeners();
+            _weeklyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Weekly));
+        }
+
+        if (_dailyButton != null)
+        {
+            _dailyButton.onClick.RemoveAllListeners();
+            _dailyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Daily));
+        }
+
+        if (_weeklyButton == null || _dailyButton == null || _rankingTypeLabel == null)
+        {
+            Debug.LogWarning("[RankingUIManager] WeeklyButton, DailyButton, RankingTypeLabel must be assigned in the Inspector.");
+        }
+    }
+
     private void OnCloseClicked()
     {
         HideRanking();
@@ -194,6 +221,7 @@ public class RankingUIManager : MonoBehaviour
     private void RefreshRankingList()
     {
         ClearRankingRows();
+        RefreshRankingHeader();
 
         if (IsOfflineModeActive())
         {
@@ -201,14 +229,6 @@ public class RankingUIManager : MonoBehaviour
         }
 
         List<UGSRankingEntry> rankings = GetCurrentRankingEntries();
-
-        if (_rankingTypeLabel != null)
-        {
-            _rankingTypeLabel.text = _currentRankingType == RankingType.Daily
-                ? "Daily Ranking"
-                : "All Score Ranking";
-        }
-
         if (_contentTransform == null || _rankingRowPrefab == null)
         {
             return;
@@ -227,9 +247,20 @@ public class RankingUIManager : MonoBehaviour
 
     private void UpdateYourHighScore()
     {
-        float bestScore = _cloudSaveManager != null ? _cloudSaveManager.GetDisplayBestScore() : 0f;
-        string playerName = _cloudSaveManager != null ? _cloudSaveManager.GetPlayerName() : "Player";
-        int currentSkinID = _skinManager != null ? _skinManager.currentSkinID : 1;
+        UGSRankingEntry currentPlayerEntry = IsOfflineModeActive() ? null : GetCurrentPlayerEntry();
+
+        float bestScore = currentPlayerEntry != null
+            ? currentPlayerEntry.score
+            : (_cloudSaveManager != null ? _cloudSaveManager.GetDisplayBestScore() : 0f);
+
+        string playerName = currentPlayerEntry != null && !string.IsNullOrWhiteSpace(currentPlayerEntry.playerName)
+            ? currentPlayerEntry.playerName
+            : (_cloudSaveManager != null ? _cloudSaveManager.GetPlayerName() : "Player");
+
+        int currentSkinID = currentPlayerEntry != null
+            ? currentPlayerEntry.skinID
+            : (_skinManager != null ? _skinManager.currentSkinID : 1);
+
         SkinData skinData = _skinDatabase != null ? _skinDatabase.GetSkinById(currentSkinID) : null;
 
         if (_yourNameText != null)
@@ -259,6 +290,7 @@ public class RankingUIManager : MonoBehaviour
 
         if (IsOfflineModeActive())
         {
+            _untilRankingText.text = "Offline Mode";
             return;
         }
 
@@ -266,6 +298,12 @@ public class RankingUIManager : MonoBehaviour
         if (rankings.Count == 0)
         {
             _untilRankingText.text = "No ranking data";
+            return;
+        }
+
+        if (GetCurrentPlayerEntry() == null && yourScore <= 0f)
+        {
+            _untilRankingText.text = "Play once to enter ranking";
             return;
         }
 
@@ -373,7 +411,14 @@ public class RankingUIManager : MonoBehaviour
 
         return _currentRankingType == RankingType.Daily
             ? _ugsLeaderboardManager.GetCachedDailyRankings()
-            : _ugsLeaderboardManager.GetCachedRankings();
+            : _ugsLeaderboardManager.GetCachedWeeklyRankings();
+    }
+
+    private UGSRankingEntry GetCurrentPlayerEntry()
+    {
+        return _currentRankingType == RankingType.Daily
+            ? _playerDailyEntry
+            : _playerWeeklyEntry;
     }
 
     private void UpdateOfflineModeUI()
@@ -390,9 +435,9 @@ public class RankingUIManager : MonoBehaviour
             _changeNameButton.interactable = !isOffline;
         }
 
-        if (_allTimeButton != null)
+        if (_weeklyButton != null)
         {
-            _allTimeButton.interactable = !isOffline;
+            _weeklyButton.interactable = !isOffline;
         }
 
         if (_dailyButton != null)
@@ -400,11 +445,52 @@ public class RankingUIManager : MonoBehaviour
             _dailyButton.interactable = !isOffline;
         }
 
+        UpdateRankingTypeButtonVisuals(isOffline);
     }
 
     private bool IsOfflineModeActive()
     {
         _cloudSaveManager = UGSCloudSaveManager.instance;
         return _cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive();
+    }
+
+    private void RefreshRankingHeader()
+    {
+        if (_rankingTypeLabel != null)
+        {
+            _rankingTypeLabel.text = _currentRankingType == RankingType.Daily
+                ? "Daily Ranking"
+                : "Weekly Ranking";
+        }
+
+        UpdateRankingTypeButtonVisuals(IsOfflineModeActive());
+    }
+
+    private void UpdateRankingTypeButtonVisuals(bool isOffline)
+    {
+        UpdateRankingTypeButtonVisual(_weeklyButton, _currentRankingType == RankingType.Weekly, isOffline);
+        UpdateRankingTypeButtonVisual(_dailyButton, _currentRankingType == RankingType.Daily, isOffline);
+    }
+
+    private void UpdateRankingTypeButtonVisual(Button button, bool isSelected, bool isOffline)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        Image image = button.GetComponent<Image>();
+        if (image != null)
+        {
+            image.color = isOffline
+                ? DisabledButtonColor
+                : (isSelected ? SelectedButtonColor : UnselectedButtonColor);
+        }
+
+        TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
+        if (text != null)
+        {
+            text.color = isSelected ? SelectedTextColor : UnselectedTextColor;
+        }
     }
 }

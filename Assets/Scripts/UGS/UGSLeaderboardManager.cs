@@ -1,34 +1,34 @@
-using UnityEngine;
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
-
-using Unity.Services.Leaderboards;
 using Unity.Services.Leaderboards.Models;
+using UnityEngine;
+using UnityEngine.Serialization;
 
-/// <summary>
-/// UGS Leaderboards専用マネージャー
-/// オンラインランキングを管理
-/// </summary>
 public class UGSLeaderboardManager : MonoBehaviour
 {
+    private const string LegacyAllTimeLeaderboardId = "drift_ocean_ranking";
+    private const string DefaultWeeklyLeaderboardId = "drift_ocean_weekly_ranking";
+    private const string DefaultDailyLeaderboardId = "drift_ocean_daily_ranking";
+
     public static UGSLeaderboardManager instance;
 
     [Header("Settings")]
-    [SerializeField] private string leaderboardId = "drift_ocean_ranking"; // 総合ランキング（全期間）
-    [SerializeField] private string dailyLeaderboardId = "drift_ocean_daily_ranking"; // デイリーランキング（毎日リセット）
-    // メタデータが有効にならない場合は、新しいIDに変更してください（例: drift_ocean_ranking_v2）
+    [FormerlySerializedAs("leaderboardId")]
+    [SerializeField] private string weeklyLeaderboardId = DefaultWeeklyLeaderboardId;
+    [SerializeField] private string dailyLeaderboardId = DefaultDailyLeaderboardId;
 
     private UGSManager _ugsManager;
     private UGSCloudSaveManager _cloudSaveManager;
 
-    // キャッシュ
-    private List<UGSRankingEntry> _cachedRankings = new List<UGSRankingEntry>(); // 総合ランキング
-    private List<UGSRankingEntry> _cachedDailyRankings = new List<UGSRankingEntry>(); // デイリーランキング
+    private readonly List<UGSRankingEntry> _cachedWeeklyRankings = new List<UGSRankingEntry>();
+    private readonly List<UGSRankingEntry> _cachedDailyRankings = new List<UGSRankingEntry>();
 
     void Awake()
     {
+        EnsureLeaderboardIds();
+
         if (instance == null)
         {
             instance = this;
@@ -42,14 +42,105 @@ public class UGSLeaderboardManager : MonoBehaviour
 
     void Start()
     {
-        _ugsManager = UGSManager.instance;
-        _cloudSaveManager = UGSCloudSaveManager.instance;
+        CacheManagers();
     }
 
-    /// <summary>
-    /// スコアを総合・デイリーの両方のリーダーボードに送信
-    /// </summary>
+    void OnValidate()
+    {
+        EnsureLeaderboardIds();
+    }
+
     public async Task<bool> SubmitScore(float score)
+    {
+        CacheManagers();
+
+        if (_ugsManager == null || !_ugsManager.IsSignedIn())
+        {
+            Debug.LogWarning("UGS not signed in. Cannot submit score.");
+            return false;
+        }
+
+        if (_cloudSaveManager == null)
+        {
+            Debug.LogWarning("Cloud save manager not found. Cannot submit score metadata.");
+            return false;
+        }
+
+        var metadata = new Dictionary<string, string>
+        {
+            { "playerName", _cloudSaveManager.GetPlayerName() },
+            { "skinID", _cloudSaveManager.GetCurrentSkinID().ToString() }
+        };
+
+        bool weeklySuccess = await _ugsManager.SubmitScore(weeklyLeaderboardId, score, metadata);
+        bool dailySuccess = await _ugsManager.SubmitScore(dailyLeaderboardId, score, metadata);
+        bool success = weeklySuccess && dailySuccess;
+
+        if (!success)
+        {
+            Debug.LogError($"Failed to submit score. Weekly: {weeklySuccess}, Daily: {dailySuccess}");
+            return false;
+        }
+
+        try
+        {
+            await RefreshWeeklyLeaderboard();
+            await RefreshDailyLeaderboard();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Score submission succeeded, but leaderboard refresh failed: {e.Message}");
+        }
+
+        return true;
+    }
+
+    public Task<bool> RefreshLeaderboard(int limit = 10)
+    {
+        return RefreshWeeklyLeaderboard(limit);
+    }
+
+    public Task<UGSRankingEntry> GetPlayerRank()
+    {
+        return GetPlayerWeeklyRank();
+    }
+
+    public List<UGSRankingEntry> GetCachedRankings()
+    {
+        return GetCachedWeeklyRankings();
+    }
+
+    public async Task<bool> RefreshWeeklyLeaderboard(int limit = 10)
+    {
+        return await RefreshLeaderboardCache(weeklyLeaderboardId, _cachedWeeklyRankings, "weekly", limit);
+    }
+
+    public async Task<bool> RefreshDailyLeaderboard(int limit = 10)
+    {
+        return await RefreshLeaderboardCache(dailyLeaderboardId, _cachedDailyRankings, "daily", limit);
+    }
+
+    public List<UGSRankingEntry> GetCachedWeeklyRankings()
+    {
+        return _cachedWeeklyRankings;
+    }
+
+    public List<UGSRankingEntry> GetCachedDailyRankings()
+    {
+        return _cachedDailyRankings;
+    }
+
+    public async Task<UGSRankingEntry> GetPlayerWeeklyRank()
+    {
+        return await GetPlayerEntry(weeklyLeaderboardId, "weekly");
+    }
+
+    public async Task<UGSRankingEntry> GetPlayerDailyRank()
+    {
+        return await GetPlayerEntry(dailyLeaderboardId, "daily");
+    }
+
+    private void CacheManagers()
     {
         if (_ugsManager == null)
         {
@@ -60,388 +151,118 @@ public class UGSLeaderboardManager : MonoBehaviour
         {
             _cloudSaveManager = UGSCloudSaveManager.instance;
         }
-
-        Debug.Log($"[DEBUG] SubmitScore called. _ugsManager is null: {_ugsManager == null}");
-        if (_ugsManager != null)
-        {
-            Debug.Log($"[DEBUG] SubmitScore: _ugsManager.IsSignedIn(): {_ugsManager.IsSignedIn()}");
-        }
-
-        if (_ugsManager == null || !_ugsManager.IsSignedIn())
-        {
-            Debug.LogWarning("UGS not signed in. Cannot submit score.");
-            return false;
-        }
-
-        if (_cloudSaveManager == null)
-        {
-            Debug.LogWarning("CloudSaveManager not found.");
-            return false;
-        }
-
-        // プレイヤー名とスキンIDをメタデータとして送信
-        string playerName = _cloudSaveManager.GetPlayerName();
-        int skinID = _cloudSaveManager.GetCurrentSkinID();
-
-        Debug.Log($"[DEBUG] CloudSaveManager player name: '{playerName}'");
-        Debug.Log($"[DEBUG] CloudSaveManager skin ID: {skinID}");
-
-        var metadata = new Dictionary<string, string>
-        {
-            { "playerName", playerName },
-            { "skinID", skinID.ToString() }
-        };
-
-        Debug.Log($"[DEBUG] Metadata dictionary created: playerName={metadata["playerName"]}, skinID={metadata["skinID"]}");
-        Debug.Log($"Submitting score: {score}, Player: {playerName}, Skin: {skinID}");
-
-        // 総合ランキングに送信
-        bool successAllTime = await _ugsManager.SubmitScore(leaderboardId, score, metadata);
-
-        // デイリーランキングに送信
-        bool successDaily = await _ugsManager.SubmitScore(dailyLeaderboardId, score, metadata);
-
-        bool success = successAllTime && successDaily;
-
-        if (success)
-        {
-            Debug.Log("Score submitted successfully to both leaderboards!");
-
-            // スコア送信後にランキングを更新（エラーが発生しても続行）
-            try
-            {
-                await RefreshLeaderboard();
-                await RefreshDailyLeaderboard();
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Failed to refresh leaderboards after score submission: {e.Message}");
-                // スコアは既に送信されているので、リフレッシュ失敗は無視
-            }
-        }
-        else
-        {
-            Debug.LogError($"Failed to submit score! AllTime: {successAllTime}, Daily: {successDaily}");
-        }
-
-        return success;
     }
 
-    /// <summary>
-    /// リーダーボードを取得してキャッシュ
-    /// </summary>
-    public async Task<bool> RefreshLeaderboard(int limit = 10)
+    private void EnsureLeaderboardIds()
     {
-        // デバッグ用：詳細なログを出力
-        Debug.Log($"[DEBUG] RefreshLeaderboard called. _ugsManager is null: {_ugsManager == null}");
-        if (_ugsManager != null)
+        if (string.IsNullOrWhiteSpace(weeklyLeaderboardId) || weeklyLeaderboardId == LegacyAllTimeLeaderboardId)
         {
-            Debug.Log($"[DEBUG] _ugsManager.IsSignedIn(): {_ugsManager.IsSignedIn()}");
+            weeklyLeaderboardId = DefaultWeeklyLeaderboardId;
         }
+
+        if (string.IsNullOrWhiteSpace(dailyLeaderboardId))
+        {
+            dailyLeaderboardId = DefaultDailyLeaderboardId;
+        }
+    }
+
+    private async Task<bool> RefreshLeaderboardCache(string leaderboardId, List<UGSRankingEntry> cache, string label, int limit)
+    {
+        CacheManagers();
 
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
-            Debug.LogWarning("UGS not signed in. Cannot refresh leaderboard.");
+            Debug.LogWarning($"UGS not signed in. Cannot refresh {label} leaderboard.");
             return false;
         }
 
-        Debug.Log($"Refreshing leaderboard... (Limit: {limit})");
-
-        var scoresPage = await _ugsManager.GetLeaderboard(leaderboardId, limit);
-
-        if (scoresPage == null || scoresPage.Results == null)
+        LeaderboardScoresPage scoresPage = await _ugsManager.GetLeaderboard(leaderboardId, limit);
+        if (scoresPage?.Results == null)
         {
-            Debug.LogWarning("Failed to retrieve leaderboard.");
+            Debug.LogWarning($"Failed to retrieve {label} leaderboard.");
             return false;
         }
 
-        // キャッシュをクリア
-        _cachedRankings.Clear();
+        cache.Clear();
 
-        // データを変換
-        foreach (var entry in scoresPage.Results)
+        foreach (LeaderboardEntry entry in scoresPage.Results)
         {
-            string playerName = "Unknown";
-            int skinID = 1; // デフォルトは初期スキンID 1
-
-            // メタデータからプレイヤー名とスキンIDを取得
-            try
-            {
-                Debug.Log($"Entry PlayerID: {entry.PlayerId}, Metadata: {entry.Metadata}");
-
-                if (!string.IsNullOrEmpty(entry.Metadata))
-                {
-                    // MetadataはJSON文字列としてデシリアライズ
-                    var metadataDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(entry.Metadata);
-
-                    if (metadataDict != null)
-                    {
-                        if (metadataDict.TryGetValue("playerName", out var nameValue))
-                        {
-                            playerName = nameValue;
-                            Debug.Log($"Player name from metadata: {playerName}");
-                        }
-                        if (metadataDict.TryGetValue("skinID", out var skinValue))
-                        {
-                            int.TryParse(skinValue, out skinID);
-                            Debug.Log($"SkinID from metadata: {skinID}");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Failed to deserialize metadata");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Entry has no metadata");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to parse metadata: {e.Message}\n{e.StackTrace}");
-            }
-
-            var rankingEntry = new UGSRankingEntry
-            {
-                rank = entry.Rank + 1, // 0-indexed → 1-indexed
-                playerName = playerName,
-                score = (float)entry.Score,
-                skinID = skinID,
-                playerId = entry.PlayerId
-            };
-
-            _cachedRankings.Add(rankingEntry);
+            cache.Add(CreateRankingEntry(entry));
         }
 
-        Debug.Log($"Leaderboard refreshed: {_cachedRankings.Count} entries");
+        Debug.Log($"{label} leaderboard refreshed: {cache.Count} entries");
         return true;
     }
 
-    /// <summary>
-    /// キャッシュされた総合ランキングを取得
-    /// </summary>
-    public List<UGSRankingEntry> GetCachedRankings()
+    private async Task<UGSRankingEntry> GetPlayerEntry(string leaderboardId, string label)
     {
-        return _cachedRankings;
-    }
-
-    /// <summary>
-    /// デイリーランキングを取得してキャッシュ
-    /// </summary>
-    public async Task<bool> RefreshDailyLeaderboard(int limit = 10)
-    {
-        Debug.Log($"[DEBUG] RefreshDailyLeaderboard called. _ugsManager is null: {_ugsManager == null}");
-        if (_ugsManager != null)
-        {
-            Debug.Log($"[DEBUG] _ugsManager.IsSignedIn(): {_ugsManager.IsSignedIn()}");
-        }
+        CacheManagers();
 
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
-            Debug.LogWarning("UGS not signed in. Cannot refresh daily leaderboard.");
-            return false;
-        }
-
-        Debug.Log($"Refreshing daily leaderboard... (Limit: {limit})");
-
-        var scoresPage = await _ugsManager.GetLeaderboard(dailyLeaderboardId, limit);
-
-        if (scoresPage == null || scoresPage.Results == null)
-        {
-            Debug.LogWarning("Failed to retrieve daily leaderboard.");
-            return false;
-        }
-
-        // キャッシュをクリア
-        _cachedDailyRankings.Clear();
-
-        // データを変換
-        foreach (var entry in scoresPage.Results)
-        {
-            string playerName = "Unknown";
-            int skinID = 1; // デフォルトは初期スキンID 1
-
-            // メタデータからプレイヤー名とスキンIDを取得
-            try
-            {
-                Debug.Log($"Entry PlayerID: {entry.PlayerId}, Metadata: {entry.Metadata}");
-
-                if (!string.IsNullOrEmpty(entry.Metadata))
-                {
-                    // MetadataはJSON文字列としてデシリアライズ
-                    var metadataDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(entry.Metadata);
-
-                    if (metadataDict != null)
-                    {
-                        if (metadataDict.TryGetValue("playerName", out var nameValue))
-                        {
-                            playerName = nameValue;
-                            Debug.Log($"Player name from metadata: {playerName}");
-                        }
-                        if (metadataDict.TryGetValue("skinID", out var skinValue))
-                        {
-                            int.TryParse(skinValue, out skinID);
-                            Debug.Log($"SkinID from metadata: {skinID}");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Failed to deserialize metadata");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Entry has no metadata");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to parse metadata: {e.Message}\n{e.StackTrace}");
-            }
-
-            var rankingEntry = new UGSRankingEntry
-            {
-                rank = entry.Rank + 1, // 0-indexed → 1-indexed
-                playerName = playerName,
-                score = (float)entry.Score,
-                skinID = skinID,
-                playerId = entry.PlayerId
-            };
-
-            _cachedDailyRankings.Add(rankingEntry);
-        }
-
-        Debug.Log($"Daily leaderboard refreshed: {_cachedDailyRankings.Count} entries");
-        return true;
-    }
-
-    /// <summary>
-    /// キャッシュされたデイリーランキングを取得
-    /// </summary>
-    public List<UGSRankingEntry> GetCachedDailyRankings()
-    {
-        return _cachedDailyRankings;
-    }
-
-    /// <summary>
-    /// プレイヤー自身の総合ランクとスコアを取得
-    /// </summary>
-    public async Task<UGSRankingEntry> GetPlayerRank()
-    {
-        if (_ugsManager == null || !_ugsManager.IsSignedIn())
-        {
-            Debug.LogWarning("UGS not signed in. Cannot get player rank.");
+            Debug.LogWarning($"UGS not signed in. Cannot get player {label} rank.");
             return null;
         }
 
-        var playerEntry = await _ugsManager.GetPlayerScore(leaderboardId);
-
+        LeaderboardEntry playerEntry = await _ugsManager.GetPlayerScore(leaderboardId);
         if (playerEntry == null)
         {
-            Debug.LogWarning("Player has no score yet.");
+            Debug.LogWarning($"Player has no {label} score yet.");
             return null;
         }
 
-        string playerName = "Unknown";
-        int skinID = 1; // デフォルトは初期スキンID 1
+        return CreateRankingEntry(playerEntry);
+    }
+
+    private UGSRankingEntry CreateRankingEntry(LeaderboardEntry entry)
+    {
+        ParseMetadata(entry.Metadata, out string playerName, out int skinID);
+
+        return new UGSRankingEntry
+        {
+            rank = entry.Rank + 1,
+            playerName = playerName,
+            score = (float)entry.Score,
+            skinID = skinID,
+            playerId = entry.PlayerId
+        };
+    }
+
+    private void ParseMetadata(string metadataJson, out string playerName, out int skinID)
+    {
+        playerName = "Unknown";
+        skinID = 1;
+
+        if (string.IsNullOrEmpty(metadataJson))
+        {
+            return;
+        }
 
         try
         {
-            if (!string.IsNullOrEmpty(playerEntry.Metadata))
+            Dictionary<string, string> metadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(metadataJson);
+            if (metadata == null)
             {
-                // MetadataはJSON文字列としてデシリアライズ
-                var metadataDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(playerEntry.Metadata);
+                return;
+            }
 
-                if (metadataDict != null)
-                {
-                    if (metadataDict.TryGetValue("playerName", out var nameValue))
-                    {
-                        playerName = nameValue;
-                    }
-                    if (metadataDict.TryGetValue("skinID", out var skinValue))
-                    {
-                        int.TryParse(skinValue, out skinID);
-                    }
-                }
+            if (metadata.TryGetValue("playerName", out string nameValue) && !string.IsNullOrWhiteSpace(nameValue))
+            {
+                playerName = nameValue;
+            }
+
+            if (metadata.TryGetValue("skinID", out string skinValue) && int.TryParse(skinValue, out int parsedSkinId))
+            {
+                skinID = parsedSkinId;
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"Failed to parse metadata: {e.Message}\n{e.StackTrace}");
+            Debug.LogError($"Failed to parse leaderboard metadata: {e.Message}");
         }
-
-        return new UGSRankingEntry
-        {
-            rank = playerEntry.Rank + 1,
-            playerName = playerName,
-            score = (float)playerEntry.Score,
-            skinID = skinID,
-            playerId = playerEntry.PlayerId
-        };
-    }
-
-    /// <summary>
-    /// プレイヤー自身のデイリーランクとスコアを取得
-    /// </summary>
-    public async Task<UGSRankingEntry> GetPlayerDailyRank()
-    {
-        if (_ugsManager == null || !_ugsManager.IsSignedIn())
-        {
-            Debug.LogWarning("UGS not signed in. Cannot get player daily rank.");
-            return null;
-        }
-
-        var playerEntry = await _ugsManager.GetPlayerScore(dailyLeaderboardId);
-
-        if (playerEntry == null)
-        {
-            Debug.LogWarning("Player has no daily score yet.");
-            return null;
-        }
-
-        string playerName = "Unknown";
-        int skinID = 1; // デフォルトは初期スキンID 1
-
-        try
-        {
-            if (!string.IsNullOrEmpty(playerEntry.Metadata))
-            {
-                // MetadataはJSON文字列としてデシリアライズ
-                var metadataDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(playerEntry.Metadata);
-
-                if (metadataDict != null)
-                {
-                    if (metadataDict.TryGetValue("playerName", out var nameValue))
-                    {
-                        playerName = nameValue;
-                    }
-                    if (metadataDict.TryGetValue("skinID", out var skinValue))
-                    {
-                        int.TryParse(skinValue, out skinID);
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to parse metadata: {e.Message}\n{e.StackTrace}");
-        }
-
-        return new UGSRankingEntry
-        {
-            rank = playerEntry.Rank + 1,
-            playerName = playerName,
-            score = (float)playerEntry.Score,
-            skinID = skinID,
-            playerId = playerEntry.PlayerId
-        };
     }
 }
 
-/// <summary>
-/// UGS用のランキングエントリー
-/// </summary>
 [Serializable]
 public class UGSRankingEntry
 {
