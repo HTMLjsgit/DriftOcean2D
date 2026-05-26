@@ -119,6 +119,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &13131254 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7417996099344055284, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
+  m_PrefabInstance: {fileID: 5245048956010763585}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &20951331
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4865,6 +4876,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42721c90168933e41aaaf168c39e4d18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+--- !u!114 &2050599629 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4102505037823605252, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
+  m_PrefabInstance: {fileID: 5245048956010763585}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &2053846874
 GameObject:
   m_ObjectHideFlags: 0
@@ -5393,9 +5415,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1688616054}
     - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
+      propertyPath: _rankingTypeLabel
+      value: 
+      objectReference: {fileID: 13131254}
+    - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
       propertyPath: _defaultRankingType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
+      propertyPath: _rankingTypeSwitchButton
+      value: 
+      objectReference: {fileID: 2050599629}
     - target: {fileID: 4531354003107337264, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 540
@@ -5935,6 +5965,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 498082690}
     m_Modifications:
+    - target: {fileID: 517351413140240073, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
+      propertyPath: m_Name
+      value: RankingTypeChangeButton
+      objectReference: {fileID: 0}
     - target: {fileID: 523829809055083995, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -6013,6 +6047,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 523829809055083995, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461370986278434476, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8454414722775077953, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}

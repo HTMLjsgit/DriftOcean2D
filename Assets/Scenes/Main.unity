@@ -2565,6 +2565,10 @@ PrefabInstance:
       propertyPath: _rankingTypeLabel
       value: 
       objectReference: {fileID: 164330306}
+    - target: {fileID: 2326745228778218695, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
+      propertyPath: _rankingTypeSwitchButton
+      value: 
+      objectReference: {fileID: 1349625471}
     - target: {fileID: 4531354003107337264, guid: 206b5d4c419d31c4191d11c7573d64d8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 540
@@ -3107,6 +3111,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1438948746}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1349625471 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4102505037823605252, guid: 359f2bc05380f6a4282c5a5a7858f6c7, type: 3}
+  m_PrefabInstance: {fileID: 1886609962}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &1438948745
 GameObject:
   m_ObjectHideFlags: 0

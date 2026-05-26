@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,7 +9,6 @@ using UnityEngine.UI;
 public class RankingUIManager : MonoBehaviour
 {
     private static readonly Color SelectedButtonColor = new Color(0.12f, 0.45f, 0.84f, 0.95f);
-    private static readonly Color UnselectedButtonColor = new Color(0f, 0f, 0f, 0.45f);
     private static readonly Color DisabledButtonColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
     private static readonly Color SelectedTextColor = Color.white;
     private static readonly Color UnselectedTextColor = new Color(0.92f, 0.92f, 0.92f, 1f);
@@ -21,9 +21,11 @@ public class RankingUIManager : MonoBehaviour
     [SerializeField] private Button _changeNameButton;
 
     [Header("Ranking Type Switch")]
+    [FormerlySerializedAs("_weeklyButton")]
     [FormerlySerializedAs("_allTimeButton")]
-    [SerializeField] private Button _weeklyButton;
-    [SerializeField] private Button _dailyButton;
+    [SerializeField] private Button _rankingTypeSwitchButton;
+    [FormerlySerializedAs("_dailyButton")]
+    [SerializeField, HideInInspector] private Button _legacyDailyButton;
     [SerializeField] private TextMeshProUGUI _rankingTypeLabel;
 
     [Header("Default Ranking Type")]
@@ -52,6 +54,7 @@ public class RankingUIManager : MonoBehaviour
     private CancellationTokenSource _cancellationTokenSource;
     private UGSRankingEntry _playerWeeklyEntry;
     private UGSRankingEntry _playerDailyEntry;
+    private TextMeshProUGUI _rankingTypeSwitchLabel;
 
     private enum RankingType
     {
@@ -92,6 +95,7 @@ public class RankingUIManager : MonoBehaviour
         _ugsLeaderboardManager = UGSLeaderboardManager.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
+        SetUpRankingTypeSwitchButton();
         BindButtons();
 
         if (_flowUI == null)
@@ -101,6 +105,81 @@ public class RankingUIManager : MonoBehaviour
 
         RefreshRankingHeader();
         UpdateOfflineModeUI();
+    }
+
+    private void SetUpRankingTypeSwitchButton()
+    {
+        if (_rankingTypeLabel == null && _rankingPanel != null)
+        {
+            Transform rankingTypeLabelTransform = _rankingPanel.transform.Find("RankingTypeText");
+            if (rankingTypeLabelTransform != null)
+            {
+                _rankingTypeLabel = rankingTypeLabelTransform.GetComponent<TextMeshProUGUI>();
+            }
+        }
+
+        if (_rankingTypeSwitchButton == null && _rankingPanel != null)
+        {
+            Transform existingButtonTransform = _rankingPanel.transform.Find("RankingTypeSwitchButton");
+            if (existingButtonTransform != null)
+            {
+                _rankingTypeSwitchButton = existingButtonTransform.GetComponent<Button>();
+            }
+        }
+
+        if (_rankingTypeSwitchButton == null && _changeNameButton != null)
+        {
+            GameObject buttonObject = Instantiate(_changeNameButton.gameObject, _changeNameButton.transform.parent);
+            buttonObject.name = "RankingTypeSwitchButton";
+            buttonObject.SetActive(true);
+
+            RectTransform sourceRect = _changeNameButton.GetComponent<RectTransform>();
+            RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+            if (sourceRect != null && buttonRect != null)
+            {
+                buttonRect.anchoredPosition = new Vector2(
+                    -Mathf.Abs(sourceRect.anchoredPosition.x),
+                    sourceRect.anchoredPosition.y);
+            }
+
+            _rankingTypeSwitchButton = buttonObject.GetComponent<Button>();
+        }
+
+        if (_rankingTypeSwitchButton == null)
+        {
+            return;
+        }
+
+        _rankingTypeSwitchLabel = _rankingTypeSwitchButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (_rankingTypeSwitchLabel == null)
+        {
+            _rankingTypeSwitchLabel = CreateRankingTypeSwitchLabel(_rankingTypeSwitchButton.transform);
+        }
+    }
+
+    private TextMeshProUGUI CreateRankingTypeSwitchLabel(Transform buttonTransform)
+    {
+        GameObject labelObject = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+        labelObject.transform.SetParent(buttonTransform, false);
+
+        RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+        labelRect.anchorMin = Vector2.zero;
+        labelRect.anchorMax = Vector2.one;
+        labelRect.offsetMin = Vector2.zero;
+        labelRect.offsetMax = Vector2.zero;
+
+        TextMeshProUGUI label = labelObject.GetComponent<TextMeshProUGUI>();
+        if (_rankingTypeLabel != null)
+        {
+            label.font = _rankingTypeLabel.font;
+            label.fontSize = _rankingTypeLabel.fontSize;
+            label.fontStyle = _rankingTypeLabel.fontStyle;
+        }
+
+        label.alignment = TextAlignmentOptions.Center;
+        label.color = SelectedTextColor;
+        label.raycastTarget = false;
+        return label;
     }
 
     void Update()
@@ -127,11 +206,11 @@ public class RankingUIManager : MonoBehaviour
 
         RefreshRankingHeader();
         UpdateOfflineModeUI();
+        RefreshRankingList();
+        UpdateYourHighScore();
 
         if (IsOfflineModeActive())
         {
-            RefreshRankingList();
-            UpdateYourHighScore();
             return;
         }
 
@@ -148,10 +227,30 @@ public class RankingUIManager : MonoBehaviour
 
             if (_ugsLeaderboardManager != null)
             {
-                await _ugsLeaderboardManager.RefreshWeeklyLeaderboard();
-                await _ugsLeaderboardManager.RefreshDailyLeaderboard();
-                _playerWeeklyEntry = await _ugsLeaderboardManager.GetPlayerWeeklyRank();
-                _playerDailyEntry = await _ugsLeaderboardManager.GetPlayerDailyRank();
+                RankingType initiallyDisplayedType = _currentRankingType;
+                RankingType otherType = initiallyDisplayedType == RankingType.Weekly
+                    ? RankingType.Daily
+                    : RankingType.Weekly;
+
+                Task<bool> otherLeaderboardRefresh = RefreshLeaderboard(otherType);
+                await RefreshLeaderboard(initiallyDisplayedType);
+
+                token.ThrowIfCancellationRequested();
+
+                // Render the visible ranking as soon as its first response arrives.
+                RefreshRankingList();
+                UpdateYourHighScore();
+
+                await otherLeaderboardRefresh;
+
+                token.ThrowIfCancellationRequested();
+
+                RefreshRankingList();
+
+                Task<UGSRankingEntry> weeklyPlayerEntryTask = _ugsLeaderboardManager.GetPlayerWeeklyRank();
+                Task<UGSRankingEntry> dailyPlayerEntryTask = _ugsLeaderboardManager.GetPlayerDailyRank();
+                _playerWeeklyEntry = await weeklyPlayerEntryTask;
+                _playerDailyEntry = await dailyPlayerEntryTask;
             }
 
             token.ThrowIfCancellationRequested();
@@ -195,21 +294,20 @@ public class RankingUIManager : MonoBehaviour
             _changeNameButton.onClick.AddListener(OnChangeNameClicked);
         }
 
-        if (_weeklyButton != null)
+        if (_rankingTypeSwitchButton != null)
         {
-            _weeklyButton.onClick.RemoveAllListeners();
-            _weeklyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Weekly));
+            _rankingTypeSwitchButton.onClick.RemoveAllListeners();
+            _rankingTypeSwitchButton.onClick.AddListener(ToggleRankingType);
         }
 
-        if (_dailyButton != null)
+        if (_legacyDailyButton != null && _legacyDailyButton != _rankingTypeSwitchButton)
         {
-            _dailyButton.onClick.RemoveAllListeners();
-            _dailyButton.onClick.AddListener(() => SwitchRankingType(RankingType.Daily));
+            _legacyDailyButton.gameObject.SetActive(false);
         }
 
-        if (_weeklyButton == null || _dailyButton == null || _rankingTypeLabel == null)
+        if (_rankingTypeSwitchButton == null || _rankingTypeLabel == null)
         {
-            Debug.LogWarning("[RankingUIManager] WeeklyButton, DailyButton, RankingTypeLabel must be assigned in the Inspector.");
+            Debug.LogWarning("[RankingUIManager] RankingTypeSwitchButton and RankingTypeLabel must be assigned in the Inspector.");
         }
     }
 
@@ -389,6 +487,13 @@ public class RankingUIManager : MonoBehaviour
         UpdateYourHighScore();
     }
 
+    private void ToggleRankingType()
+    {
+        SwitchRankingType(_currentRankingType == RankingType.Weekly
+            ? RankingType.Daily
+            : RankingType.Weekly);
+    }
+
     private void ClearRankingRows()
     {
         if (_contentTransform == null)
@@ -414,6 +519,13 @@ public class RankingUIManager : MonoBehaviour
             : _ugsLeaderboardManager.GetCachedWeeklyRankings();
     }
 
+    private Task<bool> RefreshLeaderboard(RankingType type)
+    {
+        return type == RankingType.Daily
+            ? _ugsLeaderboardManager.RefreshDailyLeaderboard()
+            : _ugsLeaderboardManager.RefreshWeeklyLeaderboard();
+    }
+
     private UGSRankingEntry GetCurrentPlayerEntry()
     {
         return _currentRankingType == RankingType.Daily
@@ -435,14 +547,9 @@ public class RankingUIManager : MonoBehaviour
             _changeNameButton.interactable = !isOffline;
         }
 
-        if (_weeklyButton != null)
+        if (_rankingTypeSwitchButton != null)
         {
-            _weeklyButton.interactable = !isOffline;
-        }
-
-        if (_dailyButton != null)
-        {
-            _dailyButton.interactable = !isOffline;
+            _rankingTypeSwitchButton.interactable = !isOffline;
         }
 
         UpdateRankingTypeButtonVisuals(isOffline);
@@ -463,16 +570,22 @@ public class RankingUIManager : MonoBehaviour
                 : "Weekly Ranking";
         }
 
+        if (_rankingTypeSwitchLabel != null)
+        {
+            _rankingTypeSwitchLabel.text = _currentRankingType == RankingType.Daily
+                ? "Weekly Ranking"
+                : "Daily Ranking";
+        }
+
         UpdateRankingTypeButtonVisuals(IsOfflineModeActive());
     }
 
     private void UpdateRankingTypeButtonVisuals(bool isOffline)
     {
-        UpdateRankingTypeButtonVisual(_weeklyButton, _currentRankingType == RankingType.Weekly, isOffline);
-        UpdateRankingTypeButtonVisual(_dailyButton, _currentRankingType == RankingType.Daily, isOffline);
+        UpdateRankingTypeButtonVisual(_rankingTypeSwitchButton, isOffline);
     }
 
-    private void UpdateRankingTypeButtonVisual(Button button, bool isSelected, bool isOffline)
+    private void UpdateRankingTypeButtonVisual(Button button, bool isOffline)
     {
         if (button == null)
         {
@@ -484,13 +597,12 @@ public class RankingUIManager : MonoBehaviour
         {
             image.color = isOffline
                 ? DisabledButtonColor
-                : (isSelected ? SelectedButtonColor : UnselectedButtonColor);
+                : SelectedButtonColor;
         }
 
-        TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-        if (text != null)
+        if (_rankingTypeSwitchLabel != null)
         {
-            text.color = isSelected ? SelectedTextColor : UnselectedTextColor;
+            _rankingTypeSwitchLabel.color = isOffline ? UnselectedTextColor : SelectedTextColor;
         }
     }
 }
