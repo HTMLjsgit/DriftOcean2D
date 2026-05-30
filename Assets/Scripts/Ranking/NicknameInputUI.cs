@@ -18,7 +18,7 @@ public class NicknameInputUI : MonoBehaviour
     private UGSCloudSaveManager _cloudSaveManager;
     [Header("Settings")]
     [SerializeField] private int _maxNameLength = 10;
-    [SerializeField] private string _defaultName = "プレイヤー";
+    [SerializeField] private string _defaultName = "Player";
 
     private Action<string> _onSubmitCallback;
     private Action _onCancelCallback;

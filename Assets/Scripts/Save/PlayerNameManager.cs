@@ -8,7 +8,7 @@ public class PlayerNameManager : MonoBehaviour
     public static PlayerNameManager instance;
 
     private const string KEY_PLAYER_NAME = "PlayerName";
-    private const string DEFAULT_PLAYER_NAME = "プレイヤー";
+    private const string DEFAULT_PLAYER_NAME = "Player";
 
     [SerializeField] private string _currentPlayerName;
     public string currentPlayerName => _currentPlayerName;

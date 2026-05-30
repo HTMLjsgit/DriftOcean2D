@@ -7,7 +7,7 @@ using System.Collections.Generic;
 [Serializable]
 public class PlayerCloudData
 {
-    public string playerName = "プレイヤー";
+    public string playerName = "Player";
     public int currentSkinID = 1; // 初期スキンID（ミズクラゲ）
     public List<int> unlockedSkinIDs = new List<int> { 1 }; // 初期スキンは解放済み
     public List<int> notifiedSkinIDs = new List<int> { 1 }; // お知らせ済みスキンリスト（タイトル画面で通知済み）

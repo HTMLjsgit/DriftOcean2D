@@ -24,6 +24,7 @@ public class UGSCloudSaveManager : MonoBehaviour
 
     // データが読み込まれているかのフラグ
     public bool IsDataLoaded { get; private set; } = false;
+    public bool WasPlayerDataCreatedThisSession { get; private set; } = false;
 
     void Awake()
     {
@@ -98,12 +99,14 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         _playerData = await _ugsManager.LoadData<PlayerCloudData>(CLOUD_SAVE_KEY_PLAYER_DATA);
+        WasPlayerDataCreatedThisSession = false;
 
         // データが null の場合は新規プレイヤー
         if (_playerData == null)
         {
             Debug.Log("[DEBUG] No cloud data found. Creating new player data.");
             _playerData = new PlayerCloudData();
+            WasPlayerDataCreatedThisSession = true;
             Debug.Log($"[DEBUG] New PlayerCloudData created with default name: '{_playerData.playerName}'");
             await SavePlayerData(); // 初回保存
         }
@@ -331,7 +334,13 @@ public class UGSCloudSaveManager : MonoBehaviour
         if (_playerData == null) return false;
 
         _playerData.playerName = newName;
-        return await SavePlayerData();
+        bool saved = await SavePlayerData();
+        if (saved)
+        {
+            WasPlayerDataCreatedThisSession = false;
+        }
+
+        return saved;
     }
 
     #endregion

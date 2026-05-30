@@ -8,6 +8,7 @@ using Unity.Services.Core;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Leaderboards;
+using Unity.Services.Leaderboards.Exceptions;
 using Unity.Services.Leaderboards.Models;
 using System.Collections.Generic;
 
@@ -126,6 +127,7 @@ public class UGSManager : MonoBehaviour
             if (AuthenticationService.Instance.IsSignedIn)
             {
                 Debug.Log($"Already signed in. Player ID: {AuthenticationService.Instance.PlayerId}");
+                Debug.Log($"現在ログインしているプレイヤーID: {AuthenticationService.Instance.PlayerId}");
                 isSignedIn = true;
                 OnSignInSuccess?.Invoke();
                 return;
@@ -137,6 +139,7 @@ public class UGSManager : MonoBehaviour
             // サインイン完了後、フラグを設定してからイベント発火
             isSignedIn = true;
             Debug.Log($"Sign in successful! Player ID: {AuthenticationService.Instance.PlayerId}");
+            Debug.Log($"現在ログインしているプレイヤーID: {AuthenticationService.Instance.PlayerId}");
 
             // 少し待ってからイベント発火（確実に初期化完了させる）
             await Task.Delay(100);
@@ -358,6 +361,11 @@ public class UGSManager : MonoBehaviour
             var playerEntry = await LeaderboardsService.Instance.GetPlayerScoreAsync(leaderboardId, options);
             Debug.Log($"Player score retrieved: Rank {playerEntry.Rank}, Score {playerEntry.Score}");
             return playerEntry;
+        }
+        catch (LeaderboardsException e) when (e.Reason == LeaderboardsExceptionReason.EntryNotFound)
+        {
+            Debug.Log($"Player has no score entry yet on leaderboard '{leaderboardId}'.");
+            return null;
         }
         catch (Exception e)
         {

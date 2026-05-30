@@ -89,7 +89,7 @@ public class TitleController : MonoBehaviour
         string currentName = "";
         currentName = _cloudSaveManager.GetPlayerName();
 
-        if (string.IsNullOrEmpty(currentName))
+        if (_cloudSaveManager.WasPlayerDataCreatedThisSession || string.IsNullOrEmpty(currentName))
         {
             Debug.Log("Player name not set, showing input panel");
             // 名前が未設定なら入力画面を表示
