@@ -51,7 +51,7 @@ MonoBehaviour:
   _cancelButton: {fileID: 4944750541888517085}
   _messageText: {fileID: 6310214944620668990}
   _maxNameLength: 10
-  _defaultName: Player
+  _defaultName: player
 --- !u!1001 &2965909931053372945
 PrefabInstance:
   m_ObjectHideFlags: 0
