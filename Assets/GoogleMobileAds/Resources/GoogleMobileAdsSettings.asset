@@ -18,5 +18,5 @@ MonoBehaviour:
   enableGradleBuildPreProcessor: 1
   disableOptimizeInitialization: 0
   disableOptimizeAdLoading: 1
-  userTrackingUsageDescription: 
-  userLanguage: en
+  userTrackingUsageDescription: "\u3042\u306A\u305F\u306B\u6700\u9069\u306A\u5E83\u544A\u3092\u8868\u793A\u3059\u308B\u305F\u3081\u306B\u30C8\u30E9\u30C3\u30AD\u30F3\u30B0\u306E\u8A31\u53EF\u3092\u304A\u9858\u3044\u3057\u307E\u3059\u3002"
+  userLanguage: ja

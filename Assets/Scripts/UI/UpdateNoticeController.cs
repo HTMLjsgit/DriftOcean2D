@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -86,7 +87,7 @@ public class UpdateNoticeController : MonoBehaviour
 
     private int GetCurrentVersionCode()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+        #if UNITY_ANDROID && !UNITY_EDITOR
         try
         {
             using AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
@@ -111,11 +112,35 @@ public class UpdateNoticeController : MonoBehaviour
             Debug.LogWarning($"[UpdateNoticeController] Failed to read Android versionCode: {e.Message}");
             return 0;
         }
+#elif UNITY_IOS && !UNITY_EDITOR
+        return ParseVersionToCode(Application.version);
 #elif UNITY_EDITOR
         return PlayerSettings.Android.bundleVersionCode;
 #else
         return 0;
 #endif
+    }
+
+    /// <summary>
+    /// マーケティングバージョン文字列（例 "1.2.3"）を単調増加する整数コードに変換する。
+    /// 各要素 &lt; 1000 を前提に major*1_000_000 + minor*1_000 + build で畳む。
+    /// パース不能な場合は 0 を返す（更新通知はスキップされる）。
+    /// </summary>
+    private int ParseVersionToCode(string version)
+    {
+        try
+        {
+            Version v = new Version(version);
+            int major = Mathf.Max(v.Major, 0);
+            int minor = Mathf.Max(v.Minor, 0);
+            int build = Mathf.Max(v.Build, 0); // 未指定(-1)は0扱い
+            return major * 1_000_000 + minor * 1_000 + build;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[UpdateNoticeController] Failed to parse iOS version '{version}': {e.Message}");
+            return 0;
+        }
     }
 
     private void ShowNotice()

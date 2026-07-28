@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 using GoogleMobileAds.Api;
 
+#if UNITY_IOS && !UNITY_EDITOR
+using Unity.Advertisement.IosSupport;
+#endif
+
 /// <summary>
 /// Google AdMob広告管理クラス
 /// リワード広告（スキン解放・コンティニュー用）とインタースティシャル広告（5回ごと）を管理
@@ -69,6 +73,50 @@ public class AdsManager : MonoBehaviour
     /// 広告SDKの初期化
     /// </summary>
     private void InitializeAds()
+    {
+#if UNITY_IOS && !UNITY_EDITOR
+        // iOS: ATT 同意ダイアログを提示してから広告SDKを初期化する
+        StartCoroutine(RequestATTThenInitialize());
+#else
+        RunMobileAdsInitialize();
+#endif
+    }
+
+#if UNITY_IOS && !UNITY_EDITOR
+    /// <summary>
+    /// iOS の ATT 権限を確認してから広告SDKを初期化する。
+    /// 許可・拒否いずれでも初期化は継続する。応答が無い場合はタイムアウトでフォールバックする。
+    /// </summary>
+    private IEnumerator RequestATTThenInitialize()
+    {
+        const float timeoutSeconds = 10f;
+
+        if (ATTrackingStatusBinding.GetAuthorizationTrackingStatus()
+            == ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED)
+        {
+            ATTrackingStatusBinding.RequestAuthorizationTracking();
+
+            // RequestAuthorizationTracking はコールバックを持たないため、
+            // ステータスが NOT_DETERMINED から変化するまでポーリングする。
+            float elapsed = 0f;
+            while (ATTrackingStatusBinding.GetAuthorizationTrackingStatus()
+                       == ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED
+                   && elapsed < timeoutSeconds)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+        }
+
+        Debug.Log($"ATT status resolved: {ATTrackingStatusBinding.GetAuthorizationTrackingStatus()}");
+        RunMobileAdsInitialize();
+    }
+#endif
+
+    /// <summary>
+    /// 広告SDKの初期化本体
+    /// </summary>
+    private void RunMobileAdsInitialize()
     {
         try
         {
