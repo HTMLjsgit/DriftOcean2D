@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using DG.Tweening;
 /// <summary>
 /// プレイヤーの動き、値保持
@@ -8,6 +9,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private AudioSource _jumpAudioSource;
     private Rigidbody2D _rigidbody2D;
+    private Collider2D _skinTapCollider;
+    private Camera _mainCamera;
     private GameManager _gameManager;
     private GameOverManager _gameOverManager;
     public static PlayerController instance;
@@ -55,6 +58,7 @@ public class PlayerController : MonoBehaviour
 
         // Rigidbody2Dを取得してgravityScaleを0に設定（シーン開始時は落下させない）
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _skinTapCollider = GetComponent<Collider2D>();
         _rigidbody2D.gravityScale = 0;
         Debug.Log("[PlayerController] gravityScale set to 0 in Awake");
     }
@@ -64,6 +68,7 @@ public class PlayerController : MonoBehaviour
     {
         // _rigidbody2DはAwakeで既に取得済み
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _mainCamera = Camera.main;
         _gameManager = GameManager.instance;
         _gameOverManager = GameOverManager.instance;
         _lastInputTime = Time.time;
@@ -94,29 +99,57 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        TrackGameplayTap();
+        TrackGameplayTap(IsPointerOverSkin());
         Jump();
         _lastInputTime = Time.time; // 入力時間をリセット
     }
 
-    private async void TrackGameplayTap()
+    private async void TrackGameplayTap(bool tappedSkin)
     {
-        int currentSkinID = SkinManager.instance.currentSkinID;
-        if (_tapSkinID != currentSkinID)
+        if (tappedSkin)
         {
-            _tapSkinID = currentSkinID;
-            _sameSkinTapCount = 0;
-        }
+            int currentSkinID = SkinManager.instance.currentSkinID;
+            if (_tapSkinID != currentSkinID)
+            {
+                _tapSkinID = currentSkinID;
+                _sameSkinTapCount = 0;
+            }
 
-        _pendingBounceCount++;
-        _sameSkinTapCount++;
-        _tapUnlockConditionMet |= SkinManager.instance.IsTapUnlockConditionMet(_sameSkinTapCount);
+            _pendingBounceCount++;
+            _sameSkinTapCount++;
+            _tapUnlockConditionMet |= SkinManager.instance.IsTapUnlockConditionMet(_sameSkinTapCount);
+        }
 
         if (!_playDayRegistered)
         {
             _playDayRegistered = true;
             await AchievementManager.instance.RegisterPlayStarted();
         }
+    }
+
+    private bool IsPointerOverSkin()
+    {
+        if (_skinTapCollider == null || Pointer.current == null)
+        {
+            return false;
+        }
+
+        if (_mainCamera == null)
+        {
+            _mainCamera = Camera.main;
+        }
+
+        if (_mainCamera == null)
+        {
+            return false;
+        }
+
+        Vector2 screenPosition = Pointer.current.position.ReadValue();
+        float distanceFromCamera = Mathf.Abs(transform.position.z - _mainCamera.transform.position.z);
+        Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(
+            new Vector3(screenPosition.x, screenPosition.y, distanceFromCamera));
+
+        return _skinTapCollider.OverlapPoint(worldPosition);
     }
 
     private void CheckNoInput()
