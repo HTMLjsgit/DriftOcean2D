@@ -30,6 +30,13 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private bool _isAnimating = false; // アニメーション再生中フラグ
 
+    private int _pendingBounceCount;
+    private int _sameSkinTapCount;
+    private int _tapSkinID = -1;
+    private bool _tapUnlockConditionMet;
+    private int _lastCollidedObstacleID;
+    private bool _playDayRegistered;
+
     // 無操作解放が達成されたかのフラグ（外部からアクセス用）
     public bool NoInputUnlockAchieved { get; private set; } = false;
     void Awake()
@@ -87,8 +94,29 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        TrackGameplayTap();
         Jump();
         _lastInputTime = Time.time; // 入力時間をリセット
+    }
+
+    private async void TrackGameplayTap()
+    {
+        int currentSkinID = SkinManager.instance.currentSkinID;
+        if (_tapSkinID != currentSkinID)
+        {
+            _tapSkinID = currentSkinID;
+            _sameSkinTapCount = 0;
+        }
+
+        _pendingBounceCount++;
+        _sameSkinTapCount++;
+        _tapUnlockConditionMet |= SkinManager.instance.IsTapUnlockConditionMet(_sameSkinTapCount);
+
+        if (!_playDayRegistered)
+        {
+            _playDayRegistered = true;
+            await AchievementManager.instance.RegisterPlayStarted();
+        }
     }
 
     private void CheckNoInput()
@@ -154,6 +182,12 @@ public class PlayerController : MonoBehaviour
         //ゲームオーバー
         if(collider.gameObject.tag == "Obstacle")
         {
+            ObstacleDiscoveryMarker marker = collider.GetComponent<ObstacleDiscoveryMarker>();
+            if (marker != null)
+            {
+                _lastCollidedObstacleID = marker.Data.id;
+            }
+
             _gameOverManager.GameOver();
         }
     }
@@ -189,7 +223,34 @@ public class PlayerController : MonoBehaviour
         _lastInputTime = Time.time;
         _noInputUnlockTriggered = false;
         NoInputUnlockAchieved = false;
+        _pendingBounceCount = 0;
+        _sameSkinTapCount = 0;
+        _tapSkinID = -1;
+        _tapUnlockConditionMet = false;
+        _lastCollidedObstacleID = 0;
+        _playDayRegistered = false;
 
         Debug.Log("[PlayerController] Reset for retry");
+    }
+
+    public int ConsumePendingBounceCount()
+    {
+        int count = _pendingBounceCount;
+        _pendingBounceCount = 0;
+        return count;
+    }
+
+    public bool ConsumeTapUnlockCondition()
+    {
+        bool achieved = _tapUnlockConditionMet;
+        _tapUnlockConditionMet = false;
+        return achieved;
+    }
+
+    public int ConsumeCollidedObstacleID()
+    {
+        int obstacleID = _lastCollidedObstacleID;
+        _lastCollidedObstacleID = 0;
+        return obstacleID;
     }
 }

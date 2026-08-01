@@ -15,6 +15,10 @@ MonoBehaviour:
   id: 14
   skinName: "\u30AB\u30CB"
   skinSprite: {fileID: -8091956101122437318, guid: 7028b9ae16bc686419f90f8ca8b2f899, type: 3}
+  iosSkinSprite: {fileID: 0}
+  description: "\u30CF\u30B5\u30DF\u306F\u9053\u5177\u3067\u3082\u3042\u308A\u6B66\u5668\u3067\u3082\u3042\u308B\u3002\u5229\u304D\u624B\u304C\u3042\u308B\u7A2E\u985E\u3082\u3002\u8339\u3067\u308B\u524D\u306F\u3053\u3093\u306A\u306B\u8D64\u304F\u306A\u3044\u3002"
+  hiddenUntilUnlocked: 0
+  countsTowardsOriginalCollection: 1
   unlockType: 11
   conditionValue: 0
   lockedDescription: "\u30B3\u30F3\u30C6\u30A3\u30CB\u30E5\u30FC\u306A\u3057\u30676\u5206\u5230\u9054"

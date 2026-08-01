@@ -66,6 +66,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 70c0e947bcebb1c429ecf6c46cb7422c, type: 2}
   - {fileID: 11400000, guid: 831602c5150ce4447822ffd76d3a5ee7, type: 2}
   - {fileID: 11400000, guid: fada7dfa9884dd1439a7cf5d4760240c, type: 2}
+  - {fileID: 11400000, guid: 27332c8933f67d64487b723012b44581, type: 2}
+  - {fileID: 11400000, guid: 8c39dc00cfc790b46a59d429d4faf4f1, type: 2}
 --- !u!1 &2182478872869024567
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,6 +77,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3768355526873074427}
+  - component: {fileID: 7289943713467675701}
   m_Layer: 0
   m_Name: Databases
   m_TagString: Untagged
@@ -98,3 +101,16 @@ Transform:
   - {fileID: 7853187880857460275}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7289943713467675701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2182478872869024567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64f035758c28cd74a809ab2a2d88fff7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AchievementManager
+  _catalog: {fileID: 11400000, guid: 830b97092f08e514d85f94b66f73e52a, type: 2}

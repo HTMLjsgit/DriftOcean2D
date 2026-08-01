@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfdf31e35068b804285967b9ba491205, type: 3}
+  m_Name: "21_\u30B7\u30FC\u30AF\u30EC\u30C3\u30C8\u5B9F\u7E3E 10,000\u5E74\u5230\u9054"
+  m_EditorClassIdentifier: Assembly-CSharp::AchievementData
+  id: 21
+  achievementName: "\u30B7\u30FC\u30AF\u30EC\u30C3\u30C8\u5B9F\u7E3E 10,000\u5E74\u5230\u9054"
+  description: "10,000\u5E74\u3078\u5230\u9054\u3059\u308B"
+  conditionType: 6
+  conditionValue: 10000
+  hiddenUntilCompleted: 1
+  excludedFromRegularCompletion: 1

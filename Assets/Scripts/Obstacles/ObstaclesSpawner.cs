@@ -66,6 +66,9 @@ public class ObstaclesSpawner : MonoBehaviour
         GameObject obstacle = Instantiate(selectedData.prefab, spawnTransform.position, spawnTransform.rotation);
         obstacle.transform.SetParent(_obstacles.transform);
 
+        ObstacleDiscoveryMarker marker = obstacle.AddComponent<ObstacleDiscoveryMarker>();
+        marker.Initialize(selectedData);
+
         _spawnedObstacles.Add(obstacle);
 
         ObstacleMover obstacleMover = obstacle.GetComponent<ObstacleMover>();

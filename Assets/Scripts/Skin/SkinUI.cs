@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Linq;
-using System.Collections.Generic;
 using DG.Tweening;
-using System.Threading.Tasks;
 
 public class SkinUI : MonoBehaviour
 {
@@ -13,12 +10,10 @@ public class SkinUI : MonoBehaviour
     [SerializeField] private Sprite _lockedSprite; // ロック状態のスプライト
     [SerializeField] private Image _outlineImage;
     [SerializeField] private TextMeshProUGUI _newLabelText; // Newラベル
-    [SerializeField] private TextMeshProUGUI _tapCountText; // タップ回数表示（TapUnlock用）
     [SerializeField] private Button _button; // このスキンのボタン
     [SerializeField] private AudioSource _audioSource; // ぷにぷに音再生用
     [SerializeField] private AudioClip _bounceSound; // ぷにぷに音
     private Sprite _originalSprite; // 元のスキンスプライト
-    private SkinDatabase _skinDatabase;
     private UGSCloudSaveManager _cloudSaveManager;
     public int skinId => _skinID;
 
@@ -32,7 +27,6 @@ public class SkinUI : MonoBehaviour
 
     void Start()
     {
-        _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
     }
 
@@ -76,37 +70,6 @@ public class SkinUI : MonoBehaviour
         // 解放済みのスキンのみタップ可能（未解放スキンはタップ不可）
         _button.enabled = isUnlocked;
 
-        // タップ回数テキストを更新（TapUnlockタイプの場合のみ表示）
-        UpdateTapCountText();
-    }
-
-    /// <summary>
-    /// タップ回数テキストを更新
-    /// </summary>
-    private void UpdateTapCountText()
-    {
-        if (_tapCountText == null) return;
-
-        // このスキン自身がTapUnlockかつ未解放の場合にグローバルタップ回数を表示
-        bool isUnlocked = SkinManager.instance.IsUnlocked(_skinID);
-
-        if (!isUnlocked && _skinDatabase != null)
-        {
-            var skinData = _skinDatabase.GetAllSkins().FirstOrDefault(s => s.id == _skinID);
-
-            if (skinData != null && skinData.unlockType == SkinData.UnlockType.TapUnlock)
-            {
-                int currentCount = _cloudSaveManager.GetGlobalTapCount();
-                int requiredCount = (int)skinData.conditionValue;
-
-                _tapCountText.text = $"{currentCount}/{requiredCount}";
-                _tapCountText.gameObject.SetActive(true);
-                return;
-            }
-        }
-
-        // それ以外の場合は非表示
-        _tapCountText.gameObject.SetActive(false);
     }
 
     public async void OnClickedSkinUI()
@@ -125,12 +88,9 @@ public class SkinUI : MonoBehaviour
 
         if (isAlreadyEquipped)
         {
-            // 既に装備中の場合 → ぷにぷにアニメーション再生
+            // 選択中のスキンをもう一度タップすると詳細を表示
             PlayBounceAnimation();
-            Debug.Log($"[SkinUI {_skinID}] Already equipped - playing bounce animation");
-
-            // グローバルタップカウントを増やす
-            await HandleGlobalTapUnlock();
+            SkinInventryManager.instance.ShowSkinDetails(_skinID);
         }
         else
         {
@@ -141,60 +101,6 @@ public class SkinUI : MonoBehaviour
             // スキンを見た（装備した）としてマーク（Newラベルを消す）
             await _cloudSaveManager.MarkSkinAsSeen(_skinID);
 
-            SkinInventryManager.instance.RefreshAllSlots();
-        }
-    }
-
-    /// <summary>
-    /// グローバルタップアンロック処理（解放済みスキンをタップした時）
-    /// </summary>
-    private async Task HandleGlobalTapUnlock()
-    {
-        if (_cloudSaveManager == null || _skinDatabase == null) return;
-
-        // グローバルタップ回数を増やす
-        int newCount = await _cloudSaveManager.IncrementGlobalTapCount();
-
-        Debug.Log($"[SkinUI] Global tap count: {newCount}");
-
-        // 全てのTapUnlockタイプの未解放スキンをチェック
-        var allSkins = _skinDatabase.GetAllSkins();
-        bool anyUnlocked = false;
-        List<int> unlockedSkinIDs = new List<int>();
-
-        foreach (var skinData in allSkins)
-        {
-            // TapUnlockタイプかつ未解放のスキンをチェック
-            if (skinData.unlockType == SkinData.UnlockType.TapUnlock &&
-                !SkinManager.instance.IsUnlocked(skinData.id))
-            {
-                int requiredCount = (int)skinData.conditionValue;
-
-                // 必要回数に達したら解放
-                if (newCount >= requiredCount)
-                {
-                    Debug.Log($"[SkinUI] Tap unlock achieved! Unlocking skin {skinData.id}...");
-
-                    // スキンを解放
-                    await SkinManager.instance.UnlockSkin(skinData.id);
-                    anyUnlocked = true;
-                    unlockedSkinIDs.Add(skinData.id);
-
-                    Debug.Log($"[SkinUI] Skin {skinData.id} unlocked by tap!");
-                }
-            }
-        }
-
-        // スキンが解放された場合
-        if (anyUnlocked)
-        {
-            // グローバルタップ回数をリセット
-            await _cloudSaveManager.ResetGlobalTapCount();
-
-            // スキン一覧画面で解放したので、通知済みとしてマーク（タイトル画面でお知らせを出さない）
-            await _cloudSaveManager.MarkSkinsAsNotified(unlockedSkinIDs);
-
-            // UI更新
             SkinInventryManager.instance.RefreshAllSlots();
         }
     }

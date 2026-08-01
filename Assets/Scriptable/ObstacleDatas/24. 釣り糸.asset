@@ -12,6 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f551b2646cebb4eb4dd66164c3bbc9, type: 3}
   m_Name: "24. \u91E3\u308A\u7CF8"
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleData
-  name: "24. \u91E3\u308A\u7CF8"
+  id: 24
+  displayName: "\u91E3\u308A\u7CF8"
   prefab: {fileID: 2575805199110171709, guid: e3140760b8172ef48aab4dba23f2ef1f, type: 3}
   baseSpeed: 7
+  encyclopediaSprite: {fileID: -7568968078360489962, guid: 21a42062fbd82284d8e726b95b93dcde, type: 3}
+  description: "\u9B5A\u3092\u91E3\u308B\u305F\u3081\u306B\u4F7F\u308F\u308C\u308B\u4E08\u592B\u306A\u7D30\u3044\u7CF8\u3002"
+  decomposition: "\u7D04600\u5E74\uFF08\u76EE\u5B89\uFF09"
+  materials: "\u30CA\u30A4\u30ED\u30F3\uFF08PA\uFF09"
+  sources: "\u6F01\u696D\n\u91E3\u308A\n\u707D\u5BB3\n\u7CF8\u5207\u308C\u306A\u3069"
+  trivia: "\u5207\u308C\u305F\u91E3\u308A\u7CF8\u3092\u56DE\u53CE\u3059\u308B\u6D3B\u52D5\u304C\u5404\u5730\u3067\u884C\u308F\u308C\u3066\u3044\u307E\u3059\u3002"
+  era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1950\u5E74\u4EE3\u3054\u308D"

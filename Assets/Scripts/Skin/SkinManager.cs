@@ -77,7 +77,12 @@ public class SkinManager : MonoBehaviour
         await SyncUnlocksFromCurrentStats();
     }
 
-    public async Task ReportGameResult(float runScore, float runTime, bool noInputAchieved = false, bool usedContinue = false)
+    public async Task ReportGameResult(
+        float runScore,
+        float runTime,
+        bool noInputAchieved = false,
+        bool usedContinue = false,
+        bool tapUnlockAchieved = false)
     {
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
@@ -124,7 +129,8 @@ public class SkinManager : MonoBehaviour
             noInputAchieved,
             usedContinue,
             reachedMaxDifficulty,
-            maxDifficultySurvivalTime
+            maxDifficultySurvivalTime,
+            tapUnlockAchieved
         );
     }
 
@@ -150,7 +156,8 @@ public class SkinManager : MonoBehaviour
             false,
             false,
             false,
-            0f
+            0f,
+            false
         );
     }
 
@@ -165,7 +172,8 @@ public class SkinManager : MonoBehaviour
         bool noInputAchieved,
         bool usedContinue,
         bool reachedMaxDifficulty,
-        float maxDifficultySurvivalTime)
+        float maxDifficultySurvivalTime,
+        bool tapUnlockAchieved)
     {
         if (_skinDatabase == null)
         {
@@ -225,9 +233,13 @@ public class SkinManager : MonoBehaviour
                     unlock = reachedMaxDifficulty &&
                              (skin.conditionValue == 0f || maxDifficultySurvivalTime >= skin.conditionValue);
                     break;
+                case SkinData.UnlockType.TapUnlock:
+                    unlock = tapUnlockAchieved;
+                    break;
                 case SkinData.UnlockType.AdWatch:
                 case SkinData.UnlockType.CompleteAll:
-                case SkinData.UnlockType.TapUnlock:
+                case SkinData.UnlockType.AchievementCompleteReward:
+                case SkinData.UnlockType.SecretAchievementReward:
                     break;
             }
 
@@ -242,17 +254,30 @@ public class SkinManager : MonoBehaviour
             Debug.Log($"Skin unlocked: {skin.skinName}");
         }
 
-        SkinData goldSkin = _skinDatabase
-            .GetAllSkins()
+        List<SkinData> allSkins = _skinDatabase.GetAllSkins();
+        SkinData goldSkin = allSkins
             .FirstOrDefault(s => s != null && s.unlockType == SkinData.UnlockType.CompleteAll);
 
         if (goldSkin != null && !IsUnlocked(goldSkin.id))
         {
-            if (unlockedCount >= _skinDatabase.GetAllSkins().Count - 1)
+            bool originalCollectionComplete = allSkins
+                .Where(s => s != null && s.countsTowardsOriginalCollection && s.id != goldSkin.id)
+                .All(s => IsUnlocked(s.id));
+
+            if (originalCollectionComplete)
             {
                 await UnlockSkin(goldSkin.id);
             }
         }
+    }
+
+    public bool IsTapUnlockConditionMet(int sameSkinTapCount)
+    {
+        _skinDatabase = SkinDatabase.instance;
+        return _skinDatabase.GetAllSkins().Any(skin =>
+            skin.unlockType == SkinData.UnlockType.TapUnlock &&
+            !IsUnlocked(skin.id) &&
+            sameSkinTapCount >= Mathf.RoundToInt(skin.conditionValue));
     }
 
     public async Task UnlockBySNSShare()
@@ -343,7 +368,7 @@ public class SkinManager : MonoBehaviour
             ? _skinDatabase.GetAllSkins().FirstOrDefault(s => s != null && s.id == currentSkinID)
             : null;
 
-        return skin != null ? skin.skinSprite : null;
+        return skin != null ? skin.GetDisplaySprite() : null;
     }
 
     public async void UnlockSkinByAd(int skinID, System.Action onSuccess = null, System.Action onFailed = null)

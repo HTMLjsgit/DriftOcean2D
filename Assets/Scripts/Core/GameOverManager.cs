@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,8 +12,15 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private Button _backToTitleButton;
     [SerializeField] private TextMeshProUGUI _scoreText;
 
+    [Header("Result Summary")]
+    [SerializeField] private TextMeshProUGUI _resultCommentText;
+    [SerializeField] private GameObject _unlockNoticePanel;
+    [SerializeField] private TextMeshProUGUI _unlockNoticeText;
+
     [Header("Ranking System")]
     [SerializeField] private Button _rankingButton;
+    [SerializeField] private Button _oceanLogButton;
+    [SerializeField] private OceanLogUI _oceanLogUI;
 
     [Header("SNS Share")]
     [SerializeField] private Button _shareButton;
@@ -75,6 +84,8 @@ public class GameOverManager : MonoBehaviour
             _rankingButton.onClick.AddListener(OnViewRankingClicked);
         }
 
+        _oceanLogButton.onClick.AddListener(_oceanLogUI.Open);
+
         if (_shareButton != null)
         {
             _shareButton.onClick.AddListener(OnShareButtonClicked);
@@ -109,6 +120,11 @@ public class GameOverManager : MonoBehaviour
             _scoreText.SetText(finalScore.ToString("F2"));
         }
 
+        int resultYear = Mathf.FloorToInt(finalScore);
+        string resultComment = AchievementManager.instance.GetResultComment(finalScore);
+        _resultCommentText.SetText($"{resultYear}年まで漂った！\n{resultComment}");
+        _unlockNoticePanel.SetActive(false);
+
         Time.timeScale = 0f;
 
         if (_cloudSaveManager != null && _cloudSaveManager.IsOfflineModeActive())
@@ -124,36 +140,75 @@ public class GameOverManager : MonoBehaviour
             return;
         }
 
-        try
+        List<int> previousSkinIDs = _cloudSaveManager.GetUnlockedSkinIDs().ToList();
+        List<int> previousAchievementIDs = _cloudSaveManager.GetUnlockedAchievementIDs();
+        int bounceCount = _playerController.ConsumePendingBounceCount();
+        bool tapUnlockAchieved = _playerController.ConsumeTapUnlockCondition();
+        int collidedObstacleID = _playerController.ConsumeCollidedObstacleID();
+        bool reachedHardMode = DifficultyManager.instance.maxDifficultyMode;
+
+        if (_cloudSaveManager != null)
         {
-            if (_cloudSaveManager != null)
-            {
-                await _cloudSaveManager.UpdateStats(finalScore, finalTime);
-            }
-
-            bool noInputAchieved = _playerController != null && _playerController.NoInputUnlockAchieved;
-
-            if (_skinManager != null)
-            {
-                await _skinManager.ReportGameResult(finalScore, finalTime, noInputAchieved, _hasUsedContinue);
-            }
-
-            if (_stageManager != null)
-            {
-                _stageManager.SetCurrentPlay(false);
-            }
-
-            if (_leaderboardManager != null)
-            {
-                await _leaderboardManager.SubmitScore(finalScore);
-            }
-
-            UpdateContinueButton();
+            await _cloudSaveManager.UpdateStats(finalScore, finalTime, bounceCount, reachedHardMode);
+            await _cloudSaveManager.DiscoverObstacle(collidedObstacleID);
         }
-        catch (System.Exception e)
+
+        bool noInputAchieved = _playerController != null && _playerController.NoInputUnlockAchieved;
+
+        if (_skinManager != null)
         {
-            Debug.LogError($"[GameOverManager] Error during GameOver processing: {e.Message}\n{e.StackTrace}");
-            UpdateContinueButton();
+            await _skinManager.ReportGameResult(
+                finalScore,
+                finalTime,
+                noInputAchieved,
+                _hasUsedContinue,
+                tapUnlockAchieved);
+        }
+
+        await AchievementManager.instance.EvaluateAchievements();
+
+        ShowUnlockNotices(
+            previousSkinIDs,
+            previousAchievementIDs);
+
+        if (_stageManager != null)
+        {
+            _stageManager.SetCurrentPlay(false);
+        }
+
+        if (_leaderboardManager != null)
+        {
+            await _leaderboardManager.SubmitScore(finalScore);
+        }
+
+        UpdateContinueButton();
+    }
+
+    private void ShowUnlockNotices(
+        List<int> previousSkinIDs,
+        List<int> previousAchievementIDs)
+    {
+        List<int> newSkinIDs = _cloudSaveManager.GetUnlockedSkinIDs()
+            .Where(id => !previousSkinIDs.Contains(id))
+            .ToList();
+        List<int> newAchievementIDs = _cloudSaveManager.GetUnlockedAchievementIDs()
+            .Where(id => !previousAchievementIDs.Contains(id))
+            .ToList();
+        List<string> messages = new List<string>();
+        if (newAchievementIDs.Count > 0)
+        {
+            messages.Add("実績を解放しました");
+        }
+
+        if (newSkinIDs.Count > 0)
+        {
+            messages.Add("スキンを解放しました");
+        }
+
+        if (messages.Count > 0)
+        {
+            _unlockNoticeText.SetText(string.Join("\n", messages));
+            _unlockNoticePanel.SetActive(true);
         }
     }
 

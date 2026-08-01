@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,13 @@ public class SkinInventryManager : MonoBehaviour
 
     [Header("Skin List Settings")]
     [SerializeField] private List<SkinUI> _skinSlots;
+
+    [Header("Skin Details")]
+    [SerializeField] private GameObject _detailPanel;
+    [SerializeField] private Button _detailCloseButton;
+    [SerializeField] private Image _detailSkinImage;
+    [SerializeField] private TextMeshProUGUI _detailSkinName;
+    [SerializeField] private TextMeshProUGUI _detailDescription;
 
     [Header("Offline Mode")]
     [SerializeField] private GameObject _offlinePanel;
@@ -44,6 +52,9 @@ public class SkinInventryManager : MonoBehaviour
         {
             _closeButton.onClick.AddListener(() => _flowUI.SwitchView("Start"));
         }
+
+        _detailCloseButton.onClick.AddListener(() => _detailPanel.SetActive(false));
+        _detailPanel.SetActive(false);
 
         _cloudSaveManager = UGSCloudSaveManager.instance;
 
@@ -82,7 +93,9 @@ public class SkinInventryManager : MonoBehaviour
             SkinData data = SkinDatabase.instance.GetSkinById(slot.skinId);
             if (data != null)
             {
-                slot.Initialize(data.skinSprite);
+                bool visible = !data.hiddenUntilUnlocked || SkinManager.instance.IsUnlocked(data.id);
+                slot.gameObject.SetActive(visible);
+                slot.Initialize(data.GetDisplaySprite());
             }
         }
 
@@ -93,6 +106,8 @@ public class SkinInventryManager : MonoBehaviour
     {
         foreach (SkinUI slot in _skinSlots)
         {
+            SkinData data = SkinDatabase.instance.GetSkinById(slot.skinId);
+            slot.gameObject.SetActive(!data.hiddenUntilUnlocked || SkinManager.instance.IsUnlocked(data.id));
             slot.UpdateUIState();
         }
 
@@ -102,6 +117,15 @@ public class SkinInventryManager : MonoBehaviour
         }
 
         UpdateOfflinePanel();
+    }
+
+    public void ShowSkinDetails(int skinID)
+    {
+        SkinData data = SkinDatabase.instance.GetSkinById(skinID);
+        _detailSkinName.SetText(data.skinName);
+        _detailDescription.SetText(data.description);
+        _detailSkinImage.sprite = data.GetDisplaySprite();
+        _detailPanel.SetActive(true);
     }
 
     private void UpdateOfflinePanel()

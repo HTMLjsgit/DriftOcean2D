@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfdf31e35068b804285967b9ba491205, type: 3}
+  m_Name: "18_Ocean Log\u5B8C\u6210"
+  m_EditorClassIdentifier: Assembly-CSharp::AchievementData
+  id: 18
+  achievementName: "Ocean Log\u5B8C\u6210"
+  description: "Ocean Log\u309230\u7A2E\u985E\u3059\u3079\u3066\u767B\u9332\u3059\u308B"
+  conditionType: 3
+  conditionValue: 30
+  hiddenUntilCompleted: 0
+  excludedFromRegularCompletion: 0

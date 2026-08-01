@@ -294,6 +294,9 @@ public class UGSCloudSaveManager : MonoBehaviour
         _playerData.notifiedSkinIDs = _playerData.notifiedSkinIDs.Distinct().ToList();
         _playerData.seenSkinIDs = _playerData.seenSkinIDs.Distinct().ToList();
         _playerData.viewedSkinInventoryUnlockedSkins = _playerData.viewedSkinInventoryUnlockedSkins.Distinct().ToList();
+        _playerData.discoveredObstacleIDs = _playerData.discoveredObstacleIDs.Distinct().ToList();
+        _playerData.viewedObstacleIDs = _playerData.viewedObstacleIDs.Distinct().ToList();
+        _playerData.unlockedAchievementIDs = _playerData.unlockedAchievementIDs.Distinct().ToList();
 
         if (_ugsManager != null && _ugsManager.IsSignedIn())
         {
@@ -321,7 +324,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     public string GetPlayerName()
     {
-        string name = _playerData?.playerName ?? "プレイヤー";
+        string name = _playerData?.playerName ?? "player";
         Debug.Log($"[DEBUG] UGSCloudSaveManager.GetPlayerName() returning: '{name}', _playerData is null: {_playerData == null}");
         return name;
     }
@@ -449,19 +452,49 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// <summary>
     /// 統計データを更新して保存
     /// </summary>
-    public async Task<bool> UpdateStats(float runScore, float runTime)
+    public async Task<bool> UpdateStats(
+        float runScore,
+        float runTime,
+        int bounceCount = 0,
+        bool reachedHardMode = false)
     {
         if (_playerData == null) return false;
 
         _playerData.stats.totalPlayCount++;
         _playerData.stats.totalPlayTime += runTime;
         _playerData.stats.deathCount++;
+        _playerData.stats.totalBounceCount += Mathf.Max(0, bounceCount);
+        _playerData.stats.hasReachedHardMode |= reachedHardMode;
 
         if (runScore > _playerData.stats.bestScore)
         {
             _playerData.stats.bestScore = runScore;
         }
 
+        return await SavePlayerData();
+    }
+
+    public async Task<bool> RegisterPlayDay()
+    {
+        if (_playerData == null) return false;
+
+        string today = DateTime.UtcNow.ToString("yyyy-MM-dd");
+        if (_playerData.stats.lastPlayDateUtc == today)
+        {
+            return true;
+        }
+
+        if (DateTime.TryParse(_playerData.stats.lastPlayDateUtc, out DateTime lastPlayDate) &&
+            lastPlayDate.Date == DateTime.UtcNow.Date.AddDays(-1))
+        {
+            _playerData.stats.consecutivePlayDays++;
+        }
+        else
+        {
+            _playerData.stats.consecutivePlayDays = 1;
+        }
+
+        _playerData.stats.lastPlayDateUtc = today;
         return await SavePlayerData();
     }
 
@@ -553,6 +586,90 @@ public class UGSCloudSaveManager : MonoBehaviour
     public bool HasNoContinueHardModeUnlocked()
     {
         return _playerData?.stats.hasNoContinueHardModeUnlocked ?? false;
+    }
+
+    #endregion
+
+    #region Ocean Log
+
+    public bool IsObstacleDiscovered(int obstacleID)
+    {
+        return _playerData?.discoveredObstacleIDs.Contains(obstacleID) ?? false;
+    }
+
+    public List<int> GetDiscoveredObstacleIDs()
+    {
+        return _playerData?.discoveredObstacleIDs.ToList() ?? new List<int>();
+    }
+
+    public async Task<bool> DiscoverObstacle(int obstacleID)
+    {
+        if (_playerData == null || obstacleID <= 0) return false;
+
+        if (_playerData.discoveredObstacleIDs.Contains(obstacleID))
+        {
+            return true;
+        }
+
+        _playerData.discoveredObstacleIDs.Add(obstacleID);
+        return await SavePlayerData();
+    }
+
+    public bool HasNewObstacleEntries()
+    {
+        if (_playerData == null) return false;
+
+        return _playerData.discoveredObstacleIDs.Any(id => !_playerData.viewedObstacleIDs.Contains(id));
+    }
+
+    public bool IsObstacleEntryNew(int obstacleID)
+    {
+        if (_playerData == null) return false;
+
+        return _playerData.discoveredObstacleIDs.Contains(obstacleID) &&
+               !_playerData.viewedObstacleIDs.Contains(obstacleID);
+    }
+
+    public async Task<bool> MarkOceanLogAsViewed()
+    {
+        if (_playerData == null) return false;
+
+        foreach (int obstacleID in _playerData.discoveredObstacleIDs)
+        {
+            if (!_playerData.viewedObstacleIDs.Contains(obstacleID))
+            {
+                _playerData.viewedObstacleIDs.Add(obstacleID);
+            }
+        }
+
+        return await SavePlayerData();
+    }
+
+    public bool IsAchievementUnlocked(int achievementID)
+    {
+        return _playerData?.unlockedAchievementIDs.Contains(achievementID) ?? false;
+    }
+
+    public List<int> GetUnlockedAchievementIDs()
+    {
+        return _playerData?.unlockedAchievementIDs.ToList() ?? new List<int>();
+    }
+
+    public async Task<bool> UnlockAchievements(IEnumerable<int> achievementIDs)
+    {
+        if (_playerData == null || achievementIDs == null) return false;
+
+        bool changed = false;
+        foreach (int achievementID in achievementIDs)
+        {
+            if (!_playerData.unlockedAchievementIDs.Contains(achievementID))
+            {
+                _playerData.unlockedAchievementIDs.Add(achievementID);
+                changed = true;
+            }
+        }
+
+        return !changed || await SavePlayerData();
     }
 
     #endregion
@@ -705,4 +822,5 @@ public class UGSCloudSaveManager : MonoBehaviour
     }
 
     #endregion
+
 }

@@ -18,12 +18,27 @@ public class SkinData : ScriptableObject
         ConsecutiveSurvival, // 連続で一定時間生存（イルカ用）
         NoContinueHardMode,  // コンティニューなしでハードモード到達（カニ用）
         TapUnlock,      // ぷにぷにタップ回数で解放（conditionValueでタップ回数指定）
-        MaxDifficultySurvival // 最高難易度で生存（conditionValue=0でハードモード到達、>0で生存時間指定）
+        MaxDifficultySurvival, // 最高難易度で生存（conditionValue=0でハードモード到達、>0で生存時間指定）
+        AchievementCompleteReward,
+        SecretAchievementReward
     }
 
     public int id;
     public string skinName;
     public Sprite skinSprite;
+
+    [Header("Platform Sprite")]
+    [Tooltip("iOSで別画像を使う場合のみ設定します。未設定時は通常画像を使います。")]
+    public Sprite iosSkinSprite;
+
+    [Header("Encyclopedia")]
+    [TextArea(2, 5)]
+    public string description;
+    [Tooltip("解放されるまでスキン一覧に枠自体を表示しません。")]
+    public bool hiddenUntilUnlocked;
+    [Tooltip("初期20種のコンプリート判定に含めるスキンです。")]
+    public bool countsTowardsOriginalCollection = true;
+
     public UnlockType unlockType;
 
     [Header("条件値 (秒数・回数・スコア)")]
@@ -31,4 +46,15 @@ public class SkinData : ScriptableObject
 
     [Header("説明文 (ロック時に表示)")]
     public string lockedDescription; // 例：「3分間生き残る」
+
+    public Sprite GetDisplaySprite()
+    {
+#if UNITY_IOS
+        if (iosSkinSprite != null)
+        {
+            return iosSkinSprite;
+        }
+#endif
+        return skinSprite;
+    }
 }

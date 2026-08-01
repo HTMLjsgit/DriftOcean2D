@@ -13,6 +13,9 @@ public class PlayerCloudData
     public List<int> notifiedSkinIDs = new List<int> { 1 }; // お知らせ済みスキンリスト（タイトル画面で通知済み）
     public List<int> seenSkinIDs = new List<int> { 1 }; // 見た（装備した）スキンリスト（Newラベル用）
     public List<int> viewedSkinInventoryUnlockedSkins = new List<int> { 1 }; // スキン一覧で確認済みの解放スキンリスト（SkinボタンのNewラベル用）
+    public List<int> discoveredObstacleIDs = new List<int>();
+    public List<int> viewedObstacleIDs = new List<int>();
+    public List<int> unlockedAchievementIDs = new List<int>();
     public PlayerStats stats = new PlayerStats();
 
     // ぷにぷにタップ回数（スキンID → タップ回数）※旧仕様の互換性のため残す（使用しない）
@@ -85,6 +88,10 @@ public class PlayerStats
     public float totalPlayTime = 0f;
     public int deathCount = 0;
     public float bestScore = 0f;
+    public int totalBounceCount = 0;
+    public bool hasReachedHardMode = false;
+    public int consecutivePlayDays = 0;
+    public string lastPlayDateUtc = "";
 
     // 連続生存条件用（イルカ：3回連続で1分以上生存）
     public int consecutiveSurvivalCount = 0;  // 連続で条件を満たした回数
