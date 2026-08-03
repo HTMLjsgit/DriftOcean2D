@@ -43,6 +43,11 @@ public class GameOverManager : MonoBehaviour
 
     void Awake()
     {
+        if (_gameOverPanel != null)
+        {
+            _gameOverPanel.SetActive(false);
+        }
+
         if (instance == null)
         {
             instance = this;

@@ -19,6 +19,11 @@ public class UGSCloudSaveManager : MonoBehaviour
     private UGSManager _ugsManager;
     private PlayerCloudData _playerData;
 
+#if UNITY_EDITOR
+    private PlayerCloudData _editorTestDataSnapshot;
+    public bool IsEditorTestSessionActive { get; private set; }
+#endif
+
     // データロード完了イベント
     public event Action OnDataLoaded;
 
@@ -297,6 +302,14 @@ public class UGSCloudSaveManager : MonoBehaviour
         _playerData.discoveredObstacleIDs = _playerData.discoveredObstacleIDs.Distinct().ToList();
         _playerData.viewedObstacleIDs = _playerData.viewedObstacleIDs.Distinct().ToList();
         _playerData.unlockedAchievementIDs = _playerData.unlockedAchievementIDs.Distinct().ToList();
+
+#if UNITY_EDITOR
+        if (IsEditorTestSessionActive)
+        {
+            Debug.Log("[UGSCloudSaveManager] Editor test session is active. Skipping Cloud Save write.");
+            return true;
+        }
+#endif
 
         if (_ugsManager != null && _ugsManager.IsSignedIn())
         {
@@ -671,6 +684,101 @@ public class UGSCloudSaveManager : MonoBehaviour
 
         return !changed || await SavePlayerData();
     }
+
+#if UNITY_EDITOR
+    public bool EditorUnlockAchievements(IEnumerable<int> achievementIDs)
+    {
+        if (!EditorBeginTestSession() || achievementIDs == null) return false;
+
+        foreach (int achievementID in achievementIDs.Where(id => id > 0).Distinct())
+        {
+            if (!_playerData.unlockedAchievementIDs.Contains(achievementID))
+            {
+                _playerData.unlockedAchievementIDs.Add(achievementID);
+            }
+        }
+
+        return true;
+    }
+
+    public bool EditorDiscoverObstacles(IEnumerable<int> obstacleIDs)
+    {
+        if (!EditorBeginTestSession() || obstacleIDs == null) return false;
+
+        foreach (int obstacleID in obstacleIDs.Where(id => id > 0).Distinct())
+        {
+            if (_playerData.discoveredObstacleIDs.Contains(obstacleID))
+            {
+                continue;
+            }
+
+            _playerData.discoveredObstacleIDs.Add(obstacleID);
+        }
+
+        return true;
+    }
+
+    public bool EditorResetAchievements()
+    {
+        if (!EditorBeginTestSession()) return false;
+
+        _playerData.unlockedAchievementIDs.Clear();
+        return true;
+    }
+
+    public bool EditorResetOceanLog()
+    {
+        if (!EditorBeginTestSession()) return false;
+
+        _playerData.discoveredObstacleIDs.Clear();
+        _playerData.viewedObstacleIDs.Clear();
+        return true;
+    }
+
+    public bool EditorRestoreTestSession()
+    {
+        if (!IsEditorTestSessionActive || _editorTestDataSnapshot == null)
+        {
+            return false;
+        }
+
+        _playerData = ClonePlayerData(_editorTestDataSnapshot);
+        _editorTestDataSnapshot = null;
+        IsEditorTestSessionActive = false;
+        Debug.Log("[UGSCloudSaveManager] Restored the data captured before the Editor test session.");
+        return true;
+    }
+
+    private bool EditorBeginTestSession()
+    {
+        if (_playerData == null)
+        {
+            return false;
+        }
+
+        if (IsEditorTestSessionActive)
+        {
+            return true;
+        }
+
+        _editorTestDataSnapshot = ClonePlayerData(_playerData);
+        if (_editorTestDataSnapshot == null)
+        {
+            return false;
+        }
+
+        IsEditorTestSessionActive = true;
+        Debug.Log("[UGSCloudSaveManager] Started an in-memory Editor test session. Cloud Save writes are disabled until Play Mode ends.");
+        return true;
+    }
+
+    private static PlayerCloudData ClonePlayerData(PlayerCloudData source)
+    {
+        return source == null
+            ? null
+            : JsonUtility.FromJson<PlayerCloudData>(JsonUtility.ToJson(source));
+    }
+#endif
 
     #endregion
 

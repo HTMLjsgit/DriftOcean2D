@@ -101,6 +101,19 @@ public class AchievementManager : MonoBehaviour
         return _catalog.resultComments.GetComment(score);
     }
 
+#if UNITY_EDITOR
+    public async Task EditorSyncRewardSkins()
+    {
+        UGSCloudSaveManager cloudSave = UGSCloudSaveManager.instance;
+        if (cloudSave == null || cloudSave.IsOfflineModeActive())
+        {
+            return;
+        }
+
+        await UnlockRewardSkinsIfNeeded(cloudSave.GetUnlockedAchievementIDs().ToHashSet());
+    }
+#endif
+
     private bool IsConditionMet(
         AchievementData achievement,
         PlayerStats stats,
