@@ -19,7 +19,7 @@ public class PlayerSkinHandler : MonoBehaviour
             return;
         }
 
-        _skinManager = SkinManager.instance;
+        BindSkinManager();
         _skinDatabase = SkinDatabase.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         // データが既にロード済みの場合は即座に適用
@@ -36,6 +36,11 @@ public class PlayerSkinHandler : MonoBehaviour
 
     void OnDestroy()
     {
+        if (_skinManager != null)
+        {
+            _skinManager.OnCurrentSkinChanged -= OnCurrentSkinChanged;
+        }
+
         // イベント購読を解除
         if (_cloudSaveManager != null)
         {
@@ -69,7 +74,7 @@ public class PlayerSkinHandler : MonoBehaviour
         }
 
         // 最新の参照を取得（シーン遷移対策）
-        _skinManager = SkinManager.instance;
+        BindSkinManager();
         _skinDatabase = SkinDatabase.instance;
 
         if (_skinManager == null || _skinDatabase == null)
@@ -100,6 +105,36 @@ public class PlayerSkinHandler : MonoBehaviour
                 Debug.LogError("[PlayerSkinHandler] Fallback skin (ID=1) not found! Player will have no sprite.");
             }
         }
+    }
+
+    public void RefreshSkin()
+    {
+        ApplySkin();
+    }
+
+    private void BindSkinManager()
+    {
+        SkinManager latestSkinManager = SkinManager.instance;
+        if (_skinManager == latestSkinManager)
+        {
+            return;
+        }
+
+        if (_skinManager != null)
+        {
+            _skinManager.OnCurrentSkinChanged -= OnCurrentSkinChanged;
+        }
+
+        _skinManager = latestSkinManager;
+        if (_skinManager != null)
+        {
+            _skinManager.OnCurrentSkinChanged += OnCurrentSkinChanged;
+        }
+    }
+
+    private void OnCurrentSkinChanged(int skinID)
+    {
+        ApplySkin();
     }
 
     public void SetSkin(Sprite skin)

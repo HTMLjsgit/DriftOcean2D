@@ -7,10 +7,21 @@ using UnityEngine;
 
 public class AchievementTestWindow : EditorWindow
 {
+    private enum TestTab
+    {
+        Achievements,
+        Skins
+    }
+
+    private static readonly string[] TabLabels = { "実績・海洋ゴミ", "スキン" };
+
     private readonly HashSet<int> _selectedAchievementIDs = new HashSet<int>();
     private readonly HashSet<int> _selectedGarbageIDs = new HashSet<int>();
+    private readonly HashSet<int> _selectedSkinIDs = new HashSet<int>();
 
-    private Vector2 _scrollPosition;
+    private Vector2 _achievementScrollPosition;
+    private Vector2 _skinScrollPosition;
+    private TestTab _selectedTab;
     private bool _isBusy;
     private string _statusMessage = "Play Modeに入ると操作できます。";
     private MessageType _statusType = MessageType.Info;
@@ -18,7 +29,7 @@ public class AchievementTestWindow : EditorWindow
     [MenuItem("Tools/Debug/実績・海洋ゴミテスト")]
     private static void OpenWindow()
     {
-        AchievementTestWindow window = GetWindow<AchievementTestWindow>("実績テスト");
+        AchievementTestWindow window = GetWindow<AchievementTestWindow>("進行テスト");
         window.minSize = new Vector2(520f, 620f);
         window.Show();
     }
@@ -46,7 +57,7 @@ public class AchievementTestWindow : EditorWindow
     private void OnGUI()
     {
         EditorGUILayout.Space(6f);
-        EditorGUILayout.LabelField("実績・海洋ゴミ テスト操作", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("ゲーム進行 テスト操作", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
             "最初のテスト操作から一時データモードになります。Cloud Saveへは書き込まず、Play Mode終了時に変更はすべて破棄されます。",
             MessageType.Info);
@@ -60,13 +71,14 @@ public class AchievementTestWindow : EditorWindow
         UGSCloudSaveManager cloudSave = UGSCloudSaveManager.instance;
         AchievementManager achievementManager = AchievementManager.instance;
         OceanLogCatalog catalog = achievementManager != null ? achievementManager.Catalog : null;
+        SkinDatabase skinDatabase = SkinDatabase.instance;
 
-        if (!CanUseTestControls(cloudSave, achievementManager, catalog))
+        if (!CanUseTestControls(cloudSave, achievementManager, catalog, skinDatabase))
         {
             return;
         }
 
-        DrawCurrentStatus(cloudSave, catalog);
+        DrawCurrentStatus(cloudSave, catalog, skinDatabase);
         if (cloudSave.IsEditorTestSessionActive)
         {
             EditorGUILayout.HelpBox(
@@ -76,26 +88,48 @@ public class AchievementTestWindow : EditorWindow
 
         EditorGUILayout.HelpBox(_statusMessage, _statusType);
 
+        GUIStyle tabStyle = new GUIStyle(EditorStyles.miniButtonMid)
+        {
+            fixedHeight = 32f,
+            fontStyle = FontStyle.Bold,
+            fontSize = 13
+        };
+        _selectedTab = (TestTab)GUILayout.Toolbar((int)_selectedTab, TabLabels, tabStyle);
+        EditorGUILayout.Space(8f);
+
         using (new EditorGUI.DisabledScope(_isBusy))
         {
-            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-            DrawAchievementSection(cloudSave, catalog);
-            EditorGUILayout.Space(12f);
-            DrawGarbageSection(cloudSave, catalog);
-            EditorGUILayout.Space(12f);
-            DrawResetSection(cloudSave);
-            EditorGUILayout.EndScrollView();
+            if (_selectedTab == TestTab.Achievements)
+            {
+                _achievementScrollPosition = EditorGUILayout.BeginScrollView(_achievementScrollPosition);
+                DrawAchievementSection(cloudSave, catalog);
+                EditorGUILayout.Space(12f);
+                DrawGarbageSection(cloudSave, catalog);
+                EditorGUILayout.Space(12f);
+                DrawResetSection(cloudSave);
+                EditorGUILayout.EndScrollView();
+            }
+            else
+            {
+                _skinScrollPosition = EditorGUILayout.BeginScrollView(_skinScrollPosition);
+                DrawSkinSection(cloudSave, skinDatabase);
+                EditorGUILayout.EndScrollView();
+            }
+
+            EditorGUILayout.Space(8f);
+            DrawRestoreSection(cloudSave);
         }
     }
 
     private bool CanUseTestControls(
         UGSCloudSaveManager cloudSave,
         AchievementManager achievementManager,
-        OceanLogCatalog catalog)
+        OceanLogCatalog catalog,
+        SkinDatabase skinDatabase)
     {
-        if (cloudSave == null || achievementManager == null || catalog == null)
+        if (cloudSave == null || achievementManager == null || catalog == null || skinDatabase == null)
         {
-            EditorGUILayout.HelpBox("実績管理オブジェクトの生成を待っています。", MessageType.Info);
+            EditorGUILayout.HelpBox("実績・スキン管理オブジェクトの生成を待っています。", MessageType.Info);
             Repaint();
             return false;
         }
@@ -109,14 +143,17 @@ public class AchievementTestWindow : EditorWindow
 
         if (cloudSave.IsOfflineModeActive())
         {
-            EditorGUILayout.HelpBox("UGSがオフラインのため、テストデータを保存できません。", MessageType.Error);
+            EditorGUILayout.HelpBox("UGSがオフラインのため、元になるプレイヤーデータを取得できません。", MessageType.Error);
             return false;
         }
 
         return true;
     }
 
-    private static void DrawCurrentStatus(UGSCloudSaveManager cloudSave, OceanLogCatalog catalog)
+    private static void DrawCurrentStatus(
+        UGSCloudSaveManager cloudSave,
+        OceanLogCatalog catalog,
+        SkinDatabase skinDatabase)
     {
         List<AchievementData> regularAchievements = catalog.achievements
             .Where(item => item != null && !item.hiddenUntilCompleted)
@@ -129,6 +166,9 @@ public class AchievementTestWindow : EditorWindow
         int unlockedSecretAchievements = secretAchievements
             .Count(item => cloudSave.IsAchievementUnlocked(item.id));
         int discoveredGarbage = cloudSave.GetDiscoveredObstacleIDs().Count;
+        List<SkinData> skins = GetTestableSkins(skinDatabase);
+        HashSet<int> unlockedSkinIDs = cloudSave.GetUnlockedSkinIDs().ToHashSet();
+        int unlockedSkins = skins.Count(item => unlockedSkinIDs.Contains(item.id));
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.LabelField(
@@ -141,8 +181,16 @@ public class AchievementTestWindow : EditorWindow
             "海洋ゴミ図鑑",
             $"{discoveredGarbage}/{catalog.garbageEntries.Count} 発見済み");
         EditorGUILayout.LabelField(
+            "スキン",
+            $"{unlockedSkins}/{skins.Count} 開放済み");
+        EditorGUILayout.LabelField(
             "データ状態",
             cloudSave.IsEditorTestSessionActive ? "一時データ（Play Mode終了時に破棄）" : "保存済みデータ");
+        EditorGUILayout.LabelField(
+            "適用先",
+            cloudSave.IsEditorTestSessionActive
+                ? "UGSCloudSaveManager（一時コピー）"
+                : "UGSCloudSaveManager（ロード済みデータ）");
         EditorGUILayout.EndVertical();
     }
 
@@ -272,6 +320,86 @@ public class AchievementTestWindow : EditorWindow
         }
     }
 
+    private void DrawSkinSection(UGSCloudSaveManager cloudSave, SkinDatabase skinDatabase)
+    {
+        List<SkinData> skins = GetTestableSkins(skinDatabase);
+        HashSet<int> unlockedSkinIDs = cloudSave.GetUnlockedSkinIDs().ToHashSet();
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("スキン開放テスト", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(
+            "チェックしたスキンを一時的に開放・未開放へ変更できます。初期スキンID 1はリセットされません。",
+            EditorStyles.wordWrappedMiniLabel);
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("全部選択"))
+        {
+            SetAllSelected(_selectedSkinIDs, skins.Select(item => item.id));
+        }
+
+        if (GUILayout.Button("選択を全部外す"))
+        {
+            _selectedSkinIDs.Clear();
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        using (new EditorGUI.DisabledScope(_selectedSkinIDs.Count == 0))
+        {
+            if (GUILayout.Button($"選択したスキンを開放 ({_selectedSkinIDs.Count})"))
+            {
+                UnlockSkins(_selectedSkinIDs.ToArray());
+            }
+
+            if (GUILayout.Button($"選択したスキンを未開放へ戻す ({_selectedSkinIDs.Count})"))
+            {
+                ResetSkins(_selectedSkinIDs.ToArray());
+            }
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        using (new EditorGUI.DisabledScope(_selectedSkinIDs.Count != 1))
+        {
+            if (GUILayout.Button("選択した1体を開放して装備", GUILayout.Height(28f)))
+            {
+                UnlockAndEquipSkin(_selectedSkinIDs.Single());
+            }
+        }
+
+        GUI.backgroundColor = new Color(0.7f, 1f, 0.7f);
+        if (GUILayout.Button("全スキン開放（報酬・シークレット含む）", GUILayout.Height(28f)))
+        {
+            UnlockSkins(skins.Select(item => item.id).ToArray());
+        }
+
+        GUI.backgroundColor = new Color(1f, 0.65f, 0.65f);
+        if (GUILayout.Button("全スキンを未開放へ戻す（ID 1のみ残す）", GUILayout.Height(28f)))
+        {
+            ConfirmAndResetAllSkins(cloudSave);
+        }
+
+        GUI.backgroundColor = Color.white;
+
+        EditorGUILayout.HelpBox(
+            "透明スキンなどの隠し報酬もテスト用に直接操作できます。ゲーム本編の解除条件は変更されません。",
+            MessageType.Info);
+
+        EditorGUILayout.Space(4f);
+        foreach (SkinData skin in skins)
+        {
+            bool selected = _selectedSkinIDs.Contains(skin.id);
+            bool nextSelected = EditorGUILayout.ToggleLeft(
+                $"[{skin.id:00}] {GetSkinDisplayName(skin)}  " +
+                $"({GetSkinUnlockLabel(skin)})" +
+                (unlockedSkinIDs.Contains(skin.id) ? "  [開放済み]" : string.Empty),
+                selected);
+            SetSelected(_selectedSkinIDs, skin.id, nextSelected);
+        }
+    }
+
     private void DrawResetSection(UGSCloudSaveManager cloudSave)
     {
         EditorGUILayout.LabelField("リセット", EditorStyles.boldLabel);
@@ -299,14 +427,21 @@ public class AchievementTestWindow : EditorWindow
         }
 
         GUI.backgroundColor = Color.white;
+    }
 
+    private void DrawRestoreSection(UGSCloudSaveManager cloudSave)
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("一時テストデータ", EditorStyles.boldLabel);
         using (new EditorGUI.DisabledScope(!cloudSave.IsEditorTestSessionActive))
         {
-            if (GUILayout.Button("テスト開始前の状態に今すぐ戻す"))
+            if (GUILayout.Button("テスト開始前の全データに今すぐ戻す", GUILayout.Height(26f)))
             {
                 RestoreTestSession(cloudSave);
             }
         }
+
+        EditorGUILayout.EndVertical();
     }
 
     private async void UnlockAchievementsAsync(IReadOnlyCollection<int> achievementIDs)
@@ -363,6 +498,120 @@ public class AchievementTestWindow : EditorWindow
             SetOperationResult(
                 $"選択したゴミ{garbageIDs.Count}種類を図鑑へ登録しました。{achievementResult}",
                 MessageType.Info);
+        }
+        catch (Exception exception)
+        {
+            HandleOperationException(exception);
+        }
+        finally
+        {
+            EndOperation();
+        }
+    }
+
+    private void UnlockSkins(IReadOnlyCollection<int> skinIDs)
+    {
+        if (!TryBeginOperation("スキンを開放しています…", out UGSCloudSaveManager cloudSave))
+        {
+            return;
+        }
+
+        try
+        {
+            bool changed = cloudSave.EditorUnlockSkins(skinIDs);
+            RefreshSkinUI();
+            SetOperationResult(
+                changed ? $"スキンを{skinIDs.Count}件開放しました。" : "スキンのテスト変更に失敗しました。",
+                changed ? MessageType.Info : MessageType.Error);
+        }
+        catch (Exception exception)
+        {
+            HandleOperationException(exception);
+        }
+        finally
+        {
+            EndOperation();
+        }
+    }
+
+    private void UnlockAndEquipSkin(int skinID)
+    {
+        if (!TryBeginOperation("スキンを開放して装備しています…", out UGSCloudSaveManager cloudSave))
+        {
+            return;
+        }
+
+        try
+        {
+            bool changed = cloudSave.EditorUnlockAndEquipSkin(skinID);
+            RefreshSkinUI();
+            SetOperationResult(
+                changed ? $"スキンID {skinID}を開放して装備しました。" : "スキンのテスト変更に失敗しました。",
+                changed ? MessageType.Info : MessageType.Error);
+        }
+        catch (Exception exception)
+        {
+            HandleOperationException(exception);
+        }
+        finally
+        {
+            EndOperation();
+        }
+    }
+
+    private void ResetSkins(IReadOnlyCollection<int> skinIDs)
+    {
+        int[] resettableSkinIDs = skinIDs.Where(id => id > 1).ToArray();
+        if (resettableSkinIDs.Length == 0)
+        {
+            SetOperationResult("初期スキンID 1はリセット対象外です。", MessageType.Warning);
+            Repaint();
+            return;
+        }
+
+        if (!TryBeginOperation("スキンをリセットしています…", out UGSCloudSaveManager cloudSave))
+        {
+            return;
+        }
+
+        try
+        {
+            bool changed = cloudSave.EditorResetSkins(resettableSkinIDs);
+            RefreshSkinUI();
+            SetOperationResult(
+                changed ? $"選択したスキンを{resettableSkinIDs.Length}件リセットしました。" : "スキンのテスト変更に失敗しました。",
+                changed ? MessageType.Info : MessageType.Error);
+        }
+        catch (Exception exception)
+        {
+            HandleOperationException(exception);
+        }
+        finally
+        {
+            EndOperation();
+        }
+    }
+
+    private void ConfirmAndResetAllSkins(UGSCloudSaveManager cloudSave)
+    {
+        if (!EditorUtility.DisplayDialog(
+                "全スキンをリセット",
+                "初期スキンID 1だけを残し、ほかのスキンをすべて未開放へ戻します。続けますか？",
+                "全リセット",
+                "キャンセル"))
+        {
+            return;
+        }
+
+        if (!BeginOperation("全スキンをリセットしています…")) return;
+
+        try
+        {
+            bool changed = cloudSave.EditorResetAllSkins();
+            RefreshSkinUI();
+            SetOperationResult(
+                changed ? "全スキンを初期状態へリセットしました。" : "スキンのテスト変更に失敗しました。",
+                changed ? MessageType.Info : MessageType.Error);
         }
         catch (Exception exception)
         {
@@ -499,6 +748,7 @@ public class AchievementTestWindow : EditorWindow
 
         bool restored = cloudSave.EditorRestoreTestSession();
         RefreshOceanLogUI();
+        RefreshSkinUI();
         SetOperationResult(
             restored ? "テスト開始前の状態へ戻しました。" : "戻す一時データがありません。",
             restored ? MessageType.Info : MessageType.Warning);
@@ -545,6 +795,79 @@ public class AchievementTestWindow : EditorWindow
             {
                 oceanLogUI.Refresh();
             }
+        }
+    }
+
+    private static void RefreshSkinUI()
+    {
+        foreach (SkinInventryManager skinInventory in Resources.FindObjectsOfTypeAll<SkinInventryManager>())
+        {
+            if (skinInventory != null && skinInventory.gameObject.scene.IsValid())
+            {
+                skinInventory.ApplySkinSprites();
+            }
+        }
+
+        foreach (PlayerSkinHandler playerSkin in Resources.FindObjectsOfTypeAll<PlayerSkinHandler>())
+        {
+            if (playerSkin != null && playerSkin.gameObject.scene.IsValid())
+            {
+                playerSkin.RefreshSkin();
+            }
+        }
+    }
+
+    private static List<SkinData> GetTestableSkins(SkinDatabase skinDatabase)
+    {
+        return skinDatabase.GetAllSkins()
+            .Where(item => item != null && item.id > 0)
+            .OrderBy(item => item.id)
+            .ToList();
+    }
+
+    private static string GetSkinDisplayName(SkinData skin)
+    {
+        return string.IsNullOrWhiteSpace(skin.skinName) ? skin.name : skin.skinName;
+    }
+
+    private static string GetSkinUnlockLabel(SkinData skin)
+    {
+        switch (skin.unlockType)
+        {
+            case SkinData.UnlockType.None:
+                return "初期開放";
+            case SkinData.UnlockType.ScoreReach:
+                return $"スコア {Mathf.RoundToInt(skin.conditionValue)}";
+            case SkinData.UnlockType.PlayCount:
+                return $"プレイ {Mathf.RoundToInt(skin.conditionValue)}回";
+            case SkinData.UnlockType.SurvivalTime:
+                return $"生存 {skin.conditionValue:0.#}秒";
+            case SkinData.UnlockType.TotalPlayTime:
+                return $"累計プレイ {skin.conditionValue / 60f:0.#}分";
+            case SkinData.UnlockType.DeathCount:
+                return $"ゲームオーバー {Mathf.RoundToInt(skin.conditionValue)}回";
+            case SkinData.UnlockType.AdWatch:
+                return "広告視聴";
+            case SkinData.UnlockType.CompleteAll:
+                return "通常スキンコンプリート";
+            case SkinData.UnlockType.NoInput:
+                return "無操作";
+            case SkinData.UnlockType.SNSShare:
+                return "SNSシェア";
+            case SkinData.UnlockType.ConsecutiveSurvival:
+                return "連続生存";
+            case SkinData.UnlockType.NoContinueHardMode:
+                return "ノーコンティニューハード";
+            case SkinData.UnlockType.TapUnlock:
+                return $"同じスキンを{Mathf.RoundToInt(skin.conditionValue)}回タップ";
+            case SkinData.UnlockType.MaxDifficultySurvival:
+                return "最高難易度";
+            case SkinData.UnlockType.AchievementCompleteReward:
+                return "実績コンプリート報酬";
+            case SkinData.UnlockType.SecretAchievementReward:
+                return "シークレット実績報酬";
+            default:
+                return skin.unlockType.ToString();
         }
     }
 

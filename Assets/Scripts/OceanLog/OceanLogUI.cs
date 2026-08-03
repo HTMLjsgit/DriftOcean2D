@@ -39,30 +39,35 @@ public class OceanLogUI : MonoBehaviour
 
     private UGSCloudSaveManager _cloudSaveManager;
     private OceanLogCatalog _catalog;
+    private bool _isSubscribedToDataLoaded;
 
     private static readonly Color32 SelectedTabTextColor = new Color32(15, 61, 105, 255);
     private static readonly Color32 UnselectedTabColor = new Color32(11, 27, 56, 255);
 
+    void Awake()
+    {
+        if (_openButton != null) _openButton.onClick.AddListener(Open);
+        if (_closeButton != null) _closeButton.onClick.AddListener(Close);
+        if (_garbageTabButton != null) _garbageTabButton.onClick.AddListener(ShowGarbagePage);
+        if (_achievementTabButton != null) _achievementTabButton.onClick.AddListener(ShowAchievementPage);
+        if (_detailCloseButton != null)
+        {
+            _detailCloseButton.onClick.AddListener(() => _detailPanel.SetActive(false));
+        }
+
+        if (_rootPanel != null) _rootPanel.SetActive(false);
+        if (_detailPanel != null) _detailPanel.SetActive(false);
+    }
+
     void Start()
     {
-        _cloudSaveManager = UGSCloudSaveManager.instance;
-        _catalog = AchievementManager.instance.Catalog;
-
-        _openButton.onClick.AddListener(Open);
-        _closeButton.onClick.AddListener(Close);
-        _garbageTabButton.onClick.AddListener(ShowGarbagePage);
-        _achievementTabButton.onClick.AddListener(ShowAchievementPage);
-        _detailCloseButton.onClick.AddListener(() => _detailPanel.SetActive(false));
-        _cloudSaveManager.OnDataLoaded += UpdateOpenButtonNewLabel;
-
-        _rootPanel.SetActive(false);
-        _detailPanel.SetActive(false);
+        EnsureDependencies();
         UpdateOpenButtonNewLabel();
     }
 
     void Update()
     {
-        if (!Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             return;
         }
@@ -79,11 +84,20 @@ public class OceanLogUI : MonoBehaviour
 
     void OnDestroy()
     {
-        _cloudSaveManager.OnDataLoaded -= UpdateOpenButtonNewLabel;
+        if (_isSubscribedToDataLoaded && _cloudSaveManager != null)
+        {
+            _cloudSaveManager.OnDataLoaded -= UpdateOpenButtonNewLabel;
+        }
     }
 
     public async void Open()
     {
+        if (!EnsureDependencies())
+        {
+            Debug.LogError("[OceanLogUI] Cannot open because the data managers are not ready.");
+            return;
+        }
+
         _rootPanel.SetActive(true);
         _detailPanel.SetActive(false);
         ShowGarbagePage();
@@ -124,6 +138,12 @@ public class OceanLogUI : MonoBehaviour
 
     public void Refresh()
     {
+        if (!EnsureDependencies())
+        {
+            Debug.LogWarning("[OceanLogUI] Refresh skipped because the data managers are not ready.");
+            return;
+        }
+
         List<int> discoveredIDs = _cloudSaveManager.GetDiscoveredObstacleIDs();
         for (int i = 0; i < _catalog.garbageEntries.Count; i++)
         {
@@ -164,6 +184,33 @@ public class OceanLogUI : MonoBehaviour
 
     private void UpdateOpenButtonNewLabel()
     {
-        _openButtonNewText.gameObject.SetActive(_cloudSaveManager.HasNewObstacleEntries());
+        if (_openButtonNewText == null)
+        {
+            return;
+        }
+
+        bool hasNewEntries = EnsureDependencies() && _cloudSaveManager.HasNewObstacleEntries();
+        _openButtonNewText.gameObject.SetActive(hasNewEntries);
+    }
+
+    private bool EnsureDependencies()
+    {
+        if (_cloudSaveManager == null)
+        {
+            _cloudSaveManager = UGSCloudSaveManager.instance;
+        }
+
+        if (_catalog == null && AchievementManager.instance != null)
+        {
+            _catalog = AchievementManager.instance.Catalog;
+        }
+
+        if (!_isSubscribedToDataLoaded && _cloudSaveManager != null)
+        {
+            _cloudSaveManager.OnDataLoaded += UpdateOpenButtonNewLabel;
+            _isSubscribedToDataLoaded = true;
+        }
+
+        return _cloudSaveManager != null && _catalog != null;
     }
 }

@@ -17,6 +17,8 @@ public class SkinManager : MonoBehaviour
     [Header("Current Status")]
     public int currentSkinID;
 
+    public event System.Action<int> OnCurrentSkinChanged;
+
     private bool anyNewUnlock;
 
     void Awake()
@@ -63,7 +65,7 @@ public class SkinManager : MonoBehaviour
 
         if (IsOfflineModeActive())
         {
-            currentSkinID = _offlineModeSkinID;
+            ApplyCurrentSkinID(_offlineModeSkinID);
             return;
         }
 
@@ -73,7 +75,7 @@ public class SkinManager : MonoBehaviour
             return;
         }
 
-        currentSkinID = _cloudSaveManager.GetCurrentSkinID();
+        ApplyCurrentSkinID(_cloudSaveManager.GetCurrentSkinID());
         await SyncUnlocksFromCurrentStats();
     }
 
@@ -337,7 +339,7 @@ public class SkinManager : MonoBehaviour
 
         if (IsOfflineModeActive())
         {
-            currentSkinID = _offlineModeSkinID;
+            ApplyCurrentSkinID(_offlineModeSkinID);
             return;
         }
 
@@ -353,8 +355,14 @@ public class SkinManager : MonoBehaviour
             return;
         }
 
-        currentSkinID = id;
+        ApplyCurrentSkinID(id);
         await _cloudSaveManager.EquipSkin(id);
+    }
+
+    public void ApplyCurrentSkinID(int id)
+    {
+        currentSkinID = id;
+        OnCurrentSkinChanged?.Invoke(id);
     }
 
     public Sprite GetCurrentSkinSprite()

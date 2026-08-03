@@ -36,11 +36,13 @@ public class UGSCloudSaveManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            // このComponentはUGS Prefabの子なので、ルートごと保持しないと
+            // TitleからMainへ移動した際に一時テストデータが破棄される。
+            DontDestroyOnLoad(transform.root.gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(transform.root.gameObject);
         }
     }
 
@@ -97,13 +99,33 @@ public class UGSCloudSaveManager : MonoBehaviour
     {
         Debug.Log("[DEBUG] LoadPlayerData started...");
 
+#if UNITY_EDITOR
+        if (IsEditorTestSessionActive)
+        {
+            Debug.Log("[UGSCloudSaveManager] Editor test session is active. Skipping Cloud Save load.");
+            return;
+        }
+#endif
+
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
         {
             Debug.LogWarning("[DEBUG] UGSManager not ready. Cannot load player data.");
             return;
         }
 
-        _playerData = await _ugsManager.LoadData<PlayerCloudData>(CLOUD_SAVE_KEY_PLAYER_DATA);
+        PlayerCloudData loadedPlayerData = await _ugsManager.LoadData<PlayerCloudData>(CLOUD_SAVE_KEY_PLAYER_DATA);
+
+#if UNITY_EDITOR
+        // テスト開始前に発行済みだった非同期ロードが後から完了しても、
+        // 一時データをCloud Saveの内容で上書きしない。
+        if (IsEditorTestSessionActive)
+        {
+            Debug.Log("[UGSCloudSaveManager] Discarded a Cloud Save load that completed during the Editor test session.");
+            return;
+        }
+#endif
+
+        _playerData = loadedPlayerData;
         WasPlayerDataCreatedThisSession = false;
 
         // データが null の場合は新規プレイヤー
@@ -146,6 +168,14 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     private void ApplyUnavailablePlayerDataState(string logMessage)
     {
+#if UNITY_EDITOR
+        if (IsEditorTestSessionActive)
+        {
+            Debug.Log("[UGSCloudSaveManager] Editor test session is active. Keeping the in-memory test data despite UGS becoming unavailable.");
+            return;
+        }
+#endif
+
         Debug.LogWarning(logMessage);
 
         _playerData = null;
@@ -187,6 +217,14 @@ public class UGSCloudSaveManager : MonoBehaviour
 
     public async Task ReloadPlayerData()
     {
+#if UNITY_EDITOR
+        if (IsEditorTestSessionActive)
+        {
+            Debug.Log("[UGSCloudSaveManager] Editor test session is active. Keeping the in-memory test data instead of reloading Cloud Save.");
+            return;
+        }
+#endif
+
         Debug.Log("[DEBUG] ReloadPlayerData called - forcing reload from cloud...");
 
         if (_ugsManager == null || !_ugsManager.IsSignedIn())
@@ -701,6 +739,77 @@ public class UGSCloudSaveManager : MonoBehaviour
         return true;
     }
 
+    public bool EditorUnlockSkins(IEnumerable<int> skinIDs)
+    {
+        if (!EditorBeginTestSession() || skinIDs == null) return false;
+
+        foreach (int skinID in skinIDs.Where(id => id > 0).Distinct())
+        {
+            if (!_playerData.unlockedSkinIDs.Contains(skinID))
+            {
+                _playerData.unlockedSkinIDs.Add(skinID);
+            }
+        }
+
+        return true;
+    }
+
+    public bool EditorUnlockAndEquipSkin(int skinID)
+    {
+        if (!EditorBeginTestSession() || skinID <= 0) return false;
+
+        if (!_playerData.unlockedSkinIDs.Contains(skinID))
+        {
+            _playerData.unlockedSkinIDs.Add(skinID);
+        }
+
+        _playerData.currentSkinID = skinID;
+        if (!_playerData.seenSkinIDs.Contains(skinID))
+        {
+            _playerData.seenSkinIDs.Add(skinID);
+        }
+
+        EditorSyncRuntimeSkin();
+        return true;
+    }
+
+    public bool EditorResetSkins(IEnumerable<int> skinIDs)
+    {
+        if (!EditorBeginTestSession() || skinIDs == null) return false;
+
+        HashSet<int> resetIDs = skinIDs
+            .Where(id => id > 1)
+            .ToHashSet();
+
+        _playerData.unlockedSkinIDs.RemoveAll(resetIDs.Contains);
+        _playerData.notifiedSkinIDs.RemoveAll(resetIDs.Contains);
+        _playerData.seenSkinIDs.RemoveAll(resetIDs.Contains);
+        _playerData.viewedSkinInventoryUnlockedSkins.RemoveAll(resetIDs.Contains);
+
+        if (resetIDs.Contains(_playerData.currentSkinID))
+        {
+            _playerData.currentSkinID = 1;
+        }
+
+        EditorEnsureInitialSkinState();
+        EditorSyncRuntimeSkin();
+        return true;
+    }
+
+    public bool EditorResetAllSkins()
+    {
+        if (!EditorBeginTestSession()) return false;
+
+        _playerData.unlockedSkinIDs = new List<int> { 1 };
+        _playerData.notifiedSkinIDs = new List<int> { 1 };
+        _playerData.seenSkinIDs = new List<int> { 1 };
+        _playerData.viewedSkinInventoryUnlockedSkins = new List<int> { 1 };
+        _playerData.currentSkinID = 1;
+
+        EditorSyncRuntimeSkin();
+        return true;
+    }
+
     public bool EditorDiscoverObstacles(IEnumerable<int> obstacleIDs)
     {
         if (!EditorBeginTestSession() || obstacleIDs == null) return false;
@@ -745,6 +854,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         _playerData = ClonePlayerData(_editorTestDataSnapshot);
         _editorTestDataSnapshot = null;
         IsEditorTestSessionActive = false;
+        EditorSyncRuntimeSkin();
         Debug.Log("[UGSCloudSaveManager] Restored the data captured before the Editor test session.");
         return true;
     }
@@ -770,6 +880,37 @@ public class UGSCloudSaveManager : MonoBehaviour
         IsEditorTestSessionActive = true;
         Debug.Log("[UGSCloudSaveManager] Started an in-memory Editor test session. Cloud Save writes are disabled until Play Mode ends.");
         return true;
+    }
+
+    private void EditorEnsureInitialSkinState()
+    {
+        if (!_playerData.unlockedSkinIDs.Contains(1))
+        {
+            _playerData.unlockedSkinIDs.Add(1);
+        }
+
+        if (!_playerData.notifiedSkinIDs.Contains(1))
+        {
+            _playerData.notifiedSkinIDs.Add(1);
+        }
+
+        if (!_playerData.seenSkinIDs.Contains(1))
+        {
+            _playerData.seenSkinIDs.Add(1);
+        }
+
+        if (!_playerData.viewedSkinInventoryUnlockedSkins.Contains(1))
+        {
+            _playerData.viewedSkinInventoryUnlockedSkins.Add(1);
+        }
+    }
+
+    private void EditorSyncRuntimeSkin()
+    {
+        if (SkinManager.instance != null)
+        {
+            SkinManager.instance.ApplyCurrentSkinID(_playerData.currentSkinID);
+        }
     }
 
     private static PlayerCloudData ClonePlayerData(PlayerCloudData source)

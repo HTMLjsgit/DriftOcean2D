@@ -24,6 +24,7 @@ public class SkinUI : MonoBehaviour
     [SerializeField] private Ease _recoverEase = Ease.OutBack; // 戻るときのイージング
 
     private bool _isAnimating = false; // アニメーション再生中フラグ
+    private bool _isEquipInProgress;
 
     void Start()
     {
@@ -74,6 +75,11 @@ public class SkinUI : MonoBehaviour
 
     public async void OnClickedSkinUI()
     {
+        if (_isEquipInProgress)
+        {
+            return;
+        }
+
         bool isUnlocked = SkinManager.instance.IsUnlocked(_skinID);
 
         // ロックされている場合は何もしない
@@ -95,13 +101,27 @@ public class SkinUI : MonoBehaviour
         else
         {
             // 未装備の場合 → 装備する
-            await SkinManager.instance.EquipSkin(_skinID);
-            Debug.Log($"Equipped Skin ID: {_skinID}");
+            _isEquipInProgress = true;
+            try
+            {
+                var equipTask = SkinManager.instance.EquipSkin(_skinID);
 
-            // スキンを見た（装備した）としてマーク（Newラベルを消す）
-            await _cloudSaveManager.MarkSkinAsSeen(_skinID);
+                // EquipSkinは通信待ちの前にcurrentSkinIDを更新するため、
+                // Cloud Saveの完了を待たず一回目のタップで選択表示を切り替える。
+                SkinInventryManager.instance.RefreshAllSlots();
 
-            SkinInventryManager.instance.RefreshAllSlots();
+                await equipTask;
+                Debug.Log($"Equipped Skin ID: {_skinID}");
+
+                // スキンを見た（装備した）としてマーク（Newラベルを消す）
+                await _cloudSaveManager.MarkSkinAsSeen(_skinID);
+
+                SkinInventryManager.instance.RefreshAllSlots();
+            }
+            finally
+            {
+                _isEquipInProgress = false;
+            }
         }
     }
 

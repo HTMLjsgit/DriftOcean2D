@@ -44,7 +44,8 @@ public class UGSManager : MonoBehaviour
         {
             Debug.Log($"[DEBUG] UGSManager Awake: Creating new singleton instance");
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            // UGSManagerはUGS Prefabの子なので、Prefabルートごとシーンをまたいで保持する。
+            DontDestroyOnLoad(transform.root.gameObject);
 #if UNITY_EDITOR
             _lastSimulateOfflineInEditor = simulateOfflineInEditor;
 #endif
@@ -52,7 +53,7 @@ public class UGSManager : MonoBehaviour
         else
         {
             Debug.Log($"[DEBUG] UGSManager Awake: Destroying duplicate instance");
-            Destroy(gameObject);
+            Destroy(transform.root.gameObject);
         }
     }
 
