@@ -140,10 +140,11 @@ public class AdsManager : MonoBehaviour
                 LoadRewardedAd();
                 LoadInterstitialAd();
 
-                if (openAdInspectorOnInitialize)
-                {
-                    OpenAdInspector();
-                }
+                // 初回起動時にAd Inspectorを自動表示しない。
+                // if (openAdInspectorOnInitialize)
+                // {
+                //     OpenAdInspector();
+                // }
             });
         }
         catch (Exception e)
