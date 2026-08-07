@@ -476,7 +476,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u3059\u3079\u3066\u306E\u6F02\u6D41\u7269\u3092\u8A18\u9332\u3057\u307E\u3057\u305F\u3002by\u30C9\u30EA\u30D5\u30C8\u30FB\u30AA\u30FC\u30B7\u30E3\u30F3"
+  m_text: "\u3059\u3079\u3066\u306E\u6F02\u6D41\u7269\u3092\u8A18\u9332\u3057\u307E\u3057\u305F\u3002by
+    Drift Ocean"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2397398443b369c4f815871b61e4738b, type: 2}
   m_sharedMaterial: {fileID: 7164497713928546170, guid: 2397398443b369c4f815871b61e4738b, type: 2}

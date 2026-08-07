@@ -18,6 +18,7 @@ public class SkinInventryManager : MonoBehaviour
     [SerializeField] private GameObject _detailPanel;
     [SerializeField] private Button _detailCloseButton;
     [SerializeField] private Image _detailSkinImage;
+    [SerializeField] private Image _detailSkinBackgroundImage;
     [SerializeField] private TextMeshProUGUI _detailSkinName;
     [SerializeField] private TextMeshProUGUI _detailDescription;
 
@@ -26,6 +27,7 @@ public class SkinInventryManager : MonoBehaviour
 
     private UGSCloudSaveManager _cloudSaveManager;
     private bool _isInitialized;
+    private Color _defaultDetailSkinBackgroundColor = Color.white;
 
     void Awake()
     {
@@ -39,6 +41,11 @@ public class SkinInventryManager : MonoBehaviour
         }
 
         UpdateOfflinePanel();
+
+        if (_detailSkinBackgroundImage != null)
+        {
+            _defaultDetailSkinBackgroundColor = _detailSkinBackgroundImage.color;
+        }
     }
 
     void Update()
@@ -125,6 +132,14 @@ public class SkinInventryManager : MonoBehaviour
         _detailSkinName.SetText(data.skinName);
         _detailDescription.SetText(data.description);
         _detailSkinImage.sprite = data.GetDisplaySprite();
+
+        if (_detailSkinBackgroundImage != null)
+        {
+            _detailSkinBackgroundImage.color = data.useCustomDetailBackground
+                ? data.detailBackgroundColor
+                : _defaultDetailSkinBackgroundColor;
+        }
+
         _detailPanel.SetActive(true);
     }
 

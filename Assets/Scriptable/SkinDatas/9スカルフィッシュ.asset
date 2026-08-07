@@ -19,6 +19,8 @@ MonoBehaviour:
   description: "\u6B7B\u5F8C\u306A\u304A\u3001\u5E83\u3044\u6D77\u3092\u6F02\u3044\u7D9A\u3051\u3066\u3044\u308B\u3002"
   hiddenUntilUnlocked: 1
   countsTowardsOriginalCollection: 1
+  useCustomDetailBackground: 1
+  detailBackgroundColor: {r: 0.8219081, g: 0.873659, b: 0.90188676, a: 1}
   unlockType: 12
   conditionValue: 30
   lockedDescription: "30\u56DE\u9023\u7D9A\u3067\u30D7\u30EC\u30A4\u30E4\u30FC\u3092\u30BF\u30C3\u30D7\u3057\u305F"

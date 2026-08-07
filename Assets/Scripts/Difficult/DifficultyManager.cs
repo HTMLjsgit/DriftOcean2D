@@ -13,6 +13,7 @@ public class DifficultyManager : MonoBehaviour
 
     [Header("Stages")]
     [SerializeField] private List<DifficultyProfile> difficultyStages;
+    [SerializeField] private ObstacleData restPhaseObstacle;
     public bool maxDifficultyMode;
     private List<DifficultyProfile> _pendingStages;
     private bool _isChangingDifficulty = false;
@@ -110,6 +111,17 @@ public class DifficultyManager : MonoBehaviour
         {
             Debug.Log($"<color=cyan>休憩タイム突入！ {profile.restDuration}秒間 敵が出ません</color>");
             _obstacleSpawner.spawn = false;
+
+            // 通常スポーンは止めたまま、年代表示を確認するための
+            // ゲームオーバー手段として休憩中に木を1個だけ流す。
+            if (restPhaseObstacle != null)
+            {
+                _obstacleSpawner.SpawnObstacle(restPhaseObstacle);
+            }
+            else
+            {
+                Debug.LogWarning("[DifficultyManager] Rest phase obstacle is not assigned.");
+            }
             
             // 休憩中も他の処理（ゲームオーバーなど）でオブジェクトが消えるとエラーになるのでTokenを渡す
             await UniTask.Delay(TimeSpan.FromSeconds(profile.restDuration), cancellationToken: token);

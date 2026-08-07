@@ -39,6 +39,11 @@ public class SkinData : ScriptableObject
     [Tooltip("初期20種のコンプリート判定に含めるスキンです。")]
     public bool countsTowardsOriginalCollection = true;
 
+    [Header("Detail Appearance")]
+    [Tooltip("スキン詳細カードに専用の背景色を使用します。")]
+    public bool useCustomDetailBackground;
+    public Color detailBackgroundColor = Color.white;
+
     public UnlockType unlockType;
 
     [Header("条件値 (秒数・回数・スコア)")]

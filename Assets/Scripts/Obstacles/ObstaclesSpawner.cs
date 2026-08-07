@@ -51,6 +51,21 @@ public class ObstaclesSpawner : MonoBehaviour
     {
         if (_currentObstacleDatas == null || _currentObstacleDatas.Count == 0) return;
 
+        int dataIndex = Random.Range(0, _currentObstacleDatas.Count);
+        SpawnObstacle(_currentObstacleDatas[dataIndex]);
+    }
+
+    /// <summary>
+    /// 通常のスポーン停止中でも、指定した障害物を1個だけ流す。
+    /// </summary>
+    public void SpawnObstacle(ObstacleData selectedData)
+    {
+        if (selectedData == null || selectedData.prefab == null)
+        {
+            Debug.LogWarning("[ObstaclesSpawner] Cannot spawn because obstacle data or prefab is missing.");
+            return;
+        }
+
         // スポーン位置を決定（リストからランダム選択、もしくは_obstaclePosフォールバック）
         Transform spawnTransform = GetRandomSpawnPosition();
         if (spawnTransform == null)
@@ -58,9 +73,6 @@ public class ObstaclesSpawner : MonoBehaviour
             Debug.LogWarning("[ObstaclesSpawner] No spawn position available!");
             return;
         }
-
-        int dataIndex = Random.Range(0, _currentObstacleDatas.Count);
-        ObstacleData selectedData = _currentObstacleDatas[dataIndex];
 
         // _obstaclesの子として生成（スポーン位置そのままを使用）
         GameObject obstacle = Instantiate(selectedData.prefab, spawnTransform.position, spawnTransform.rotation);

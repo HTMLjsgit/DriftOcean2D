@@ -207,7 +207,9 @@ public class UGSManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Failed to save data to Cloud Save: {e.Message}");
-            return false;
+            // 呼び出し側でサーバー障害と通常の保存失敗を区別できるよう、
+            // Cloud Saveの例外を握りつぶさずに返す。
+            throw;
         }
     }
 
@@ -240,7 +242,9 @@ public class UGSManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Failed to load data from Cloud Save: {e.Message}");
-            return defaultValue;
+            // 「キーが存在しない」と通信・サーバー障害を区別するため、
+            // 例外時はdefaultValueを返さず呼び出し側へ伝える。
+            throw;
         }
     }
 

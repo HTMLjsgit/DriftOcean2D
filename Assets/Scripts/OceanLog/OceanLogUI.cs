@@ -87,10 +87,11 @@ public class OceanLogUI : MonoBehaviour
         if (_isSubscribedToDataLoaded && _cloudSaveManager != null)
         {
             _cloudSaveManager.OnDataLoaded -= UpdateOpenButtonNewLabel;
+            _cloudSaveManager.OnOceanLogChanged -= OnOceanLogChanged;
         }
     }
 
-    public async void Open()
+    public void Open()
     {
         if (!EnsureDependencies())
         {
@@ -102,7 +103,6 @@ public class OceanLogUI : MonoBehaviour
         _detailPanel.SetActive(false);
         ShowGarbagePage();
         Refresh();
-        await _cloudSaveManager.MarkOceanLogAsViewed();
         UpdateOpenButtonNewLabel();
     }
 
@@ -180,6 +180,28 @@ public class OceanLogUI : MonoBehaviour
         _detailTriviaText.SetText($"！ {data.trivia}");
         _detailEraText.SetText(data.era);
         _detailPanel.SetActive(true);
+
+        MarkGarbageDetailAsViewed(data.id);
+    }
+
+    private async void MarkGarbageDetailAsViewed(int obstacleID)
+    {
+        if (!EnsureDependencies() || !_cloudSaveManager.IsObstacleEntryNew(obstacleID))
+        {
+            return;
+        }
+
+        await _cloudSaveManager.MarkObstacleEntryAsViewed(obstacleID);
+    }
+
+    private void OnOceanLogChanged()
+    {
+        UpdateOpenButtonNewLabel();
+
+        if (_rootPanel != null && _rootPanel.activeSelf)
+        {
+            Refresh();
+        }
     }
 
     private void UpdateOpenButtonNewLabel()
@@ -208,6 +230,7 @@ public class OceanLogUI : MonoBehaviour
         if (!_isSubscribedToDataLoaded && _cloudSaveManager != null)
         {
             _cloudSaveManager.OnDataLoaded += UpdateOpenButtonNewLabel;
+            _cloudSaveManager.OnOceanLogChanged += OnOceanLogChanged;
             _isSubscribedToDataLoaded = true;
         }
 

@@ -61,4 +61,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1a1006f0b603c3942bf7712748026586, type: 2}
   - {fileID: 11400000, guid: a39eb5c5c8f50fe4e954d09bb18726a5, type: 2}
   - {fileID: 11400000, guid: d159b4c9884726b41b2af9b0c305df38, type: 2}
+  restPhaseObstacle: {fileID: 11400000, guid: b7450fceb447b8c468ab977640624b1c, type: 2}
   maxDifficultyMode: 0

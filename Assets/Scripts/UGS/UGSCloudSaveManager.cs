@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Unity.Services.CloudSave;
 
 /// <summary>
 /// UGS Cloud Save専用マネージャー
@@ -18,14 +19,16 @@ public class UGSCloudSaveManager : MonoBehaviour
 
     private UGSManager _ugsManager;
     private PlayerCloudData _playerData;
+    private bool _cloudSaveFailureOfflineMode;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
     private PlayerCloudData _editorTestDataSnapshot;
     public bool IsEditorTestSessionActive { get; private set; }
 #endif
 
     // データロード完了イベント
     public event Action OnDataLoaded;
+    public event Action OnOceanLogChanged;
 
     // データが読み込まれているかのフラグ
     public bool IsDataLoaded { get; private set; } = false;
@@ -99,7 +102,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     {
         Debug.Log("[DEBUG] LoadPlayerData started...");
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (IsEditorTestSessionActive)
         {
             Debug.Log("[UGSCloudSaveManager] Editor test session is active. Skipping Cloud Save load.");
@@ -113,9 +116,25 @@ public class UGSCloudSaveManager : MonoBehaviour
             return;
         }
 
-        PlayerCloudData loadedPlayerData = await _ugsManager.LoadData<PlayerCloudData>(CLOUD_SAVE_KEY_PLAYER_DATA);
+        PlayerCloudData loadedPlayerData;
+        try
+        {
+            loadedPlayerData = await _ugsManager.LoadData<PlayerCloudData>(CLOUD_SAVE_KEY_PLAYER_DATA);
+        }
+        catch (CloudSaveException e) when (ShouldEnterOfflineModeForCloudSaveFailure(e))
+        {
+            ApplyUnavailablePlayerDataState(
+                $"[UGSCloudSaveManager] Cloud Save load failed ({e.Reason}). Switching to offline mode.");
+            return;
+        }
+        catch (Exception e)
+        {
+            // 設定ミスなど、サーバー障害以外の例外を新規プレイヤー扱いにはしない。
+            Debug.LogError($"[UGSCloudSaveManager] Cloud Save load failed without entering offline mode: {e}");
+            return;
+        }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         // テスト開始前に発行済みだった非同期ロードが後から完了しても、
         // 一時データをCloud Saveの内容で上書きしない。
         if (IsEditorTestSessionActive)
@@ -125,6 +144,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 #endif
 
+        _cloudSaveFailureOfflineMode = false;
         _playerData = loadedPlayerData;
         WasPlayerDataCreatedThisSession = false;
 
@@ -168,7 +188,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     private void ApplyUnavailablePlayerDataState(string logMessage)
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (IsEditorTestSessionActive)
         {
             Debug.Log("[UGSCloudSaveManager] Editor test session is active. Keeping the in-memory test data despite UGS becoming unavailable.");
@@ -178,6 +198,7 @@ public class UGSCloudSaveManager : MonoBehaviour
 
         Debug.LogWarning(logMessage);
 
+        _cloudSaveFailureOfflineMode = true;
         _playerData = null;
         IsDataLoaded = true;
 
@@ -217,7 +238,7 @@ public class UGSCloudSaveManager : MonoBehaviour
 
     public async Task ReloadPlayerData()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (IsEditorTestSessionActive)
         {
             Debug.Log("[UGSCloudSaveManager] Editor test session is active. Keeping the in-memory test data instead of reloading Cloud Save.");
@@ -263,7 +284,15 @@ public class UGSCloudSaveManager : MonoBehaviour
 
     public bool IsOfflineModeActive()
     {
-        return IsDataLoaded && (_ugsManager == null || !_ugsManager.IsSignedIn());
+        return IsDataLoaded &&
+               (_cloudSaveFailureOfflineMode || _ugsManager == null || !_ugsManager.IsSignedIn());
+    }
+
+    private static bool ShouldEnterOfflineModeForCloudSaveFailure(CloudSaveException exception)
+    {
+        // Cloud Save SDKではHTTP 500/503がServiceUnavailableに変換される。
+        return exception != null &&
+               exception.Reason == CloudSaveExceptionReason.ServiceUnavailable;
     }
 
     private void ClearPendingOfflineBestScore()
@@ -341,7 +370,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         _playerData.viewedObstacleIDs = _playerData.viewedObstacleIDs.Distinct().ToList();
         _playerData.unlockedAchievementIDs = _playerData.unlockedAchievementIDs.Distinct().ToList();
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (IsEditorTestSessionActive)
         {
             Debug.Log("[UGSCloudSaveManager] Editor test session is active. Skipping Cloud Save write.");
@@ -352,7 +381,22 @@ public class UGSCloudSaveManager : MonoBehaviour
         if (_ugsManager != null && _ugsManager.IsSignedIn())
         {
             Debug.Log("Saving player data to Cloud Save...");
-            bool success = await _ugsManager.SaveData(CLOUD_SAVE_KEY_PLAYER_DATA, _playerData);
+            bool success;
+            try
+            {
+                success = await _ugsManager.SaveData(CLOUD_SAVE_KEY_PLAYER_DATA, _playerData);
+            }
+            catch (CloudSaveException e) when (ShouldEnterOfflineModeForCloudSaveFailure(e))
+            {
+                ApplyUnavailablePlayerDataState(
+                    $"[UGSCloudSaveManager] Cloud Save save failed ({e.Reason}). Switching to offline mode.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[UGSCloudSaveManager] Cloud Save save failed without entering offline mode: {e}");
+                return false;
+            }
 
             if (success)
             {
@@ -663,6 +707,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         }
 
         _playerData.discoveredObstacleIDs.Add(obstacleID);
+        OnOceanLogChanged?.Invoke();
         return await SavePlayerData();
     }
 
@@ -681,18 +726,22 @@ public class UGSCloudSaveManager : MonoBehaviour
                !_playerData.viewedObstacleIDs.Contains(obstacleID);
     }
 
-    public async Task<bool> MarkOceanLogAsViewed()
+    public async Task<bool> MarkObstacleEntryAsViewed(int obstacleID)
     {
-        if (_playerData == null) return false;
+        if (_playerData == null || obstacleID <= 0) return false;
 
-        foreach (int obstacleID in _playerData.discoveredObstacleIDs)
+        if (!_playerData.discoveredObstacleIDs.Contains(obstacleID))
         {
-            if (!_playerData.viewedObstacleIDs.Contains(obstacleID))
-            {
-                _playerData.viewedObstacleIDs.Add(obstacleID);
-            }
+            return false;
         }
 
+        if (_playerData.viewedObstacleIDs.Contains(obstacleID))
+        {
+            return true;
+        }
+
+        _playerData.viewedObstacleIDs.Add(obstacleID);
+        OnOceanLogChanged?.Invoke();
         return await SavePlayerData();
     }
 
@@ -723,7 +772,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         return !changed || await SavePlayerData();
     }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
     public bool EditorUnlockAchievements(IEnumerable<int> achievementIDs)
     {
         if (!EditorBeginTestSession() || achievementIDs == null) return false;
@@ -814,6 +863,7 @@ public class UGSCloudSaveManager : MonoBehaviour
     {
         if (!EditorBeginTestSession() || obstacleIDs == null) return false;
 
+        bool changed = false;
         foreach (int obstacleID in obstacleIDs.Where(id => id > 0).Distinct())
         {
             if (_playerData.discoveredObstacleIDs.Contains(obstacleID))
@@ -822,6 +872,12 @@ public class UGSCloudSaveManager : MonoBehaviour
             }
 
             _playerData.discoveredObstacleIDs.Add(obstacleID);
+            changed = true;
+        }
+
+        if (changed)
+        {
+            OnOceanLogChanged?.Invoke();
         }
 
         return true;
@@ -841,6 +897,7 @@ public class UGSCloudSaveManager : MonoBehaviour
 
         _playerData.discoveredObstacleIDs.Clear();
         _playerData.viewedObstacleIDs.Clear();
+        OnOceanLogChanged?.Invoke();
         return true;
     }
 
@@ -855,6 +912,7 @@ public class UGSCloudSaveManager : MonoBehaviour
         _editorTestDataSnapshot = null;
         IsEditorTestSessionActive = false;
         EditorSyncRuntimeSkin();
+        OnOceanLogChanged?.Invoke();
         Debug.Log("[UGSCloudSaveManager] Restored the data captured before the Editor test session.");
         return true;
     }

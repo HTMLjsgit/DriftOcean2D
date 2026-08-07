@@ -6,8 +6,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Play Mode中のゲーム画面から、一時UGSテストデータを操作するメニュー。
-/// 製品ビルドでは自動的に無効になる。
+/// ゲーム画面から、一時UGSテストデータを操作するメニュー。
+/// Unity EditorとWindowsビルドだけで有効になる。
 /// </summary>
 public class RuntimeProgressTestMenu : MonoBehaviour
 {
@@ -61,7 +61,7 @@ public class RuntimeProgressTestMenu : MonoBehaviour
 
     private void Awake()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (_instance == null)
         {
             _instance = this;
@@ -78,13 +78,15 @@ public class RuntimeProgressTestMenu : MonoBehaviour
 
     private void OnDisable()
     {
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         RestoreGameInput();
+#endif
     }
 
     private void OnDestroy()
     {
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         RestoreGameInput();
-#if UNITY_EDITOR
         DestroyGeneratedStyleTextures();
 #endif
         if (_instance == this)
@@ -93,7 +95,7 @@ public class RuntimeProgressTestMenu : MonoBehaviour
         }
     }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
     private void OnGUI()
     {
         GUI.depth = -10000;
@@ -110,7 +112,7 @@ public class RuntimeProgressTestMenu : MonoBehaviour
         float viewHeight = Screen.height / scale;
         if (!_isOpen)
         {
-            Rect hamburgerRect = new Rect(viewWidth - 98f, 22f, 76f, 76f);
+            Rect hamburgerRect = new Rect(viewWidth - 98f, 52f, 76f, 76f);
             if (GUI.Button(hamburgerRect, "≡", _hamburgerStyle))
             {
                 SetOpen(true);
@@ -151,7 +153,7 @@ public class RuntimeProgressTestMenu : MonoBehaviour
         GUILayout.Space(66f);
         GUILayout.EndHorizontal();
 
-        GUILayout.Label("ゲーム進行をPlay Mode中だけ変更できます", _sectionStyle);
+        GUILayout.Label("ゲーム進行を現在の起動中だけ変更できます", _sectionStyle);
 
         UGSCloudSaveManager cloudSave = UGSCloudSaveManager.instance;
         AchievementManager achievementManager = AchievementManager.instance;

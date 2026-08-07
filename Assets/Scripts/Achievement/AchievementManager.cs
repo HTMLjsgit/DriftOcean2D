@@ -101,7 +101,7 @@ public class AchievementManager : MonoBehaviour
         return _catalog.resultComments.GetComment(score);
     }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
     public async Task EditorSyncRewardSkins()
     {
         UGSCloudSaveManager cloudSave = UGSCloudSaveManager.instance;
