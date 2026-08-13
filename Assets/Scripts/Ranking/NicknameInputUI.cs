@@ -59,7 +59,23 @@ public class NicknameInputUI : MonoBehaviour
     /// <param name="onCancel">キャンセル時のコールバック</param>
     public void ShowPanel(string message, Action<string> onSubmit, Action onCancel = null)
     {
+        ShowPanel(message, onSubmit, onCancel, null);
+    }
+
+    /// <summary>
+    /// 指定した画面の最前面にニックネーム入力パネルを表示
+    /// </summary>
+    public void ShowPanel(string message, Action<string> onSubmit, Action onCancel, Transform presentationParent)
+    {
         Debug.Log($"NicknameInputUI.ShowPanel called: message={message}");
+
+        if (presentationParent != null)
+        {
+            // Rankingなど別Canvasの裏側に隠れないよう、表示先の配下へ移動する。
+            _inputPanel.transform.SetParent(presentationParent, true);
+            _inputPanel.transform.SetAsLastSibling();
+        }
+
         _inputPanel.SetActive(true);
 
         // メッセージ設定

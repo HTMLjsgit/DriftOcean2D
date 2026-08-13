@@ -270,6 +270,12 @@ public class RankingUIManager : MonoBehaviour
 
     public void HideRanking()
     {
+        // Rankingを閉じたまま入力パネルだけが次回再表示されないようにする。
+        if (_nicknameInputUI != null)
+        {
+            _nicknameInputUI.HidePanel();
+        }
+
         if (_flowUI != null)
         {
             _flowUI.SwitchView("Start");
@@ -432,15 +438,23 @@ public class RankingUIManager : MonoBehaviour
             return;
         }
 
+        // NicknameInputUIの初期化順に依存しないよう、クリック時にも取得する。
         if (_nicknameInputUI == null)
         {
+            _nicknameInputUI = NicknameInputUI.instance;
+        }
+
+        if (_nicknameInputUI == null || _rankingPanel == null)
+        {
+            Debug.LogError("[RankingUIManager] NicknameInputUI or RankingPanel is not available.");
             return;
         }
 
         _nicknameInputUI.ShowPanel(
             "What's your name",
             OnNameChanged,
-            null
+            null,
+            _rankingPanel.transform
         );
     }
 

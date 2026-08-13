@@ -14,7 +14,6 @@ public class TitleController : MonoBehaviour
     private SkinInventryManager _startSkinManager;
     private RankingUIManager _rankingUIManager;
     private SceneController _sceneController;
-    private NicknameInputUI _nicknameInputUI;
     private UGSCloudSaveManager _cloudSaveManager;
     private SkinDatabase _skinDatabase;
 
@@ -23,7 +22,6 @@ public class TitleController : MonoBehaviour
         // イベントリスナーを解除
         if (_cloudSaveManager != null)
         {
-            _cloudSaveManager.OnDataLoaded -= CheckAndShowFirstTimeNameInput;
             _cloudSaveManager.OnDataLoaded -= UpdateSkinButtonNewLabel;
         }
     }
@@ -34,13 +32,10 @@ public class TitleController : MonoBehaviour
         _rankingUIManager = RankingUIManager.instance;
         _startSkinManager = SkinInventryManager.instance;
         _sceneController = SceneController.instance;
-        _nicknameInputUI = NicknameInputUI.instance;
         _cloudSaveManager = UGSCloudSaveManager.instance;
         _skinDatabase = SkinDatabase.instance;
         UpdateOfflinePanel();
 
-        // UGSデータロード完了後に名前入力チェック
-        _cloudSaveManager.OnDataLoaded += CheckAndShowFirstTimeNameInput;
         _cloudSaveManager.OnDataLoaded += UpdateSkinButtonNewLabel;
 
         // 既にロード済みの場合は即座に更新
@@ -76,52 +71,6 @@ public class TitleController : MonoBehaviour
         {
             _sceneController.SceneLoad("Main");
         });
-    }
-
-    /// <summary>
-    /// 初回起動時に名前入力画面を表示
-    /// </summary>
-    private void CheckAndShowFirstTimeNameInput()
-    {
-        Debug.Log($"CheckAndShowFirstTimeNameInput");
-
-        // UGS使用時はCloudSaveから名前を取得
-        string currentName = "";
-        currentName = _cloudSaveManager.GetPlayerName();
-
-        if (_cloudSaveManager.WasPlayerDataCreatedThisSession || string.IsNullOrEmpty(currentName))
-        {
-            Debug.Log("Player name not set, showing input panel");
-            // 名前が未設定なら入力画面を表示
-            _nicknameInputUI.ShowPanel(
-                "What's your name",
-                OnFirstTimeNameSubmitted,
-                null // キャンセルなし
-            );
-        }
-        else
-        {
-            Debug.Log($"Player name already set: {currentName}");
-        }
-    }
-
-    /// <summary>
-    /// 初回名前入力完了時の処理
-    /// </summary>
-    private async void OnFirstTimeNameSubmitted(string playerName)
-    {
-        Debug.Log($"プレイヤー名を設定します: {playerName}");
-
-        // UGS使用時はCloudSaveに保存
-        bool success = await _cloudSaveManager.SetPlayerName(playerName);
-        if (success)
-        {
-            Debug.Log($"プレイヤー名をUGSに保存しました: {playerName}");
-        }
-        else
-        {
-            Debug.LogWarning("Failed to save player name to UGS.");
-        }
     }
 
     /// <summary>
