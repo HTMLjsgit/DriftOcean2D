@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 0
   skinName: "\u30AA\u30D5\u30E9\u30A4\u30F3"
+  englishSkinName: offline
   skinSprite: {fileID: 21300000, guid: e3bb0de34c3f719418fe1237c80f9eec, type: 3}
   iosSkinSprite: {fileID: 0}
   description: 
+  englishDescription: 
   hiddenUntilUnlocked: 0
   countsTowardsOriginalCollection: 0
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 0
   conditionValue: 0
   lockedDescription: "\u521D\u671F\u30B9\u30AD\u30F3"

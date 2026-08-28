@@ -23,3 +23,28 @@ MonoBehaviour:
   sources: "\u5BB6\u5EAD\u3054\u307F\n\u30EC\u30B8\u30E3\u30FC\n\u98A8\n\u6CB3\u5DDD\u306A\u3069"
   trivia: "\u6E7F\u6C17\u3084\u9178\u5316\u3092\u9632\u3050\u305F\u3081\u3001\u8907\u6570\u306E\u7D20\u6750\u3092\u7D44\u307F\u5408\u308F\u305B\u3066\u4F5C\u3089\u308C\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1970\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Snack Packaging
+  descriptionEnglish: A bag used to package snacks such as potato chips and cheese
+    snacks.
+  decompositionEnglish: 'PP: (Research ongoing) It is known to remain in the environment
+    for a long time.
+
+    PET: About 450 years (estimate)
+
+    Aluminum: Metals corrode
+    in the ocean and are eventually expected to break down.'
+  materialsEnglish: 'Polypropylene (PP)
+
+    Polyethylene terephthalate (PET)
+
+    Aluminum
+    (foil), etc.'
+  sourcesEnglish: 'Household waste
+
+    Recreation
+
+    Wind
+
+    Rivers, etc.'
+  triviaEnglish: They are made from multiple layers to keep out moisture and oxygen.
+  eraEnglish: 'Widely used since: around the 1970s'

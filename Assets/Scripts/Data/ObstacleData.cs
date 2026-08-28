@@ -20,6 +20,15 @@ public class ObstacleData : ScriptableObject
     [TextArea(2, 5)] public string trivia;
     [TextArea(1, 3)] public string era;
 
+    [Header("Ocean Log English")]
+    public string displayNameEnglish;
+    [TextArea(2, 5)] public string descriptionEnglish;
+    [TextArea(2, 5)] public string decompositionEnglish;
+    [TextArea(2, 6)] public string materialsEnglish;
+    [TextArea(2, 6)] public string sourcesEnglish;
+    [TextArea(2, 5)] public string triviaEnglish;
+    [TextArea(1, 3)] public string eraEnglish;
+
     public Sprite GetEncyclopediaSprite()
     {
         if (encyclopediaSprite != null)

@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 15
   skinName: "\u30EB\u30A2\u30FC"
+  englishSkinName: Fishing Lure
   skinSprite: {fileID: -1788716161453253334, guid: 3c61514d323038d43b1f31498f723d83, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u6D77\u3067\u5931\u308F\u308C\u305F\u30EB\u30A2\u30FC\u306F\u56DE\u53CE\u304C\u96E3\u3057\u3044\u4E8B\u3082\u591A\u3044\u3002"
+  description: "\u6D77\u3067\u5931\u308F\u308C\u305F\u30EB\u30A2\u30FC\u306F\n\u56DE\u53CE\u304C\u96E3\u3057\u3044\u4E8B\u3082\u591A\u3044\u3002"
+  englishDescription: Lost lures can be hard to recover.
   hiddenUntilUnlocked: 0
-  countsTowardsOriginalCollection: 1
+  countsTowardsOriginalCollection: 0
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 2
   conditionValue: 25
   lockedDescription: "25\u56DE\u30D7\u30EC\u30A4\u3059\u308B"

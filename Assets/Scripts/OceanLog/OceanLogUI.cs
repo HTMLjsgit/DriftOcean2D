@@ -22,6 +22,7 @@ public class OceanLogUI : MonoBehaviour
     [SerializeField] private GameObject _achievementPage;
     [SerializeField] private TextMeshProUGUI _garbageCountText;
     [SerializeField] private TextMeshProUGUI _completeMessageText;
+    [SerializeField] private TextMeshProUGUI _notesText;
     [SerializeField] private List<OceanLogGarbageEntryUI> _garbageEntries;
     [SerializeField] private List<AchievementEntryUI> _achievementEntries;
 
@@ -32,8 +33,11 @@ public class OceanLogUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _detailNameText;
     [SerializeField] private TextMeshProUGUI _detailDescriptionText;
     [SerializeField] private TextMeshProUGUI _detailDecompositionText;
+    [SerializeField] private TextMeshProUGUI _detailDecompositionLabel;
     [SerializeField] private TextMeshProUGUI _detailMaterialsText;
+    [SerializeField] private TextMeshProUGUI _detailMaterialsLabel;
     [SerializeField] private TextMeshProUGUI _detailSourcesText;
+    [SerializeField] private TextMeshProUGUI _detailSourcesLabel;
     [SerializeField] private TextMeshProUGUI _detailTriviaText;
     [SerializeField] private TextMeshProUGUI _detailEraText;
 
@@ -63,8 +67,75 @@ public class OceanLogUI : MonoBehaviour
     {
         EnsureDependencies();
         UpdateOpenButtonNewLabel();
+        UpdateTabLabels();
+        UpdateCompleteMessage();
+        UpdateNotesText();
     }
 
+    private void UpdateCompleteMessage()
+
+    {
+        if (_completeMessageText == null)
+        {
+            return;
+        }
+
+        if (Application.systemLanguage == SystemLanguage.Japanese)
+        {
+        _completeMessageText.SetText("すべての漂流物を記録しました。 by Drift Ocean");
+        }
+        else
+        {
+        _completeMessageText.SetText("All drifting objects have been recorded. by Drift Ocean");
+        }
+   }
+   private void UpdateNotesText()
+   {
+       if (_notesText == null)
+       {
+           return;
+       }
+       if (Application.systemLanguage == SystemLanguage.Japanese)
+       {
+           _notesText.SetText(
+
+        "【Ocean Logについて】\n" +
+
+        "※ この図鑑に収録されている漂流物は一例です。海には、ほかにもさまざまな種類のものが存在します。\n" +
+
+        "※ 分解までの年数は、国内外の教育・研究機関で広く用いられている一般的な目安を参考にしています。素材や大きさ、海水温、紫外線などの環境によって大きく異なる場合があります。\n" +
+
+        "※ 「広く使われ始めた年代」または「海のごみ問題として注目された年代」は、国内外の資料をもとにした目安です。地域や時代背景によって異なります。\n" +
+
+        "※ 世界の海洋プラスチックごみの約8割は、陸域から発生しているとも言われています。街で捨てられたごみは、風や雨によって側溝や川へ流れ、やがて海へたどり着きます。（環境省資料より）"
+       );
+       }
+       else
+       {
+          _notesText.SetText(
+        "About the Ocean Log\n" +
+
+        "The objects shown here are only a selection; many other types of debris can be found in the ocean.\n" +
+
+        "Decomposition times and historical dates are approximate and may vary by source and environmental conditions.\n" +
+
+        "An estimated 80% of marine plastic pollution comes from land, carried to the ocean by wind, rain, drains, and rivers.\n" +
+
+        "(Source: Ministry of the Environment, Government of Japan)"
+
+       );
+       }
+   }
+
+    private void UpdateTabLabels()
+    {
+        if (Application.systemLanguage != SystemLanguage.Japanese)
+        {
+        _garbageTabLabel.SetText("Ocean Log");
+        _achievementTabLabel.SetText("Achievements");
+        }
+    }
+    
     void Update()
     {
         if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -157,7 +228,7 @@ public class OceanLogUI : MonoBehaviour
         }
 
         _garbageCountText.SetText(
-            $"集まったゴミの詳細：<color=#0966AD>{discoveredIDs.Count}</color>/30");
+            $"Objects：<color=#0966AD>{discoveredIDs.Count}</color>/30");
         _completeMessageText.gameObject.SetActive(discoveredIDs.Count >= 30);
 
         for (int i = 0; i < _catalog.achievements.Count; i++)
@@ -169,19 +240,41 @@ public class OceanLogUI : MonoBehaviour
         }
     }
 
-    public void ShowGarbageDetails(ObstacleData data)
-    {
-        _detailImage.sprite = data.GetEncyclopediaSprite();
-        _detailNameText.SetText(data.displayName);
-        _detailDescriptionText.SetText(data.description);
-        _detailDecompositionText.SetText(data.decomposition);
-        _detailMaterialsText.SetText(data.materials);
-        _detailSourcesText.SetText($"・{data.sources.Replace("\n", "\n・")}");
-        _detailTriviaText.SetText($"！ {data.trivia}");
-        _detailEraText.SetText(data.era);
+   public void ShowGarbageDetails(ObstacleData data)
+   {
+       _detailImage.sprite = data.GetEncyclopediaSprite();
+
+       if (Application.systemLanguage == SystemLanguage.Japanese)
+       {
+           _detailNameText.SetText(data.displayName);
+           _detailDescriptionText.SetText(data.description);
+           _detailDecompositionText.SetText(data.decomposition);
+           _detailDecompositionLabel.SetText("分解まで");
+           _detailMaterialsText.SetText(data.materials);
+           _detailMaterialsLabel.SetText("素材");
+           _detailSourcesText.SetText($"・{data.sources.Replace("\n", "\n・")}");
+           _detailTriviaText.SetText($"！ {data.trivia}");
+           _detailSourcesLabel.SetText("主な由来");
+           _detailEraText.SetText(data.era);
+        }
+        else
+       {
+           _detailNameText.SetText(data.displayNameEnglish);
+           _detailDescriptionText.SetText(data.descriptionEnglish);
+           _detailDecompositionText.SetText(data.decompositionEnglish);
+           _detailDecompositionLabel.SetText("Decomposition Time");
+           _detailMaterialsText.SetText(data.materialsEnglish);
+           _detailMaterialsLabel.SetText("Materials");
+           _detailSourcesText.SetText($"・{data.sourcesEnglish.Replace("\n", "\n・")}");
+           _detailTriviaText.SetText($"! {data.triviaEnglish}");
+           _detailSourcesLabel.SetText("Common Sources");
+           _detailEraText.SetText(data.eraEnglish);
+        }
+
         _detailPanel.SetActive(true);
 
         MarkGarbageDetailAsViewed(data.id);
+
     }
 
     private async void MarkGarbageDetailAsViewed(int obstacleID)

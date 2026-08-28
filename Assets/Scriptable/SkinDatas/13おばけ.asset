@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 13
   skinName: "\u304A\u3070\u3051"
+  englishSkinName: 
   skinSprite: {fileID: 4008334295994179843, guid: 34db96051729eee419893b35e0eb4598, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u65E5\u672C\u6642\u95938\u6708\u306B\u306A\u308B\u3068\u3001\u9678\u306B\u4E0A\u304C\u308B\u7FD2\u6163\u304C\u3042\u308B\u3002"
+  description: "\u65E5\u672C\u6642\u95938\u6708\u306B\u306A\u308B\u3068\n\u9678\u306B\u4E0A\u304C\u308B\u7FD2\u6163\u304C\u3042\u308B\u3002"
+  englishDescription: Ghost stories are part of sea folklore.
   hiddenUntilUnlocked: 0
   countsTowardsOriginalCollection: 1
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 5
   conditionValue: 10
   lockedDescription: "10\u56DE\u6B7B\u4EA1\u3059\u308B"

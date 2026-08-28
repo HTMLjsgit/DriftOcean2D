@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "3\u65E5\u9023\u7D9A\u30D7\u30EC\u30A4"
   description: "3\u65E5\u9593\u9023\u7D9A\u3067\u30D7\u30EC\u30A4\u3059\u308B"
   conditionType: 4
+  achievementNameEnglish: Play for 3 Consecutive Days
+  descriptionEnglish: Play for 3 Consecutive Days
   conditionValue: 3
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

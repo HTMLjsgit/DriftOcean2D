@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 21
   skinName: "\u30EA\u30F3\u30B4"
+  englishSkinName: Apple
   skinSprite: {fileID: 21300000, guid: 13ab255a28a729446b2ade0aa607d52e, type: 3}
   iosSkinSprite: {fileID: 21300000, guid: 9f714223c6b4ced4799f3246a5d5beb3, type: 3}
-  description: "\u7F8E\u5473\u3057\u3044\u679C\u5B9F\u3002\u8AB0\u304B\u304C\u3001\u304B\u3058\u3063\u3066\u3057\u307E\u3063\u305F\u3002"
+  description: "\u7F8E\u5473\u3057\u3044\u679C\u5B9F\u3002\n\u8AB0\u304B\u304C\u9F67\u3063\u3066\u3057\u307E\u3063\u305F\u3002"
+  englishDescription: A delicious fruit. Always getting bitten.
   hiddenUntilUnlocked: 1
   countsTowardsOriginalCollection: 0
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 14
   conditionValue: 0
   lockedDescription: "\u30B7\u30FC\u30AF\u30EC\u30C3\u30C8\u5B9F\u7E3E\u3092\u9664\u304F\u3059\u3079\u3066\u306E\u5B9F\u7E3E\u3092\u9054\u6210"

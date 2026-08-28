@@ -14,11 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 6
   skinName: "\u30AF\u30EA\u30AA\u30CD"
+  englishSkinName: Sea angel
   skinSprite: {fileID: -9086287400839430657, guid: 32db98f255a9600488a094786f42b5b5, type: 3}
   iosSkinSprite: {fileID: 0}
   description: "\u51B7\u305F\u3044\u6D77\u306B\u66AE\u3089\u3059\u5C0F\u3055\u306A\u8089\u98DF\u751F\u7269\u3002\u6D77\u6D41\u306B\u4E57\u308A\u3001\u9060\u304F\u304B\u3089\u65C5\u3057\u3066\u304F\u308B\u3053\u3068\u3082\u3002"
+  englishDescription: A tiny carnivore from cold seas. It can travel far on ocean
+    currents.
   hiddenUntilUnlocked: 0
-  countsTowardsOriginalCollection: 1
+  countsTowardsOriginalCollection: 0
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 3
   conditionValue: 360
   lockedDescription: "6\u5206\u9593\u751F\u304D\u6B8B\u308B"

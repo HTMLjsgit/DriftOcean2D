@@ -127,7 +127,13 @@ public class GameOverManager : MonoBehaviour
 
         int resultYear = Mathf.FloorToInt(finalScore);
         string resultComment = AchievementManager.instance.GetResultComment(finalScore);
-        _resultCommentText.SetText($"{resultYear}年まで漂った！\n{resultComment}");
+        
+        _resultCommentText.SetText(
+        Application.systemLanguage == SystemLanguage.Japanese
+        ? $"{resultYear}年まで漂った！\n{resultComment}"
+        : $"{resultYear} years drifted!\n{resultComment}"
+        );
+
         _unlockNoticePanel.SetActive(false);
 
         Time.timeScale = 0f;
@@ -202,12 +208,12 @@ public class GameOverManager : MonoBehaviour
         List<string> messages = new List<string>();
         if (newAchievementIDs.Count > 0)
         {
-            messages.Add("実績を解放しました");
+            messages.Add("Achievement Unlocked!");
         }
 
         if (newSkinIDs.Count > 0)
         {
-            messages.Add("スキンを解放しました");
+            messages.Add("Skin Unlocked!");
         }
 
         if (messages.Count > 0)

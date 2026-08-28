@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u30B9\u30AD\u30F320\u7A2E\u9054\u6210"
   description: "\u521D\u671F\u30B9\u30AD\u30F320\u7A2E\u985E\u3092\u3059\u3079\u3066\u89E3\u653E\u3059\u308B"
   conditionType: 0
+  achievementNameEnglish: Unlock All 20 Initial Skins
+  descriptionEnglish: Unlock All 20 Initial Skins
   conditionValue: 20
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

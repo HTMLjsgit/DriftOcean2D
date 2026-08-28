@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 3
   skinName: "\u5C0F\u3055\u3044\u30B5\u30AB\u30CA"
+  englishSkinName: Small Fish
   skinSprite: {fileID: 471662285737347727, guid: d37c4601b5927134a914831d2ffa557d, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u91E3\u308A\u3067\u306F\u30EA\u30EA\u30FC\u30B9\u3055\u308C\u308B\u3053\u3068\u3082\u591A\u3044\u3002\u5927\u304D\u304F\u80B2\u3063\u3066\u307E\u305F\u4F1A\u304A\u3046\u3002"
+  description: "\u91E3\u308A\u3067\u306F\u30EA\u30EA\u30FC\u30B9\n\u3055\u308C\u308B\u3053\u3068\u3082\u3002\n\u5927\u304D\u304F\u80B2\u3063\u3066\u307E\u305F\u4F1A\u304A\u3046\u3002"
+  englishDescription: Sometimes released by anglers. Grow big and come back someday.
   hiddenUntilUnlocked: 0
   countsTowardsOriginalCollection: 1
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 2
   conditionValue: 5
   lockedDescription: "5\u56DE\u30D7\u30EC\u30A4\u3059\u308B"

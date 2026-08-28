@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u521D\u3081\u3066\u30CF\u30FC\u30C9\u30E2\u30FC\u30C9\u5230\u9054"
   description: "\u521D\u3081\u3066\u30CF\u30FC\u30C9\u30E2\u30FC\u30C9\u3078\u5230\u9054\u3059\u308B"
   conditionType: 2
+  achievementNameEnglish: Reach Hard Mode for the first time
+  descriptionEnglish: Reach Hard Mode for the first time
   conditionValue: 1
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

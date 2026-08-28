@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u7D2F\u8A08\u30D7\u30EC\u30A4\u6642\u959330\u5206"
   description: "\u7D2F\u8A0830\u5206\u30D7\u30EC\u30A4\u3059\u308B"
   conditionType: 5
+  achievementNameEnglish: Play for a Total of 30 Minutes
+  descriptionEnglish: Play for a Total of 30 Minutes
   conditionValue: 1800
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

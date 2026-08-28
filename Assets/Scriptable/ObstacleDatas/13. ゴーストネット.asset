@@ -23,3 +23,23 @@ MonoBehaviour:
   sources: "\u7D1B\u5931\n\u53F0\u98A8\u3084\u9AD8\u6CE2\n\u653E\u68C4\n\u6F01\u696D\u6D3B\u52D5\u306A\u3069"
   trivia: "\u300C\u30B4\u30FC\u30B9\u30C8\u30CD\u30C3\u30C8\uFF08\u5E7D\u970A\u7DB2\uFF09\u300D\u3068\u306F\u3001\u6301\u3061\u4E3B\u304C\u3044\u306A\u304F\u306A\u3063\u3066\u3082\u6D77\u3092\u6F02\u3044\u3001\u6F01\u3092\u7D9A\u3051\u3066\u3057\u307E\u3046\u7DB2\u306E\u3053\u3068\u3067\u3059\u3002"
   era: "\u6D77\u306E\u3054\u307F\u554F\u984C\u3068\u3057\u3066\u6CE8\u76EE\u3055\u308C\u305F\u5E74\u4EE3\uFF1A1980\u5E74\u4EE3\u5F8C\u534A\u3054\u308D"
+  displayNameEnglish: Ghost Net
+  descriptionEnglish: Fishing nets lost at sea. They can continue to trap fish, turtles,
+    seabirds, and other marine life.
+  decompositionEnglish: 'Nylon: About 600 years (estimate)'
+  materialsEnglish: 'Nylon (PA)
+
+    Polyethylene (PE)
+
+    Polypropylene (PP), etc.'
+  sourcesEnglish: 'Loss
+
+    Typhoons and high waves
+
+    Abandonment
+
+    Fishing
+    activities, etc.'
+  triviaEnglish: "\u201CGhost nets\u201D are fishing nets that continue to catch
+    marine life even after they are lost or abandoned."
+  eraEnglish: 'Recognized as a marine pollution issue: around the late 1980s'

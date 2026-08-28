@@ -11,6 +11,7 @@ public class ResultCommentCatalog : ScriptableObject
         public int startYear;
         public int endYear;
         [TextArea(1, 3)] public List<string> comments = new List<string>();
+        [TextArea(1, 3)] public List<string> commentsEnglish = new List<string>();
     }
 
     public List<Entry> entries = new List<Entry>();
@@ -21,25 +22,42 @@ public class ResultCommentCatalog : ScriptableObject
 
         if (year >= 10000)
         {
-            return "この美しい海からゴミが消えます様に";
+            return  Application.systemLanguage == SystemLanguage.Japanese
+                ? "この美しい海からゴミが消えます様に"
+                : "May the trash disappear from this beautiful ocean.";
         }
 
         if (year >= 5000)
         {
-            return "どこまで頑張るつもりなの？凄すぎる";
+            return Application.systemLanguage == SystemLanguage.Japanese
+                ? "どこまで頑張るつもりなの？凄すぎる"
+                : "How far are you planning to go? That's incredible.";
         }
 
         if (year >= 3000)
         {
-            return "信じられない…3,000年を超えてるよ？";
+            return Application.systemLanguage == SystemLanguage.Japanese
+                ? "信じられない…3,000年を超えてるよ？"
+                : "I can't believe it... You've passed 3,000 years!";
         }
 
         Entry entry = entries.Find(item => year >= item.startYear && year <= item.endYear);
-        if (entry != null && entry.comments.Count > 0)
+       
+        if (entry != null)
         {
-            return entry.comments[UnityEngine.Random.Range(0, entry.comments.Count)];
+            List<string> commentsToUse =
+                 Application.systemLanguage == SystemLanguage.Japanese
+                     ? entry.comments
+                     : entry.commentsEnglish;
+
+            if (commentsToUse.Count > 0)
+            {
+                return commentsToUse[UnityEngine.Random.Range(0, commentsToUse.Count)];
+            }
         }
 
-        return "海の姿が少しずつ変わり始めている。";
+        return Application.systemLanguage == SystemLanguage.Japanese
+            ? "海の姿が少しずつ変わり始めている。"
+            : "The ocean is slowly beginning to change.";
     }
 }

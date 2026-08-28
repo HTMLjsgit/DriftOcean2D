@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 18
   skinName: "\u30AA\u30AA\u30B0\u30BD\u30AF\u30E0\u30B7"
+  englishSkinName: Giant Isopod
   skinSprite: {fileID: 7952973365406442264, guid: a05b18c2044461a46b939b2e32b6148d, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u6DF1\u6D77\u306B\u66AE\u3089\u3059\u751F\u304D\u7269\u3002\u5927\u304D\u306A\u30C0\u30F3\u30B4\u30E0\u30B7\u306B\u3088\u304F\u4F8B\u3048\u3089\u308C\u308B\u3002"
+  description: "\u6DF1\u6D77\u306B\u66AE\u3089\u3059\u751F\u304D\u7269\u3002\n\u5927\u304D\u306A\u30C0\u30F3\u30B4\u30E0\u30B7\u306B\n\u3088\u304F\u4F8B\u3048\u3089\u308C\u308B\u3002"
+  englishDescription: A deep-sea creature often compared to a giant pill bug.
   hiddenUntilUnlocked: 0
   countsTowardsOriginalCollection: 1
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 13
   conditionValue: 180
   lockedDescription: "\u30CF\u30FC\u30C9\u30E2\u30FC\u30C9\u30673\u5206\u751F\u5B58"

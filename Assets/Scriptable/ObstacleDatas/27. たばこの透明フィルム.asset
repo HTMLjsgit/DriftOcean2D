@@ -23,3 +23,18 @@ MonoBehaviour:
   sources: "\u5BB6\u5EAD\u3054\u307F\n\u30DD\u30A4\u6368\u3066\n\u98A8\n\u6CB3\u5DDD\u306A\u3069"
   trivia: "\u5546\u54C1\u3092\u6C5A\u308C\u3084\u6E7F\u6C17\u304B\u3089\u5B88\u308B\u305F\u3081\u306B\u4F7F\u308F\u308C\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1970\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Clear Packaging Film
+  descriptionEnglish: A clear film used to package various products, such as cigarettes,
+    snacks, and cosmetics.
+  decompositionEnglish: (Research ongoing) It is known to remain in the environment
+    for a long time.
+  materialsEnglish: Polypropylene (PP)
+  sourcesEnglish: 'Household waste
+
+    Littering
+
+    Wind
+
+    Rivers, etc.'
+  triviaEnglish: It protects products from dirt and moisture.
+  eraEnglish: 'Widely used since: around the 1970s'

@@ -14,11 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 5
   skinName: "\u30A4\u30EB\u30AB"
+  englishSkinName: Dolphin
   skinSprite: {fileID: -5756483245913687389, guid: 6de81604f697e794ebbcca3868dc901c, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u3068\u3066\u3082\u77E5\u80FD\u304C\u9AD8\u3044\u6D77\u306E\u52D5\u7269\u3002\u9B5A\u3067\u306F\u306A\u304F\u30AF\u30B8\u30E9\u306E\u4EF2\u9593\u3002"
+  description: "\u3068\u3066\u3082\u77E5\u80FD\u304C\u9AD8\u3044\u6D77\u306E\u52D5\u7269\u3002\n\u9B5A\u3067\u306F\u306A\u304F\u30AF\u30B8\u30E9\u306E\u4EF2\u9593\u3002"
+  englishDescription: A highly intelligent marine animal. Not a fish, but a type
+    of whale.
   hiddenUntilUnlocked: 0
   countsTowardsOriginalCollection: 1
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 10
   conditionValue: 3
   lockedDescription: "3\u56DE\u9023\u7D9A\u30671\u5206\u4EE5\u4E0A\u751F\u304D\u6B8B\u308B"

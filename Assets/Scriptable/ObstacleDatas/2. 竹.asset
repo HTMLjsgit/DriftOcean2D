@@ -20,6 +20,20 @@ MonoBehaviour:
   description: "\u6210\u9577\u304C\u65E9\u3044\u81EA\u7136\u7D20\u6750\u3002\u6D77\u306E\u4E2D\u3067\u306F\u5C11\u3057\u305A\u3064\u5206\u89E3\u3055\u308C\u3001\u81EA\u7136\u3078\u9084\u308A\u307E\u3059\u3002"
   decomposition: "\u81EA\u7136\u7531\u6765\u306E\u305F\u3081\u3001\u5F90\u3005\u306B\u5206\u89E3\u3055\u308C\u307E\u3059\u3002"
   materials: "\u7AF9\uFF08\u81EA\u7136\u7D20\u6750\uFF09"
-  sources: "\u6CB3\u5DDD\n\u707D\u5BB3\n\u8FB2\u696D\n\u7AF9\u7D30\u5DE5\u306A\u3069"
+  sources: "\u81EA\u7136\u7531\u6765\uFF08\u6CB3\u5DDD\u30FB\u7AF9\u6797\u306A\u3069\uFF09\n\u81EA\u7136\u707D\u5BB3\n\u8FB2\u6797\u696D\n\u7AF9\u88FD\u54C1\u306A\u3069"
   trivia: "\u7AF9\u306F\u6728\u3067\u306F\u306A\u304F\u3001\u30A4\u30CD\u79D1\u306E\u690D\u7269\u3067\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A\u6614\u304B\u3089"
+  displayNameEnglish: Bamboo
+  descriptionEnglish: A fast-growing natural material.
+  decompositionEnglish: As a natural material, it gradually decomposes.
+  materialsEnglish: Bamboo (Natural Material)
+  sourcesEnglish: 'Natural sources (rivers, bamboo forests, etc.)
+
+    Natural disasters
+
+    Agriculture
+    and forestry
+
+    Bamboo products, etc.'
+  triviaEnglish: Bamboo is a grass, not a tree.
+  eraEnglish: 'Widely used since: Ancient times'

@@ -20,6 +20,25 @@ MonoBehaviour:
   description: "\u5BB6\u5EAD\u7528\u6D17\u6D44\u5264\u306A\u3069\u3092\u5165\u308C\u308B\u30D7\u30E9\u30B9\u30C1\u30C3\u30AF\u5BB9\u5668\u3002"
   decomposition: "PET\u306E\u5834\u5408\uFF1A\u7D04450\u5E74\uFF08\u76EE\u5B89\uFF09\nPE\u306E\u5834\u5408\uFF1A\u8ABF\u67FB\u4E2D"
   materials: "\u30DD\u30EA\u30A8\u30C1\u30EC\u30F3\u30C6\u30EC\u30D5\u30BF\u30EC\u30FC\u30C8\uFF08PET\uFF09\n\u30DD\u30EA\u30A8\u30C1\u30EC\u30F3\uFF08PE\uFF09\u306A\u3069"
-  sources: "\u5BB6\u5EAD\u3054\u307F\n\u6CB3\u5DDD\n\u707D\u5BB3\n\u30DD\u30A4\u6368\u3066\u306A\u3069"
+  sources: "\u5BB6\u5EAD\u3054\u307F\n\u6CB3\u5DDD\n\u30DD\u30A4\u6368\u3066\n\u81EA\u7136\u707D\u5BB3\u306A\u3069"
   trivia: "1990\u5E74\u4EE3\u304B\u3089\u8A70\u3081\u66FF\u3048\u88FD\u54C1\u304C\u666E\u53CA\u3057\u3001\u30DC\u30C8\u30EB\u3092\u7E70\u308A\u8FD4\u3057\u4F7F\u3046\u88FD\u54C1\u304C\u5897\u3048\u307E\u3057\u305F\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1960\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Detergent Bottle
+  descriptionEnglish: Plastic containers used for household cleaning products.
+  decompositionEnglish: 'PET: About 450 years (estimate)
+
+    PE: Research ongoing'
+  materialsEnglish: 'Polyethylene Terephthalate (PET)
+
+    Polyethylene (PE), etc.'
+  sourcesEnglish: 'Household waste
+
+    Rivers
+
+    Littering
+
+    Natural disasters,
+    etc.'
+  triviaEnglish: Refill products became popular in the 1990s, leading to more products
+    with reusable bottles.
+  eraEnglish: 'Widely used since: around the 1960s'

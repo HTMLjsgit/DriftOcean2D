@@ -21,5 +21,25 @@ MonoBehaviour:
   decomposition: "\u4E00\u822C\u7684\u306A\u30EC\u30B8\u888B\uFF1A\u7D0420\u5E74\uFF08\u76EE\u5B89\uFF09\n\u30D0\u30A4\u30AA\u30DE\u30B9\u914D\u5408\uFF0825%\u4EE5\u4E0A\uFF09\uFF1A\u7D0420\u5E74\uFF08\u76EE\u5B89\uFF09"
   materials: "\u30DD\u30EA\u30A8\u30C1\u30EC\u30F3\n\u30D0\u30A4\u30AA\u30DE\u30B9\u306E\u5834\u5408\u3001\u30D0\u30A4\u30AA\u30DE\u30B9\u914D\u5408"
   sources: "\u30DD\u30A4\u6368\u3066\n\u98A8\n\u6CB3\u5DDD\n\u707D\u5BB3\u306A\u3069"
-  trivia: "\u30D0\u30A4\u30AA\u30DE\u30B9\u914D\u5408\u30EC\u30B8\u888B\u306F\u3001\u690D\u7269\u7531\u6765\u306E\u539F\u6599\u3092\u4E00\u90E8\u4F7F\u7528\u3057\u3066\u3044\u307E\u3059\u304C\u3001\u751F\u5206\u89E3\u6027\u30D7\u30E9\u30B9\u30C1\u30C3\u30AF\u3068\u306F\u7570\u306A\u308A\u307E\u3059\u3002"
+  trivia: "\u30D0\u30A4\u30AA\u30DE\u30B9\u914D\u5408\u30EC\u30B8\u888B\u306F\u3001\u690D\u7269\u7531\u6765\u306E\u539F\u6599\u3092\u4E00\u90E8\u4F7F\u7528\u3057\u3066\u3044\u307E\u3059\u304C\u3001\u81EA\u7136\u306B\u5206\u89E3\u3055\u308C\u308B\u3068\u306F\u9650\u308A\u307E\u305B\u3093\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1980\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Plastic Shopping Bag
+  descriptionEnglish: A thin bag used for shopping. Easily blown away by the wind,
+    it can end up in the ocean.
+  decompositionEnglish: 'Regular plastic shopping bag: About 20 years (estimate)
+
+    Biomass-blended
+    bag (25% or more): About 20 years (estimate)'
+  materialsEnglish: 'Polyethylene
+
+    Biomass-blended'
+  sourcesEnglish: 'Littering
+
+    Wind
+
+    Rivers
+
+    Natural disasters, etc.'
+  triviaEnglish: Some bags contain plant-based materials, but that does not mean
+    they can break down naturally.
+  eraEnglish: 'Widely used since: around the 1980s'

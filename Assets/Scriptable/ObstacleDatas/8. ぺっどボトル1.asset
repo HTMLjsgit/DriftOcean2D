@@ -23,3 +23,18 @@ MonoBehaviour:
   sources: "\u5BB6\u5EAD\u3054\u307F\n\u30EC\u30B8\u30E3\u30FC\n\u6CB3\u5DDD\n\u30DD\u30A4\u6368\u3066\u306A\u3069"
   trivia: "\u521D\u671F\u306EPET\u30DC\u30C8\u30EB\u306F1L\u4EE5\u4E0A\u306E\u5927\u578B\u30B5\u30A4\u30BA\u304C\u4E2D\u5FC3\u3067\u3057\u305F\u3002\u73FE\u5728\u306F\u8EFD\u91CF\u5316\u304C\u9032\u307F\u3001\u98F2\u307F\u3084\u3059\u3044\u30B5\u30A4\u30BA\u304C\u5897\u3048\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1980\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Early Plastic Bottle
+  descriptionEnglish: A common type of marine debris found on beaches. A plastic
+    bottle used for drinks.
+  decompositionEnglish: About 450 years (estimate)
+  materialsEnglish: Polyethylene Terephthalate (PET)
+  sourcesEnglish: 'Household waste
+
+    Recreation
+
+    Rivers
+
+    Littering, etc.'
+  triviaEnglish: Early PET bottles were mainly large sizes of 1 liter or more. Today,
+    bottles are lighter and come in more convenient sizes.
+  eraEnglish: 'Widely used since: around the 1980s'

@@ -23,3 +23,19 @@ MonoBehaviour:
   sources: "\u30EC\u30B8\u30E3\u30FC\n\u30A4\u30D9\u30F3\u30C8\n\u30DD\u30A4\u6368\u3066\n\u98A8\u306A\u3069"
   trivia: "\u591A\u304F\u306E\u7D19\u30B3\u30C3\u30D7\u306F\u3001\u6C34\u6F0F\u308C\u3092\u9632\u3050\u305F\u3081\u5185\u5074\u306B\u8584\u3044\u30D7\u30E9\u30B9\u30C1\u30C3\u30AF\u52A0\u5DE5\u304C\u3055\u308C\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1960\u5E74\u4EE3\u3054\u308D\uFF08PE\u52A0\u5DE5\uFF09"
+  displayNameEnglish: Paper Cup
+  descriptionEnglish: A disposable paper cup for drinks.
+  decompositionEnglish: "Paper: About 2\u20135 months (estimate)\nPE: (Research ongoing)
+    It is known to remain in the environment for a long time."
+  materialsEnglish: 'Paper
+
+    Polyethylene (PE)'
+  sourcesEnglish: 'Recreation
+
+    Events
+
+    Littering
+
+    Wind, etc.'
+  triviaEnglish: Many paper cups have a thin plastic coating inside to prevent leaks.
+  eraEnglish: 'Widely used since: around the 1960s (PE-coated)'

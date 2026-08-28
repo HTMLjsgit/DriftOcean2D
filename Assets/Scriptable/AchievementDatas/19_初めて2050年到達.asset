@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u521D\u3081\u30662050\u5E74\u5230\u9054"
   description: "\u521D\u3081\u30662050\u5E74\u3078\u5230\u9054\u3059\u308B"
   conditionType: 6
+  achievementNameEnglish: Reach 2050 for the First Time
+  descriptionEnglish: Reach 2050 for the First Time
   conditionValue: 2050
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u5B9F\u7E3E\u30B3\u30F3\u30D7\u30EA\u30FC\u30C8"
   description: "\u30B7\u30FC\u30AF\u30EC\u30C3\u30C8\u3092\u9664\u304F\u3059\u3079\u3066\u306E\u5B9F\u7E3E\u3092\u9054\u6210\u3059\u308B"
   conditionType: 7
+  achievementNameEnglish: Achievement Complete
+  descriptionEnglish: ...Achievement Complete
   conditionValue: 0
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

@@ -25,6 +25,7 @@ public class SkinData : ScriptableObject
 
     public int id;
     public string skinName;
+    public string englishSkinName;
     public Sprite skinSprite;
 
     [Header("Platform Sprite")]
@@ -34,6 +35,8 @@ public class SkinData : ScriptableObject
     [Header("Encyclopedia")]
     [TextArea(2, 5)]
     public string description;
+    [TextArea(2, 5)]
+    public string englishDescription;
     [Tooltip("解放されるまでスキン一覧に枠自体を表示しません。")]
     public bool hiddenUntilUnlocked;
     [Tooltip("初期20種のコンプリート判定に含めるスキンです。")]

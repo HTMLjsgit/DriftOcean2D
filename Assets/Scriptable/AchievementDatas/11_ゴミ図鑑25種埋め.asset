@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u30B4\u30DF\u56F3\u945125\u7A2E\u57CB\u3081"
   description: "Ocean Log\u309225\u7A2E\u985E\u767B\u9332\u3059\u308B"
   conditionType: 3
+  achievementNameEnglish: Complete 25 Garbage Entries
+  descriptionEnglish: Complete 25 Garbage Entries
   conditionValue: 25
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

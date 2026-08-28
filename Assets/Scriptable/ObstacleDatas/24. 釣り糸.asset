@@ -20,6 +20,20 @@ MonoBehaviour:
   description: "\u9B5A\u3092\u91E3\u308B\u305F\u3081\u306B\u4F7F\u308F\u308C\u308B\u4E08\u592B\u306A\u7D30\u3044\u7CF8\u3002"
   decomposition: "\u7D04600\u5E74\uFF08\u76EE\u5B89\uFF09"
   materials: "\u30CA\u30A4\u30ED\u30F3\uFF08PA\uFF09"
-  sources: "\u6F01\u696D\n\u91E3\u308A\n\u707D\u5BB3\n\u7CF8\u5207\u308C\u306A\u3069"
+  sources: "\u6F01\u696D\n\u91E3\u308A\n\u81EA\u7136\u707D\u5BB3\n\u7CF8\u5207\u308C\u30FB\u7D1B\u5931\u306A\u3069"
   trivia: "\u5207\u308C\u305F\u91E3\u308A\u7CF8\u3092\u56DE\u53CE\u3059\u308B\u6D3B\u52D5\u304C\u5404\u5730\u3067\u884C\u308F\u308C\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1950\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Fishing Line
+  descriptionEnglish: A strong, thin line used for fishing.
+  decompositionEnglish: About 600 years (estimate)
+  materialsEnglish: Nylon (PA)
+  sourcesEnglish: 'Fishing
+
+    Recreational fishing
+
+    Natural disasters
+
+    Line
+    breakage or loss, etc.'
+  triviaEnglish: Efforts to collect lost fishing lines are taking place in many places.
+  eraEnglish: 'Widely used since: around the 1950s'

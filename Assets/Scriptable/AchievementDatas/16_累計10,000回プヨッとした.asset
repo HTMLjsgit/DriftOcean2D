@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u7D2F\u8A0810,000\u56DE\u30D7\u30E8\u30C3\u3068\u3057\u305F"
   description: "\u30B2\u30FC\u30E0\u4E2D\u306B\u7D2F\u8A0810,000\u56DE\u30D7\u30E8\u30C3\u3068\u3059\u308B"
   conditionType: 1
+  achievementNameEnglish: 10000 Direct Taps
+  descriptionEnglish: Directly tap a skin 10000 times
   conditionValue: 10000
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

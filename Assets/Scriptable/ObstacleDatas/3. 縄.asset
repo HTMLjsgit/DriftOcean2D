@@ -20,6 +20,27 @@ MonoBehaviour:
   description: "\u690D\u7269\u306E\u7E4A\u7DAD\u304B\u3089\u4F5C\u3089\u308C\u305F\u81EA\u7136\u7D20\u6750\u3002\u6D77\u306E\u4E2D\u3067\u306F\u5C11\u3057\u305A\u3064\u5206\u89E3\u3055\u308C\u3001\u81EA\u7136\u3078\u9084\u308A\u307E\u3059\u3002"
   decomposition: "\u81EA\u7136\u7531\u6765\u306E\u3082\u306E\u306F\u3001\u5F90\u3005\u306B\u5206\u89E3\u3055\u308C\u307E\u3059\u3002"
   materials: "\u9EBB\uFF08\u81EA\u7136\u7D20\u6750\uFF09\n\u30EF\u30E9\uFF08\u81EA\u7136\u7D20\u6750\uFF09\n\u30B7\u30E5\u30ED\uFF08\u81EA\u7136\u7D20\u6750\uFF09\u306A\u3069"
-  sources: "\u6F01\u696D\n\u8FB2\u696D\n\u8239\u8236\n\u707D\u5BB3\u306A\u3069"
-  trivia: "\u7E04\u306F\u7D045\u4E07\u5E74\u524D\u304B\u3089\u4F7F\u308F\u308C\u3066\u3044\u305F\u3068\u8003\u3048\u3089\u308C\u3066\u3044\u307E\u3059\u3002"
+  sources: "\u6F01\u696D\n\u8FB2\u6797\u696D\n\u5DE5\u696D\u30FB\u5EFA\u8A2D\n\u8239\u8236\u30FB\u6D77\u4E0A\u6D3B\u52D5\n\u81EA\u7136\u707D\u5BB3\u306A\u3069"
+  trivia: "\u690D\u7269\u306E\u7E4A\u7DAD\u3092\u306D\u3058\u3063\u3066\u304F\u3063\u3064\u3051\u308B\u3068\u3001\u7E04\u3092\u4F5C\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A\u7D045\u4E07\u5E74\u524D\u3054\u308D"
+  displayNameEnglish: Rope (Natural Fiber)
+  descriptionEnglish: A natural rope made from plant fibers.
+  decompositionEnglish: Natural materials gradually decompose.
+  materialsEnglish: 'Hemp (Natural Material)
+
+    Straw (Natural Material)
+
+    Palm
+    Fiber (Natural Material), etc.'
+  sourcesEnglish: 'Fishing
+
+    Agriculture and forestry
+
+    Industry and construction
+
+    Ships
+    and other marine activities
+
+    Natural disasters, etc.'
+  triviaEnglish: Plant fibers can be twisted together to make rope.
+  eraEnglish: 'Widely used since: around 50,000 years ago'

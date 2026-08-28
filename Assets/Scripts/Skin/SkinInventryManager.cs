@@ -129,9 +129,13 @@ public class SkinInventryManager : MonoBehaviour
     public void ShowSkinDetails(int skinID)
     {
         SkinData data = SkinDatabase.instance.GetSkinById(skinID);
-        _detailSkinName.SetText(data.skinName);
-        _detailDescription.SetText(data.description);
-        _detailSkinImage.sprite = data.GetDisplaySprite();
+     _detailSkinName.SetText(Application.systemLanguage == SystemLanguage.Japanese
+            ? data.skinName
+            : data.englishSkinName);
+     _detailDescription.SetText(Application.systemLanguage == SystemLanguage.Japanese
+            ? data.description
+            : data.englishDescription);
+     _detailSkinImage.sprite = data.GetDisplaySprite();
 
         if (_detailSkinBackgroundImage != null)
         {

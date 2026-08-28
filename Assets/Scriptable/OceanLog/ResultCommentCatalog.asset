@@ -17,333 +17,501 @@ MonoBehaviour:
     endYear: 1950
     comments:
     - "\u307E\u3060\u65C5\u306F\u59CB\u307E\u3063\u305F\u3070\u304B\u308A\u3002"
+    commentsEnglish:
+    - Just the beginning.
   - startYear: 1951
     endYear: 1951
     comments:
     - "\u4E00\u822C\u5411\u3051\u30AB\u30E9\u30FC\u653E\u9001\u304C\u59CB\u307E\u308B\u3002"
+    commentsEnglish:
+    - Color TV begins.
   - startYear: 1952
     endYear: 1952
     comments:
     - "\u9060\u304F\u306E\u4EBA\u3068\u306E\u9023\u7D61\u306F\u624B\u7D19\u304C\u4E3B\u6D41"
+    commentsEnglish:
+    - People communicated by letter.
   - startYear: 1953
     endYear: 1953
     comments:
     - "\u30A8\u30D9\u30EC\u30B9\u30C8\u521D\u767B\u9802"
+    commentsEnglish:
+    - First ascent of Everest.
   - startYear: 1954
     endYear: 1954
     comments:
     - "\u6620\u753B\u30B4\u30B8\u30E9\u516C\u958B"
+    commentsEnglish:
+    - Godzilla is released.
   - startYear: 1955
     endYear: 1955
     comments:
     - "\u30ED\u30C3\u30AF\u30F3\u30ED\u30FC\u30EB\u30D6\u30FC\u30E0\u5230\u6765\u3002"
+    commentsEnglish:
+    - "Rock \u2018n\u2019 roll takes off."
   - startYear: 1956
     endYear: 1956
     comments:
     - "\u8ECA\u793E\u4F1A\u304C\u5E83\u304C\u308B"
+    commentsEnglish:
+    - Car culture spreads.
   - startYear: 1957
     endYear: 1957
     comments:
     - "\u4E16\u754C\u521D\u306E\u4EBA\u5DE5\u885B\u661F\u6253\u3061\u4E0A\u3052"
+    commentsEnglish:
+    - First artificial satellite launched.
   - startYear: 1958
     endYear: 1958
     comments:
     - "\u30C6\u30EC\u30D3\u306E\u3042\u308B\u5BB6\u5EAD\u304C\u5897\u3048\u3066\u3044\u304F"
+    commentsEnglish:
+    - TVs spread into homes.
   - startYear: 1959
     endYear: 1959
     comments:
     - "\u5B87\u5B99\u3078\u884C\u3063\u305F\u30B5\u30EB\u304C\u751F\u9084\u3002"
+    commentsEnglish:
+    - Monkeys return from space.
   - startYear: 1960
     endYear: 1960
     comments:
     - "\u4EBA\u985E\u521D\u306E\u6DF1\u6D7710,916m\u5230\u9054"
+    commentsEnglish:
+    - First dive to 10,916m.
   - startYear: 1961
     endYear: 1961
     comments:
     - "\u300C\u5730\u7403\u306F\u9752\u304B\u3063\u305F\u300D"
+    commentsEnglish:
+    - The Earth is blue.
   - startYear: 1963
     endYear: 1963
     comments:
     - "\u30D3\u30FC\u30C8\u30EB\u30BA\u304C\u30EC\u30B3\u30FC\u30C9\u30C7\u30D3\u30E5\u30FC"
+    commentsEnglish:
+    - The Beatles make their debut.
   - startYear: 1964
     endYear: 1964
     comments:
     - "\u30AD\u30F3\u30B0\u7267\u5E2B\u30CE\u30FC\u30D9\u30EB\u5E73\u548C\u8CDE\u53D7\u8CDE"
+    commentsEnglish:
+    - King wins the Nobel Peace Prize.
   - startYear: 1965
     endYear: 1965
     comments:
     - "\u4E16\u754C\u521D\u306E\u5B87\u5B99\u904A\u6CF3\u306B\u6210\u529F"
+    commentsEnglish:
+    - First spacewalk.
   - startYear: 1966
     endYear: 1966
     comments:
     - "\u30B9\u30BF\u30FC\u30C8\u30EC\u30C3\u30AF\u653E\u9001\u958B\u59CB"
+    commentsEnglish:
+    - Star Trek premieres.
   - startYear: 1967
     endYear: 1967
     comments:
     - "\u4E16\u754C\u521D\u306E\u5FC3\u81D3\u79FB\u690D\u624B\u8853\u304C\u6210\u529F"
+    commentsEnglish:
+    - First successful heart transplant.
   - startYear: 1968
     endYear: 1968
     comments:
     - "\u9031\u520A\u5C11\u5E74\u30B8\u30E3\u30F3\u30D7\u306E\u5275\u520A"
+    commentsEnglish:
+    - Weekly Shonen Jump launches.
   - startYear: 1969
     endYear: 1969
     comments:
     - "\u30A2\u30DD\u30ED11\u53F7\u6708\u9762\u7740\u9678"
+    commentsEnglish:
+    - Apollo 11 lands on the Moon.
   - startYear: 1970
     endYear: 1970
     comments:
     - "\u30B8\u30E3\u30F3\u30DC\u30B8\u30A7\u30C3\u30C8\u5C31\u822A"
+    commentsEnglish:
+    - Jumbo jets enter service.
   - startYear: 1971
     endYear: 1971
     comments:
     - "\u30AB\u30C3\u30D7\u30E9\u30FC\u30E1\u30F3\u767A\u58F2"
+    commentsEnglish:
+    - Cup Noodles launch.
   - startYear: 1972
     endYear: 1972
     comments:
+    - Only One Earth
+    commentsEnglish:
     - Only One Earth
   - startYear: 1973
     endYear: 1973
     comments:
     - "\u30AA\u30A4\u30EB\u30B7\u30E7\u30C3\u30AF"
+    commentsEnglish:
+    - Oil crisis.
   - startYear: 1974
     endYear: 1974
     comments:
     - "\u30D0\u30FC\u30B3\u30FC\u30C9\u3067\u8CB7\u3044\u7269\u304C\u4FBF\u5229\u306B"
+    commentsEnglish:
+    - Barcodes make shopping easier.
   - startYear: 1975
     endYear: 1975
     comments:
     - "\u6620\u753B\u30B8\u30E7\u30FC\u30BA\u516C\u958B"
+    commentsEnglish:
+    - Jaws premieres.
   - startYear: 1976
     endYear: 1976
     comments:
     - "Apple\u5275\u696D"
+    commentsEnglish:
+    - Apple is founded.
   - startYear: 1977
     endYear: 1977
     comments:
     - "PET\u30DC\u30C8\u30EB\u306B\u98F2\u6599\u304C\u5165\u308B"
+    commentsEnglish:
+    - PET bottles enter the market.
   - startYear: 1978
     endYear: 1978
     comments:
     - "\u30B9\u30DA\u30FC\u30B9\u30A4\u30F3\u30D9\u30FC\u30C0\u30FC\u767A\u58F2"
+    commentsEnglish:
+    - Space Invaders is released.
   - startYear: 1979
     endYear: 1979
     comments:
     - "\u30A6\u30A9\u30FC\u30AF\u30DE\u30F3\u767A\u58F2"
+    commentsEnglish:
+    - Walkman launches.
   - startYear: 1980
     endYear: 1980
     comments:
     - "\u30D1\u30C3\u30AF\u30DE\u30F3\u767A\u58F2"
+    commentsEnglish:
+    - Pac-Man is released.
   - startYear: 1981
     endYear: 1981
     comments:
     - "\u30B9\u30DA\u30FC\u30B9\u30B7\u30E3\u30C8\u30EB\u521D\u98DB\u884C"
+    commentsEnglish:
+    - Space Shuttle makes its first flight.
   - startYear: 1982
     endYear: 1982
     comments:
     - "CD\u767A\u58F2"
+    commentsEnglish:
+    - CDs go on sale.
   - startYear: 1983
     endYear: 1983
     comments:
     - "\u30A4\u30F3\u30BF\u30FC\u30CD\u30C3\u30C8\u8A95\u751F"
+    commentsEnglish:
+    - The Internet is born.
   - startYear: 1984
     endYear: 1984
     comments:
-    - "\u30C6\u30C8\u30EA\u30B9\u8A95\u751F"
+    - "\u30BD\u9023\u3067\u30C6\u30C8\u30EA\u30B9\u8A95\u751F"
+    commentsEnglish:
+    - Tetris is born.
   - startYear: 1985
     endYear: 1985
     comments:
     - "\u30B9\u30FC\u30D1\u30FC\u30DE\u30EA\u30AA\u30D6\u30E9\u30B6\u30FC\u30BA\u767A\u58F2"
+    commentsEnglish:
+    - Super Mario Bros. is released.
   - startYear: 1986
     endYear: 1986
     comments:
     - "\u30DF\u30FC\u30EB\u5B87\u5B99\u30B9\u30C6\u30FC\u30B7\u30E7\u30F3\u6253\u3061\u4E0A\u3052"
+    commentsEnglish:
+    - Mir space station launches.
   - startYear: 1987
     endYear: 1987
     comments:
     - "\u30D6\u30E9\u30C3\u30AF\u30DE\u30F3\u30C7\u30FC"
+    commentsEnglish:
+    - Black Monday.
   - startYear: 1988
     endYear: 1988
     comments:
     - "\u5730\u7403\u6E29\u6696\u5316\u304C\u8A71\u984C\u306B"
+    commentsEnglish:
+    - Global warming gains attention.
   - startYear: 1989
     endYear: 1989
     comments:
     - "\u30D9\u30EB\u30EA\u30F3\u306E\u58C1\u5D29\u58CA"
+    commentsEnglish:
+    - The Berlin Wall falls.
   - startYear: 1990
     endYear: 1990
     comments:
     - "WWW\u8A95\u751F"
+    commentsEnglish:
+    - The World Wide Web is born.
   - startYear: 1991
     endYear: 1991
     comments:
     - "\u30B9\u30C8\u30EA\u30FC\u30C8\u30D5\u30A1\u30A4\u30BF\u30FCII\u767A\u58F2"
+    commentsEnglish:
+    - Street Fighter II is released.
   - startYear: 1992
     endYear: 1992
     comments:
     - "\u30EA\u30AA\u5730\u7403\u30B5\u30DF\u30C3\u30C8\u958B\u50AC"
+    commentsEnglish:
+    - Rio Earth Summit.
   - startYear: 1993
     endYear: 1993
     comments:
     - "\u4E16\u754C\u304C\u30CD\u30C3\u30C8\u3067\u3064\u306A\u304C\u308A\u59CB\u3081\u308B\u3002"
+    commentsEnglish:
+    - The world goes online.
   - startYear: 1994
     endYear: 1994
     comments:
     - "PlayStation\u767A\u58F2"
+    commentsEnglish:
+    - PlayStation launches.
   - startYear: 1995
     endYear: 1995
     comments:
     - "Windows 95\u767A\u58F2"
+    commentsEnglish:
+    - Windows 95 launches.
   - startYear: 1996
     endYear: 1996
     comments:
     - "\u30DD\u30B1\u30C3\u30C8\u30E2\u30F3\u30B9\u30BF\u30FC\u767A\u58F2"
+    commentsEnglish:
+    - "Pok\xE9mon launches."
   - startYear: 1997
     endYear: 1997
     comments:
     - "\u6620\u753B\u300E\u30BF\u30A4\u30BF\u30CB\u30C3\u30AF\u300F\u516C\u958B"
+    commentsEnglish:
+    - Titanic premieres.
   - startYear: 1998
     endYear: 1998
     comments:
     - "Google\u8A2D\u7ACB"
+    commentsEnglish:
+    - Google is founded.
   - startYear: 1999
     endYear: 1999
     comments:
     - "\u30CE\u30B9\u30C8\u30E9\u30C0\u30E0\u30B9\u306E\u5927\u4E88\u8A00"
+    commentsEnglish:
+    - Millennium panic.
   - startYear: 2000
     endYear: 2000
     comments:
     - "\u30DF\u30EC\u30CB\u30A2\u30E0\u306E\u5E55\u958B\u3051"
+    commentsEnglish:
+    - A new millennium begins.
   - startYear: 2001
     endYear: 2001
     comments:
+    - We will never forget.
+    commentsEnglish:
     - We will never forget.
   - startYear: 2002
     endYear: 2002
     comments:
     - "FIFA\u30EF\u30FC\u30EB\u30C9\u30AB\u30C3\u30D7\u30A2\u30B8\u30A2\u521D\u958B\u50AC"
+    commentsEnglish:
+    - First FIFA World Cup in Asia.
   - startYear: 2003
     endYear: 2003
     comments:
     - "\u63A2\u67FB\u6A5F\u300C\u306F\u3084\u3076\u3055\u300D\u6253\u3061\u4E0A\u3052"
+    commentsEnglish:
+    - Hayabusa launches.
   - startYear: 2004
     endYear: 2004
     comments:
     - "Facebook\u8A95\u751F"
+    commentsEnglish:
+    - Facebook is founded.
   - startYear: 2005
     endYear: 2005
     comments:
     - "YouTube\u8A95\u751F"
+    commentsEnglish:
+    - YouTube launches.
   - startYear: 2006
     endYear: 2006
     comments:
     - "\u51A5\u738B\u661F\u304C\u6E96\u60D1\u661F\u306B"
+    commentsEnglish:
+    - Pluto becomes a dwarf planet.
   - startYear: 2007
     endYear: 2007
     comments:
     - "iPhone\u767A\u58F2"
+    commentsEnglish:
+    - iPhone launches.
   - startYear: 2008
     endYear: 2008
     comments:
     - "\u30EA\u30FC\u30DE\u30F3\u30FB\u30B7\u30E7\u30C3\u30AF"
+    commentsEnglish:
+    - Lehman Brothers collapses.
   - startYear: 2009
     endYear: 2009
     comments:
     - "\u30CF\u30C9\u30BD\u30F3\u5DDD\u306E\u5947\u8DE1"
+    commentsEnglish:
+    - Miracle on the Hudson.
   - startYear: 2010
     endYear: 2010
     comments:
     - "Instagram\u516C\u958B"
+    commentsEnglish:
+    - Instagram launches.
   - startYear: 2011
     endYear: 2011
     comments:
-    - "\uFF3B\u30D2\u30DE\u30EF\u30EA\uFF3D"
+    - "\U0001F33B"
+    commentsEnglish:
+    - "\U0001F33B"
   - startYear: 2012
     endYear: 2012
     comments:
     - "\u706B\u661F\u306B\u751F\u547D\u304C\u5B58\u5728\u3067\u304D\u305F\u74B0\u5883\u3092\u78BA\u8A8D"
+    commentsEnglish:
+    - Mars could have supported life.
   - startYear: 2013
     endYear: 2013
     comments:
     - "\u30ED\u30B7\u30A2\u306B\u9695\u77F3\u843D\u4E0B"
+    commentsEnglish:
+    - Meteor strikes Russia.
   - startYear: 2014
     endYear: 2014
     comments:
     - "Apple Watch\u767A\u8868"
+    commentsEnglish:
+    - Apple Watch unveiled.
   - startYear: 2015
     endYear: 2015
     comments:
     - "\u7B2C3\u65B0\u6771\u4EAC\u5E02\u3001\u4F7F\u5F92\u8972\u6765"
+    commentsEnglish:
+    - Angels attack Tokyo-3.
   - startYear: 2016
     endYear: 2016
     comments:
     - "AI\u304C\u56F2\u7881\u4E16\u754C\u738B\u8005\u306B\u52DD\u5229"
+    commentsEnglish:
+    - AI beats a Go world champion.
   - startYear: 2017
     endYear: 2017
     comments:
     - "Nintendo Switch\u767A\u58F2"
+    commentsEnglish:
+    - Nintendo Switch launches.
   - startYear: 2018
     endYear: 2018
     comments:
     - "TikTok\u4E16\u754C\u7684\u4EBA\u6C17\u7206\u767A"
+    commentsEnglish:
+    - TikTok takes off worldwide.
   - startYear: 2019
     endYear: 2019
     comments:
     - "\u30D6\u30E9\u30C3\u30AF\u30DB\u30FC\u30EB\u64AE\u5F71\u6210\u529F"
+    commentsEnglish:
+    - First image of a black hole.
   - startYear: 2020
     endYear: 2020
     comments:
     - "\u65B0\u578B\u30B3\u30ED\u30CA\u30D1\u30F3\u30C7\u30DF\u30C3\u30AF"
+    commentsEnglish:
+    - COVID-19 pandemic.
   - startYear: 2021
     endYear: 2021
     comments:
     - "\u6C11\u9593\u5B87\u5B99\u65C5\u884C\u672C\u683C\u5316"
+    commentsEnglish:
+    - Private space travel takes off.
   - startYear: 2022
     endYear: 2022
     comments:
-    - "ChatGPT\u516C\u958B"
+    - "1950\u5E74\u304B\u3089\u4E16\u754C\u4EBA\u53E3\u306F\u7D043\u500D\u306B"
+    commentsEnglish:
+    - World population triples since 1950.
   - startYear: 2023
     endYear: 2023
     comments:
-    - "\u89B3\u6E2C\u53F2\u4E0A\u6700\u3082\u6691\u3044\u5E74\u3068\u3057\u3066\u8A71\u984C\u306B"
+    - "\u907A\u4F1D\u5B50\u3092\u7DE8\u96C6\u3059\u308B\u6CBB\u7642\u304C\u59CB\u307E\u308B"
+    commentsEnglish:
+    - Gene editing treatment begins.
   - startYear: 2024
     endYear: 2024
     comments:
-    - "1950\u5E74\u304B\u3089\u4E16\u754C\u4EBA\u53E3\u306F\u7D043\u500D\u306B"
+    - "\u89B3\u6E2C\u53F2\u4E0A\u6700\u3082\u6691\u3044\u5E74\u306B"
+    commentsEnglish:
+    - Hottest year on record.
   - startYear: 2025
     endYear: 2025
     comments:
     - "1950\u5E74\u304B\u308975\u5E74\u304C\u7D4C\u904E"
+    commentsEnglish:
+    - 75 years since 1950.
   - startYear: 2026
     endYear: 2026
     comments:
-    - "FIFA\u30EF\u30FC\u30EB\u30C9\u30AB\u30C3\u30D7\u958B\u50AC"
+    - "AI\u304C\u666E\u53CA"
+    commentsEnglish:
+    - AI becomes widespread.
   - startYear: 2027
     endYear: 2027
     comments:
     - "\u8A9E\u5B66\u30A2\u30D7\u30EA\u306E\u901A\u77E5\u306B\u9707\u3048\u308B"
+    commentsEnglish:
+    - Language app notifications strike fear.
   - startYear: 2028
     endYear: 2028
     comments:
     - "\u672A\u6765\u306E\u5E73\u548C\u3092\u9858\u3046"
+    commentsEnglish:
+    - Hope for a peaceful future.
   - startYear: 2029
     endYear: 2029
     comments:
     - "\u30B8\u30E7\u30F3\u30FB\u30B3\u30CA\u30FC\u3001\u4EBA\u985E\u8ECD\u3092\u7387\u3044\u308B"
+    commentsEnglish:
+    - John Connor leads the Resistance.
   - startYear: 2030
     endYear: 2030
     comments:
     - "SDGs\u76EE\u6A19\u5E74"
+    commentsEnglish:
+    - SDGs target year.
   - startYear: 2031
     endYear: 2040
     comments:
     - "\u30B2\u30FC\u30E0\u4E0A\u624B\u3060\u306D\uFF01"
+    commentsEnglish:
+    - "You\u2019re good at games!"
   - startYear: 2041
     endYear: 2050
     comments:
     - "\u672A\u6765\u306B\u6B8B\u305D\u3046\u9752\u3044\u6D77"
+    commentsEnglish:
+    - Leave a blue ocean for the future.
   - startYear: 2051
     endYear: 2999
     comments:
     - "\u2026CONTINUE?"
     - "\u5730\u7403\u306F\u3057\u3083\u3079\u3089\u306A\u3044"
     - "\u672A\u6765\u3078\u6F02\u3044\u7D9A\u3051\u3066\u3044\u307E\u3059\u2026"
+    commentsEnglish:
+    - "\u2026CONTINUE?"
+    - The Earth does not speak.
+    - "Drifting into the future\u2026"

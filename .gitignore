@@ -102,3 +102,6 @@ InitTestScene*.unity*
 /Assets/*.mp4
 /Assets/*.pdf
 /Packages/com.singularitygroup.hotreload
+.DS_Store
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta

@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 8
   skinName: "\u30E1\u30F3\u30C0\u30B3"
+  englishSkinName: Dumbo Octopus
   skinSprite: {fileID: 2975095691113872838, guid: d59b834464195bd4cb7ab53338cbb256, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u8033\u306E\u3088\u3046\u306B\u898B\u3048\u308B\u30D2\u30EC\u3092\u30D1\u30BF\u30D1\u30BF\u52D5\u304B\u3057\u3066\u6CF3\u304E\u307E\u3059"
+  description: "\u8033\u306E\u3088\u3046\u306B\u898B\u3048\u308B\u30D2\u30EC\u3092\n\u30D1\u30BF\u30D1\u30BF\u52D5\u304B\u3057\u3066\u6CF3\u304E\u307E\u3059\u3002"
+  englishDescription: Swims by gently flapping its ear-like fins.
   hiddenUntilUnlocked: 0
   countsTowardsOriginalCollection: 1
+  useCustomDetailBackground: 0
+  detailBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   unlockType: 2
   conditionValue: 8
   lockedDescription: "8\u56DE\u30D7\u30EC\u30A4\u3059\u308B"

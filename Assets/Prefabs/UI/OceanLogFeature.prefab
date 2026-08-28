@@ -63,6 +63,7 @@ MonoBehaviour:
   _achievementPage: {fileID: 2749417043614832758}
   _garbageCountText: {fileID: 2162844419088935141}
   _completeMessageText: {fileID: 6543888716234648565}
+  _notesText: {fileID: 8637588996291565236}
   _garbageEntries:
   - {fileID: 56619135177977515}
   - {fileID: 978933091457596645}
@@ -922,7 +923,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5589305698576630222}
   m_HandleRect: {fileID: 3813150767140531626}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1117,7 +1118,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -499}
-  m_SizeDelta: {x: 941.6, y: 0}
+  m_SizeDelta: {x: 3348.2534, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7463510035167563059
 MonoBehaviour:
@@ -1842,7 +1843,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -1377.3799}
-  m_SizeDelta: {x: 941.6, y: 0}
+  m_SizeDelta: {x: 3348.2534, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1005815384454812426
 MonoBehaviour:
@@ -2662,7 +2663,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -918.69}
-  m_SizeDelta: {x: 941.6, y: 0}
+  m_SizeDelta: {x: 3348.2534, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &5844934844135071634
 MonoBehaviour:
@@ -2741,7 +2742,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -46}
-  m_SizeDelta: {x: 954.6, y: 0}
+  m_SizeDelta: {x: 3348.2534, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &4422011521757988746
 MonoBehaviour:
@@ -3954,7 +3955,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -1225.7}
-  m_SizeDelta: {x: 941.6, y: 0}
+  m_SizeDelta: {x: 3348.2534, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &4422518500993481939
 MonoBehaviour:
@@ -4032,7 +4033,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8000265518966849612
@@ -4638,7 +4639,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -719.4}
-  m_SizeDelta: {x: 941.6, y: 0}
+  m_SizeDelta: {x: 3348.2534, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &5502999598137806506
 MonoBehaviour:
@@ -4959,7 +4960,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.055, y: 0.015}
   m_AnchorMax: {x: 0.945, y: 0.832}
-  m_AnchoredPosition: {x: 5.200012, y: 8.442993}
+  m_AnchoredPosition: {x: 5.199951, y: 8.442993}
   m_SizeDelta: {x: 10.4, y: 16.886}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4279690493341055819
@@ -7265,6 +7266,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9cacd869784c0046a0dbc2f586e5a7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OceanLogGarbageEntryUI
+--- !u!114 &8637588996291565236 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3454894076663327640, guid: 2a8a7ba8a7bd59c4594f3de6f58274ed, type: 3}
+  m_PrefabInstance: {fileID: 6353698048649362732}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &8784741939713216572 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2433477574949825808, guid: 2a8a7ba8a7bd59c4594f3de6f58274ed, type: 3}

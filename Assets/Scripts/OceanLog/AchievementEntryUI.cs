@@ -11,7 +11,16 @@ public class AchievementEntryUI : MonoBehaviour
     public void Initialize(AchievementData data, bool completed)
     {
         _checkImage.gameObject.SetActive(completed);
-        _nameText.SetText(data.achievementName);
-        _descriptionText.SetText(data.description);
-    }
+        
+         if (Application.systemLanguage == SystemLanguage.Japanese)
+         {
+             _nameText.SetText(data.achievementName);
+             _descriptionText.SetText(data.description);
+         }
+         else
+        {
+             _nameText.SetText(data.achievementNameEnglish);
+             _descriptionText.SetText(data.descriptionEnglish);
+         }
+     }
 }

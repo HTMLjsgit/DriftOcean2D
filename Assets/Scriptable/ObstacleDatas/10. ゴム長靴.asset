@@ -23,3 +23,25 @@ MonoBehaviour:
   sources: "\u6F01\u696D\n\u8FB2\u696D\n\u6CB3\u5DDD\n\u707D\u5BB3\u306A\u3069"
   trivia: "\u30B4\u30E0\u306F\u9774\u3060\u3051\u3067\u306A\u304F\u3001\u30BF\u30A4\u30E4\u3084\u624B\u888B\u306A\u3069\u8EAB\u8FD1\u306A\u88FD\u54C1\u306B\u3082\u4F7F\u308F\u308C\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1950\uFF5E1960\u5E74\u4EE3\u3054\u308D\uFF08PVC\u88FD\uFF09"
+  displayNameEnglish: Single Rubber Boot
+  descriptionEnglish: Boots that protect the feet from water and mud. Many are made
+    from PVC or synthetic rubber.
+  decompositionEnglish: 'Natural rubber: Gradually decomposes in the environment.
+
+    Synthetic
+    rubber: (Research ongoing) Can remain in the environment for a long time.'
+  materialsEnglish: 'Natural Rubber (Natural Material)
+
+    Synthetic Rubber
+
+    Polyvinyl
+    Chloride (PVC), etc.'
+  sourcesEnglish: 'Fishing
+
+    Agriculture
+
+    Rivers
+
+    Natural disasters, etc.'
+  triviaEnglish: Rubber is used in many everyday products, including tires and gloves.
+  eraEnglish: "Widely used since: around the 1950s\u20131960s (PVC)"

@@ -23,3 +23,16 @@ MonoBehaviour:
   sources: "\u8863\u985E\n\u6D17\u6FEF\u6392\u6C34\n\u30ED\u30FC\u30D7\n\u6F01\u5177\u306A\u3069"
   trivia: "\u4E16\u754C\u3067\u6700\u3082\u591A\u304F\u4F7F\u308F\u308C\u3066\u3044\u308B\u5408\u6210\u7E4A\u7DAD\u306E\u4E00\u3064\u3067\u3059\u3002"
   era: "\u6D77\u306E\u3054\u307F\u554F\u984C\u3068\u3057\u3066\u6CE8\u76EE\u3055\u308C\u305F\u5E74\u4EE3\uFF1A2010\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Polyester Fibers
+  descriptionEnglish: Plastic fibers used in clothing and other products. Tiny fibers
+    released during washing are called microplastics.
+  decompositionEnglish: It is known to remain in the environment for a long time.
+  materialsEnglish: Polyester (PET)
+  sourcesEnglish: 'Clothing
+
+    Laundry wastewater
+
+    Ropes and fishing gear,
+    etc.'
+  triviaEnglish: One of the most widely used synthetic fibers in the world.
+  eraEnglish: 'Recognized as a marine pollution issue: around the 2010s'

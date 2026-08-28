@@ -23,3 +23,18 @@ MonoBehaviour:
   sources: "\u5BB6\u5EAD\u3054\u307F\n\u98A8\n\u6CB3\u5DDD\n\u707D\u5BB3\u306A\u3069"
   trivia: "\u767A\u6CE1\u30B9\u30C1\u30ED\u30FC\u30EB\u306F\u3001\u305D\u306E\u7D0498\uFF05\u304C\u7A7A\u6C17\u3067\u3067\u304D\u3066\u3044\u307E\u3059\u3002"
   era: "\u5E83\u304F\u4F7F\u308F\u308C\u59CB\u3081\u305F\u5E74\u4EE3\uFF1A1970\u5E74\u4EE3\u3054\u308D"
+  displayNameEnglish: Polystyrene Food Tray
+  descriptionEnglish: A lightweight tray used for food packaging. It can easily float
+    or be carried away by wind and water.
+  decompositionEnglish: About 50 years (estimate)
+  materialsEnglish: Expanded Polystyrene (EPS)
+  sourcesEnglish: 'Household waste
+
+    Wind
+
+    Rivers
+
+    Natural disasters,
+    etc.'
+  triviaEnglish: Polystyrene foam is about 98% air.
+  eraEnglish: 'Widely used since: around the 1970s'

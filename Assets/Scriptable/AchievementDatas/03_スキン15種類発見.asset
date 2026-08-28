@@ -16,6 +16,8 @@ MonoBehaviour:
   achievementName: "\u30B9\u30AD\u30F315\u7A2E\u985E\u767A\u898B"
   description: "\u30B9\u30AD\u30F3\u309215\u7A2E\u985E\u89E3\u653E\u3059\u308B"
   conditionType: 0
+  achievementNameEnglish: Discover 10 Skins
+  descriptionEnglish: Unlock 15 Skins
   conditionValue: 15
   hiddenUntilCompleted: 0
   excludedFromRegularCompletion: 0

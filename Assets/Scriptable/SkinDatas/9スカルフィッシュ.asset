@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   id: 9
   skinName: "\u30B9\u30AB\u30EB\u30D5\u30A3\u30C3\u30B7\u30E5"
+  englishSkinName: Skeleton Fish
   skinSprite: {fileID: 4337797771683333630, guid: 941895fbc33a4694ab5c9c473a350728, type: 3}
   iosSkinSprite: {fileID: 0}
-  description: "\u6B7B\u5F8C\u306A\u304A\u3001\u5E83\u3044\u6D77\u3092\u6F02\u3044\u7D9A\u3051\u3066\u3044\u308B\u3002"
+  description: "\u6B7B\u5F8C\u306A\u304A\u3001\u5E83\u3044\u6D77\u3092\n\u6F02\u3044\u7D9A\u3051\u3066\u3044\u308B\u3002"
+  englishDescription: Drifts through the vast ocean, even after death.
   hiddenUntilUnlocked: 1
   countsTowardsOriginalCollection: 1
   useCustomDetailBackground: 1

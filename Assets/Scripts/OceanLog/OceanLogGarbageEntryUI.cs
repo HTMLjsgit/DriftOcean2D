@@ -20,8 +20,18 @@ public class OceanLogGarbageEntryUI : MonoBehaviour
 
         _garbageImage.sprite = data.GetEncyclopediaSprite();
         _garbageImage.color = discovered ? Color.white : new Color(0.2f, 0.2f, 0.2f, 0.65f);
-        _nameText.SetText(discovered ? data.displayName : "???");
-        _eraText.SetText(discovered ? data.era : "???");
+        
+        if (Application.systemLanguage == SystemLanguage.Japanese)
+        {
+            _nameText.SetText(discovered ? data.displayName : "???");
+            _eraText.SetText(discovered ? data.era : "???");
+        }
+        else
+        {
+            _nameText.SetText(discovered ? data.displayNameEnglish : "???");
+            _eraText.SetText(discovered ? data.eraEnglish : "???");
+        }
+        
         _newText.gameObject.SetActive(isNew);
         _button.interactable = discovered;
 
