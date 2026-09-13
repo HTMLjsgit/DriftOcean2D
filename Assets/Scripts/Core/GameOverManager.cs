@@ -11,6 +11,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _noAddText;
     [SerializeField] private Button _backToTitleButton;
     [SerializeField] private TextMeshProUGUI _scoreText;
+    [SerializeField] private TextMeshProUGUI _planktonCountText;
 
     [Header("Result Summary")]
     [SerializeField] private TextMeshProUGUI _resultCommentText;
@@ -113,6 +114,16 @@ public class GameOverManager : MonoBehaviour
         if (_gameOverPanel != null)
         {
             _gameOverPanel.SetActive(true);
+        }
+
+        if (OceanLifeManager.instance != null)
+        {
+            OceanLifeManager.instance.EndRun();
+        }
+        if (_planktonCountText != null)
+        {
+            int count = OceanLifeManager.instance != null ? OceanLifeManager.instance.PlanktonCount : 0;
+            _planktonCountText.text = $"PLANKTON × {count}";
         }
 
         UpdateContinueButton();

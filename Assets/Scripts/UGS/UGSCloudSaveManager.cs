@@ -429,13 +429,21 @@ public class UGSCloudSaveManager : MonoBehaviour
     /// </summary>
     public async Task<bool> SetPlayerName(string newName)
     {
-        if (_playerData == null) return false;
+        if (_playerData == null || !PlayerNameFilter.IsAllowed(newName)) return false;
 
-        _playerData.playerName = newName;
+        // SavePlayerData may enter offline mode and replace _playerData while awaiting the request.
+        PlayerCloudData dataBeingSaved = _playerData;
+        string previousName = dataBeingSaved.playerName;
+        dataBeingSaved.playerName = string.IsNullOrWhiteSpace(newName) ? PlayerNameFilter.DefaultName : newName.Trim();
         bool saved = await SavePlayerData();
         if (saved)
         {
             WasPlayerDataCreatedThisSession = false;
+            if (PlayerNameManager.instance != null) PlayerNameManager.instance.SyncFromUGS(dataBeingSaved.playerName);
+        }
+        else
+        {
+            dataBeingSaved.playerName = previousName;
         }
 
         return saved;

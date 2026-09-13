@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cac333f1044c7a046ab53f878912d157, type: 3}
+  m_Name: OceanLifeSettings
+  m_EditorClassIdentifier: Assembly-CSharp::OceanLifeSettings
+  spawnIntervalByYear:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 1950
+      value: 0.65
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1970
+      value: 0.9
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1990
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 2020
+      value: 2.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 2050
+      value: 4
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  groupChance: 0.7
+  minGroupSize: 3
+  maxGroupSize: 7
+  groupSpacing: 0.4
+  driftSpeed: 1
+  verticalDrift: 0.06
+  minViewportY: 0.14
+  maxViewportY: 0.87
+  maxActivePlankton: 100
+  colors:
+  - label: "\u767D\u30FB\u900F\u660E"
+    color: {r: 1, g: 1, b: 1, a: 0.85}
+    weight: 40
+  - label: "\u9EC4\u7DD1"
+    color: {r: 0.72, g: 1, b: 0.42, a: 1}
+    weight: 20
+  - label: "\u6C34\u8272"
+    color: {r: 0.45, g: 0.9, b: 1, a: 1}
+    weight: 15
+  - label: "\u9EC4\u8272"
+    color: {r: 1, g: 0.94, b: 0.35, a: 1}
+    weight: 8
+  - label: "\u30AA\u30EC\u30F3\u30B8"
+    color: {r: 1, g: 0.65, b: 0.3, a: 1}
+    weight: 5
+  - label: "\u8336\u8272"
+    color: {r: 0.7, g: 0.47, b: 0.27, a: 1}
+    weight: 3
+  - label: "\u7D2B"
+    color: {r: 0.75, g: 0.5, b: 1, a: 1}
+    weight: 4
+  - label: "\u30D4\u30F3\u30AF"
+    color: {r: 1, g: 0.62, b: 0.83, a: 1}
+    weight: 5
+  planktonPerFish: 100
+  maxFish: 3
+  formationOffsets:
+  - {x: -0.45, y: 0.3}
+  - {x: -0.7, y: 0}
+  - {x: -0.48, y: -0.3}
+  followDelay: 0.18
+  additionalDelayPerFish: 0.08
+  joinSpeed: 3
+  followSmoothTime: 0.1
+  farewellPause: 0.3
+  escapeSpeed: 4.5

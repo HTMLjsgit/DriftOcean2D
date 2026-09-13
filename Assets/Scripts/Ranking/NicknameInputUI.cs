@@ -79,6 +79,15 @@ public class NicknameInputUI : MonoBehaviour
         _inputPanel.SetActive(true);
 
         // メッセージ設定
+        // Older scene/prefab overrides contain large negative margins. Keep validation text inside the panel.
+        _messageText.rectTransform.anchoredPosition = new Vector2(-97f, 70f);
+        _messageText.rectTransform.sizeDelta = new Vector2(560f, 90f);
+        _messageText.margin = Vector4.zero;
+        _messageText.enableAutoSizing = true;
+        _messageText.fontSizeMin = 24f;
+        _messageText.fontSizeMax = 36f;
+        _messageText.alignment = TextAlignmentOptions.Center;
+        _messageText.textWrappingMode = TextWrappingModes.Normal;
         _messageText.text = message;
 
         // InputFieldに現在の名前を設定（UGSから取得、常に使用）
@@ -114,6 +123,16 @@ public class NicknameInputUI : MonoBehaviour
         if (string.IsNullOrEmpty(inputName))
         {
             inputName = _defaultName;
+        }
+
+        if (!PlayerNameFilter.IsAllowed(inputName))
+        {
+            _messageText.text = Application.systemLanguage == SystemLanguage.Japanese
+                ? "この名前には使用できない言葉が含まれています。別の名前を入力してください。"
+                : "This name contains a word that cannot be used. Please choose another name.";
+            _nameInputField.Select();
+            _nameInputField.ActivateInputField();
+            return;
         }
 
         // コールバック実行

@@ -46,6 +46,8 @@ public class PlayerNameManager : MonoBehaviour
     /// <param name="playerName">保存する名前</param>
     public void SavePlayerName(string playerName)
     {
+        if (!PlayerNameFilter.IsAllowed(playerName)) return;
+        playerName = playerName?.Trim();
         // 空の場合はデフォルト名を使用
         if (string.IsNullOrEmpty(playerName))
         {

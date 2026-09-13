@@ -55,6 +55,7 @@ public class RankingUIManager : MonoBehaviour
     private UGSRankingEntry _playerWeeklyEntry;
     private UGSRankingEntry _playerDailyEntry;
     private TextMeshProUGUI _rankingTypeSwitchLabel;
+    private bool _isChangingName;
 
     private enum RankingType
     {
@@ -357,9 +358,9 @@ public class RankingUIManager : MonoBehaviour
             ? currentPlayerEntry.score
             : (_cloudSaveManager != null ? _cloudSaveManager.GetDisplayBestScore() : 0f);
 
-        string playerName = currentPlayerEntry != null && !string.IsNullOrWhiteSpace(currentPlayerEntry.playerName)
-            ? currentPlayerEntry.playerName
-            : (_cloudSaveManager != null ? _cloudSaveManager.GetPlayerName() : "Player");
+        // This label describes the current player. Ranking rows retain their recorded names.
+        string playerName = _cloudSaveManager != null ? _cloudSaveManager.GetPlayerName()
+            : (_playerNameManager != null ? _playerNameManager.GetPlayerName() : PlayerNameFilter.DefaultName);
 
         int currentSkinID = currentPlayerEntry != null
             ? currentPlayerEntry.skinID
@@ -369,7 +370,8 @@ public class RankingUIManager : MonoBehaviour
 
         if (_yourNameText != null)
         {
-            _yourNameText.text = playerName;
+            _yourNameText.richText = false;
+            _yourNameText.text = PlayerNameFilter.DisplayName(playerName);
         }
 
         if (_yourScoreText != null)
@@ -460,15 +462,19 @@ public class RankingUIManager : MonoBehaviour
 
     private async void OnNameChanged(string newName)
     {
-        if (IsOfflineModeActive() || _cloudSaveManager == null)
+        if (_isChangingName || IsOfflineModeActive() || _cloudSaveManager == null || !PlayerNameFilter.IsAllowed(newName))
         {
             return;
         }
 
+        _isChangingName = true;
+        UpdateOfflineModeUI();
         try
         {
             var token = _cancellationTokenSource.Token;
-            bool success = await _cloudSaveManager.SetPlayerName(newName);
+            Task<bool> saving = _cloudSaveManager.SetPlayerName(newName);
+            UpdateYourHighScore();
+            bool success = await saving;
 
             token.ThrowIfCancellationRequested();
 
@@ -486,6 +492,11 @@ public class RankingUIManager : MonoBehaviour
         catch (System.Exception e)
         {
             Debug.LogError($"[RankingUIManager] Error in OnNameChanged: {e.Message}\n{e.StackTrace}");
+        }
+        finally
+        {
+            _isChangingName = false;
+            if (this != null) UpdateOfflineModeUI();
         }
     }
 
@@ -558,7 +569,7 @@ public class RankingUIManager : MonoBehaviour
 
         if (_changeNameButton != null)
         {
-            _changeNameButton.interactable = !isOffline;
+            _changeNameButton.interactable = !isOffline && !_isChangingName;
         }
 
         if (_rankingTypeSwitchButton != null)

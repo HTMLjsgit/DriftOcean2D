@@ -67,7 +67,7 @@ public class RankingManager : MonoBehaviour
     public bool TryAddScore(string playerName, float score, int skinID)
     {
         // 登録
-        RankingEntry newEntry = new RankingEntry(playerName, score, skinID);
+        RankingEntry newEntry = new RankingEntry(PlayerNameFilter.DisplayName(playerName), score, skinID);
         currentRanking.Add(newEntry);
 
         // ソート（降順）

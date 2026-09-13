@@ -80,6 +80,13 @@ public class StageBGMManager : MonoBehaviour
     /// <param name="volume">音量（0.0～1.0）</param>
     private void PlayBGMImmediate(AudioClip clip, float volume)
     {
+        // Also supports the optional build without the opening BGM.
+        if (clip == null)
+        {
+            _currentAudioSource.Stop();
+            _currentAudioSource.clip = null;
+            return;
+        }
         if (_currentAudioSource.clip == clip && _currentAudioSource.isPlaying)
         {
             return; // 既に同じBGMが再生中

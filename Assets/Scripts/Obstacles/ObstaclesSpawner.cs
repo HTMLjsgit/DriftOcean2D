@@ -21,6 +21,7 @@ public class ObstaclesSpawner : MonoBehaviour
     [SerializeField] private float _spawnTimeNow;
 
     private float _globalSpeedMultiplier = 1.0f;
+    public float SpeedMultiplier => _globalSpeedMultiplier;
 
     void Awake()
     {

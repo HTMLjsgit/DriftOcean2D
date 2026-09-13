@@ -68,7 +68,7 @@ public class UGSLeaderboardManager : MonoBehaviour
 
         var metadata = new Dictionary<string, string>
         {
-            { "playerName", _cloudSaveManager.GetPlayerName() },
+            { "playerName", PlayerNameFilter.DisplayName(_cloudSaveManager.GetPlayerName()) },
             { "skinID", _cloudSaveManager.GetCurrentSkinID().ToString() }
         };
 

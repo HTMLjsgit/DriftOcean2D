@@ -57,6 +57,7 @@ public class StageManager : MonoBehaviour
         // 1. まずリセット処理を行う（Time.timeScale = 0 のままでOK）
         currentPlayTime = 0;
         _scoreManager.ScoreMeasureInit();
+        if (OceanLifeManager.instance != null) OceanLifeManager.instance.ResetRun();
         _obstaclesSpawner.ClearAllObstacles();
         _obstaclesSpawner.spawn = false;
 
@@ -79,6 +80,7 @@ public class StageManager : MonoBehaviour
     }
     public void StageResume()
     {
+        if (OceanLifeManager.instance != null) OceanLifeManager.instance.ResumeRun();
         // Init（初期化）は呼ばずに、計測だけ再開する
         _scoreManager.ScoreMeasureStart();
         _obstaclesSpawner.spawn = true;
