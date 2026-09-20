@@ -69,9 +69,13 @@ MonoBehaviour:
   groupSpacing: 0.4
   driftSpeed: 1
   verticalDrift: 0.06
+  verticalDriftStopYear: 1990
   minViewportY: 0.14
   maxViewportY: 0.87
   maxActivePlankton: 100
+  attractionRadius: 0.7
+  attractionSpeed: 4
+  attractionAcceleration: 12
   colors:
   - label: "\u767D\u30FB\u900F\u660E"
     color: {r: 1, g: 1, b: 1, a: 0.85}
@@ -107,5 +111,5 @@ MonoBehaviour:
   additionalDelayPerFish: 0.08
   joinSpeed: 3
   followSmoothTime: 0.1
-  farewellPause: 0.3
+  farewellPause: 2
   escapeSpeed: 4.5

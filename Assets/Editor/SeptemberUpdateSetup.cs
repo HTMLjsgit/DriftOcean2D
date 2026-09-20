@@ -64,7 +64,7 @@ public static class SeptemberUpdateSetup
         var gameOver = InScene<GameOverManager>(scene);
         var serialized = new SerializedObject(gameOver);
         var panel = (GameObject)serialized.FindProperty("_gameOverPanel").objectReferenceValue;
-        var countTransform = panel.transform.Find("PlanktonCountText");
+        var countTransform = panel.transform.Find("ScoreResult/PlanktonCountText") ?? panel.transform.Find("PlanktonCountText");
         TextMeshProUGUI count;
         if (countTransform == null)
         {
@@ -74,34 +74,101 @@ public static class SeptemberUpdateSetup
         }
         else count = countTransform.GetComponent<TextMeshProUGUI>();
         count.text = "PLANKTON × 0";
-        var score = (TextMeshProUGUI)serialized.FindProperty("_scoreText").objectReferenceValue;
-        score.rectTransform.anchoredPosition = new Vector2(0f, 45f);
-        var notice = (GameObject)serialized.FindProperty("_unlockNoticePanel").objectReferenceValue;
-        var noticeRect = notice.GetComponent<RectTransform>();
-        noticeRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 80f);
-        float currentNoticeY = panel.transform.InverseTransformPoint(noticeRect.TransformPoint(noticeRect.rect.center)).y;
-        noticeRect.anchoredPosition += new Vector2(0f, 120f - currentNoticeY);
-        var noticeText = (TextMeshProUGUI)serialized.FindProperty("_unlockNoticeText").objectReferenceValue;
-        noticeText.enableAutoSizing = true;
-        noticeText.fontSizeMin = 20f;
-        noticeText.fontSizeMax = 24f;
-        count.fontSize = 34f;
-        count.enableAutoSizing = true;
-        count.fontSizeMin = 26f;
-        count.fontSizeMax = 34f;
-        count.alignment = TextAlignmentOptions.Center;
-        count.raycastTarget = false;
-        count.rectTransform.anchorMin = count.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        count.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        count.rectTransform.anchoredPosition = new Vector2(0f, 185f);
-        count.rectTransform.sizeDelta = new Vector2(520f, 50f);
         SetObject(gameOver, "_planktonCountText", count);
+        ConfigureResultLayout(gameOver, count);
         PrefabUtility.RecordPrefabInstancePropertyModifications(existing);
         PrefabUtility.RecordPrefabInstancePropertyModifications(gameOver);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
         Debug.Log("[SeptemberUpdate] Main scene, sprites, prefabs and filter settings are ready.");
+    }
+
+    [MenuItem("DriftOcean/September Update/Apply Feedback Layout")]
+    public static void ApplyFeedbackLayout()
+    {
+        if (EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play mode before changing scene assets.");
+        var scene = SceneManager.GetSceneByPath("Assets/Scenes/Main.unity");
+        if (!scene.isLoaded) scene = EditorSceneManager.OpenScene("Assets/Scenes/Main.unity", OpenSceneMode.Additive);
+        var gameOver = InScene<GameOverManager>(scene);
+        var serialized = new SerializedObject(gameOver);
+        var count = (TextMeshProUGUI)serialized.FindProperty("_planktonCountText").objectReferenceValue;
+        ConfigureResultLayout(gameOver, count);
+        ConnectOceanLogDetailLabels();
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+    }
+
+    private static void ConfigureResultLayout(GameOverManager gameOver, TextMeshProUGUI count)
+    {
+        var serialized = new SerializedObject(gameOver);
+        var score = (TextMeshProUGUI)serialized.FindProperty("_scoreText").objectReferenceValue;
+        var card = (RectTransform)score.transform.parent;
+        CenterRect(score.rectTransform, new Vector2(0f, 0f), new Vector2(520f, 90f));
+        score.margin = Vector4.zero;
+        score.alignment = TextAlignmentOptions.Center;
+        score.enableAutoSizing = true;
+        score.fontSizeMin = 38f;
+        score.fontSizeMax = 76f;
+        score.textWrappingMode = TextWrappingModes.NoWrap;
+        score.text = "2000.39年";
+
+        count.rectTransform.SetParent(card, false);
+        CenterRect(count.rectTransform, new Vector2(0f, -90f), new Vector2(520f, 44f));
+        count.margin = Vector4.zero;
+        count.enableAutoSizing = true;
+        count.fontSizeMin = 26f;
+        count.fontSizeMax = 34f;
+        count.alignment = TextAlignmentOptions.Center;
+        count.textWrappingMode = TextWrappingModes.NoWrap;
+        count.raycastTarget = false;
+
+        var notice = (GameObject)serialized.FindProperty("_unlockNoticePanel").objectReferenceValue;
+        CenterRect(notice.GetComponent<RectTransform>(), new Vector2(0f, -142f), new Vector2(520f, 48f));
+        var noticeText = (TextMeshProUGUI)serialized.FindProperty("_unlockNoticeText").objectReferenceValue;
+        noticeText.margin = Vector4.zero;
+        noticeText.rectTransform.offsetMin = new Vector2(38f, 0f);
+        noticeText.rectTransform.offsetMax = new Vector2(-10f, 0f);
+        noticeText.enableAutoSizing = true;
+        noticeText.fontSizeMin = 20f;
+        noticeText.fontSizeMax = 24f;
+        var icon = notice.transform.Find("UnlockImage") as RectTransform;
+        if (icon != null) CenterRect(icon, new Vector2(-240f, 0f), new Vector2(24f, 24f));
+
+        foreach (var target in new UnityEngine.Object[] { score, score.rectTransform, count, count.rectTransform,
+            notice.GetComponent<RectTransform>(), noticeText, noticeText.rectTransform, icon })
+        {
+            if (target == null) continue;
+            EditorUtility.SetDirty(target);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+        }
+    }
+
+    private static void CenterRect(RectTransform rect, Vector2 position, Vector2 size)
+    {
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+        rect.localScale = Vector3.one;
+    }
+
+    private static void ConnectOceanLogDetailLabels()
+    {
+        const string path = "Assets/Prefabs/UI/OceanLogFeature.prefab";
+        var root = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            var ui = root.GetComponent<OceanLogUI>();
+            var serialized = new SerializedObject(ui);
+            var panel = (GameObject)serialized.FindProperty("_detailPanel").objectReferenceValue;
+            var labels = panel.GetComponentsInChildren<TextMeshProUGUI>(true);
+            SetObject(ui, "_detailDecompositionLabel", labels.First(t => t.transform.parent.name == "DecompositionHeader"));
+            SetObject(ui, "_detailMaterialsLabel", labels.First(t => t.transform.parent.name == "MaterialsHeader"));
+            SetObject(ui, "_detailSourcesLabel", labels.First(t => t.transform.parent.name == "SourcesHeader"));
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+        }
+        finally { PrefabUtility.UnloadPrefabContents(root); }
     }
 
     private static T InScene<T>(Scene scene) where T : Component

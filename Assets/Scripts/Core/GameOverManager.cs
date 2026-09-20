@@ -133,7 +133,8 @@ public class GameOverManager : MonoBehaviour
 
         if (_scoreText != null)
         {
-            _scoreText.SetText(finalScore.ToString("F2"));
+            _scoreText.SetText(finalScore.ToString("F2") +
+                (Application.systemLanguage == SystemLanguage.Japanese ? "年" : " years"));
         }
 
         int resultYear = Mathf.FloorToInt(finalScore);

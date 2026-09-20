@@ -14,9 +14,15 @@ public class OceanLifeSettings : ScriptableObject
     [Min(0.1f)] public float groupSpacing = 0.4f;
     [Min(0.1f)] public float driftSpeed = 1f;
     [Range(0f, 0.4f)] public float verticalDrift = 0.06f;
+    public float verticalDriftStopYear = 1990f;
     [Range(0f, 1f)] public float minViewportY = 0.14f;
     [Range(0f, 1f)] public float maxViewportY = 0.87f;
     [Min(8)] public int maxActivePlankton = 100;
+
+    [Header("Plankton / 吸い寄せ")]
+    [Min(0f)] public float attractionRadius = 0.7f;
+    [Min(0.1f)] public float attractionSpeed = 4f;
+    [Min(0.1f)] public float attractionAcceleration = 12f;
 
     [Header("Plankton / 色と出現比率")]
     public PlanktonColorWeight[] colors =
@@ -42,7 +48,7 @@ public class OceanLifeSettings : ScriptableObject
     [Range(0f, 0.2f)] public float additionalDelayPerFish = 0.08f;
     [Min(0.1f)] public float joinSpeed = 3f;
     [Min(0.02f)] public float followSmoothTime = 0.1f;
-    [Min(0f)] public float farewellPause = 0.3f;
+    [Min(0f)] public float farewellPause = 2f;
     [Min(0.1f)] public float escapeSpeed = 4.5f;
 
     public float GetSpawnInterval(float year)

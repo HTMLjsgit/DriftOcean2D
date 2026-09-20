@@ -29,6 +29,9 @@ public class OceanLifeManager : MonoBehaviour
     public int PlanktonCount => _progress.PlanktonCount;
     public int FishCount => _followers.Count;
     public OceanLifeSettings Settings => _settings;
+    public PlayerController Player => _player;
+    public bool VerticalDriftEnabled => ScoreManager.instance == null ||
+        ScoreManager.instance.currentScore < _settings.verticalDriftStopYear;
     public bool IsPlaying => GameManager.instance != null &&
         GameManager.instance.state == GameManager.GameState.Playing && Time.timeScale > 0f;
 

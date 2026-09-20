@@ -123,8 +123,11 @@ MonoBehaviour:
   _detailNameText: {fileID: 2272271569756326107}
   _detailDescriptionText: {fileID: 8695112960898815186}
   _detailDecompositionText: {fileID: 5592110556554931226}
+  _detailDecompositionLabel: {fileID: 5221232780545300763}
   _detailMaterialsText: {fileID: 5163950302262645005}
+  _detailMaterialsLabel: {fileID: 869572899667632884}
   _detailSourcesText: {fileID: 6660094757449885899}
+  _detailSourcesLabel: {fileID: 4486164727993829422}
   _detailTriviaText: {fileID: 5085264828442874830}
   _detailEraText: {fileID: 3573499584103849790}
 --- !u!1 &133784423071978892
