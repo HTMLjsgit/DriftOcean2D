@@ -40,7 +40,7 @@ public class PlanktonPickup : MonoBehaviour
         _body.linearVelocity = Vector2.zero;
         _body.simulated = true;
         _collider.enabled = true;
-        _renderer.color = color;
+        _renderer.color = new Color(color.r, color.g, color.b, color.a * 0.5f);
         if (_glow != null) _glow.color = new Color(color.r, color.g, color.b, color.a * 0.16f);
         gameObject.SetActive(true);
     }
@@ -71,7 +71,7 @@ public class PlanktonPickup : MonoBehaviour
         position.x -= _speed * Time.fixedDeltaTime;
         // At the cutoff, keep the current height so stopping the sway does not cause a jump.
         if (_owner.VerticalDriftEnabled)
-            position.y = _baseY + Mathf.Sin(_age * 1.4f + _phase) * settings.verticalDrift;
+            position.y = _baseY + Mathf.Sin(_age * 0.0f + _phase) * settings.verticalDrift;
         _body.MovePosition(position);
         if (position.x < _despawnX) _owner.Recycle(this);
     }

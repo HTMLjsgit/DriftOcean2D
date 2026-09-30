@@ -104,8 +104,8 @@ MonoBehaviour:
   planktonPerFish: 100
   maxFish: 3
   formationOffsets:
-  - {x: -0.45, y: 0.3}
-  - {x: -0.7, y: 0}
+  - {x: -0.5, y: 0.35}
+  - {x: -0.65, y: -0.05}
   - {x: -0.48, y: -0.3}
   followDelay: 0.18
   additionalDelayPerFish: 0.08

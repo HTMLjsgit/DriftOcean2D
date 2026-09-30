@@ -42,7 +42,9 @@ public class OceanLifeSettings : ScriptableObject
     [Range(1, 3)] public int maxFish = 3;
     public Vector2[] formationOffsets =
     {
-        new Vector2(-0.45f, 0.3f), new Vector2(-0.7f, 0f), new Vector2(-0.48f, -0.3f)
+             new Vector2(-0.50f, 0.35f),   // 1匹目
+             new Vector2(-0.65f, -0.05f), // 2匹目
+             new Vector2(-0.40f, -0.3f)   // 3匹目
     };
     [Range(0.02f, 0.6f)] public float followDelay = 0.18f;
     [Range(0f, 0.2f)] public float additionalDelayPerFish = 0.08f;

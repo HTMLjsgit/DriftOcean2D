@@ -117,7 +117,7 @@ public class OceanLifeManager : MonoBehaviour
         Vector2 start = ViewportPoint(1f, Random.Range(_settings.minViewportY, _settings.maxViewportY));
         start.x += 0.3f;
         float phase = Random.Range(0f, Mathf.PI * 2f);
-        float speed = _settings.driftSpeed * (ObstaclesSpawner.instance != null ? ObstaclesSpawner.instance.SpeedMultiplier : 1f);
+        float speed = _settings.driftSpeed * 0.8f * (ObstaclesSpawner.instance != null ? ObstaclesSpawner.instance.SpeedMultiplier : 1f);
         float despawnX = ViewportPoint(0f, 0f).x - 0.5f;
         for (int i = 0; i < count && _activePlankton.Count < _settings.maxActivePlankton; i++)
         {
