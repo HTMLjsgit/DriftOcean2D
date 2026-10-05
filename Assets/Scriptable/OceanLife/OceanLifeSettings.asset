@@ -74,7 +74,7 @@ MonoBehaviour:
   maxViewportY: 0.87
   maxActivePlankton: 100
   attractionRadius: 0.7
-  attractionSpeed: 4
+  attractionSpeed: 5
   attractionAcceleration: 12
   colors:
   - label: "\u767D\u30FB\u900F\u660E"
